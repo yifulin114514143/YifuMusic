@@ -45,6 +45,10 @@ const ConfigBridge = {
     return this.config;
   },
 
+  async getStorageDir(): Promise<string> {
+    return '/tmp/yifumusic';
+  },
+
   async get<T extends keyof Config>(key: T): Promise<Config[T]> {
     const config = await this.getAll();
     return config[key];

@@ -174,6 +174,11 @@ async fn scan_library<R: Runtime>(
         .filter_map(Result::ok)
         .collect::<Vec<Track>>();
 
+    let imported_track_paths = tracks
+        .iter()
+        .map(|track| PathBuf::from(track.path.as_str()))
+        .collect::<Vec<_>>();
+
     let track_failures = track_paths.len() - tracks.len();
     scan_result.track_count = tracks.len();
     scan_result.track_failures = track_failures;
@@ -190,6 +195,20 @@ async fn scan_library<R: Runtime>(
         db.update_tracks(tracks).await?;
     } else {
         db.insert_tracks(tracks).await?;
+    }
+
+    let persisted_track_paths = db
+        .get_all_track_paths()
+        .await?
+        .into_iter()
+        .map(PathBuf::from)
+        .collect::<HashSet<_>>();
+
+    let asset_protocol_scope = window.app_handle().asset_protocol_scope();
+    for track_path in imported_track_paths {
+        if persisted_track_paths.contains(&track_path) {
+            asset_protocol_scope.allow_file(track_path)?;
+        }
     }
 
     db_insert_logger.complete();
@@ -483,6 +502,33 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                         return;
                     }
                 };
+
+                let mut db = db;
+                let tracks = match db.get_all_tracks().await {
+                    Ok(tracks) => tracks,
+                    Err(err) => {
+                        handle_fatal_error(&app_handle, err);
+                        return;
+                    }
+                };
+
+                let asset_protocol_scope = app_handle.asset_protocol_scope();
+                for track in tracks {
+                    let track_path = PathBuf::from(track.path);
+                    let track_id = match get_track_id_for_path(&track_path) {
+                        Ok(track_id) => track_id,
+                        Err(_) => continue,
+                    };
+
+                    if track_id != track.id {
+                        warn!("Skipping asset protocol access for a library track with a mismatched identifier");
+                        continue;
+                    }
+
+                    if asset_protocol_scope.allow_file(track_path).is_err() {
+                        warn!("Failed to grant asset protocol access to an existing library track");
+                    }
+                }
 
                 app_handle.manage(DBState(Mutex::new(db)));
             });

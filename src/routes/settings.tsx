@@ -2,10 +2,10 @@ import { Trans } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { getTauriVersion, getVersion } from '@tauri-apps/api/app';
-import { invoke } from '@tauri-apps/api/core';
 
 import { SettingsNav, SettingsNavLink } from '../elements/SettingsNav';
 import View from '../elements/View';
+import ConfigBridge from '../lib/bridge-config';
 export const Route = createFileRoute('/settings')({
   component: ViewSettings,
   beforeLoad: async ({ location }) => {
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/settings')({
     const [version, tauriVersion, appStorageDir] = await Promise.all([
       getVersion(),
       getTauriVersion(),
-      invoke<string>('plugin:config|get_storage_dir'),
+      ConfigBridge.getStorageDir(),
     ]);
 
     return { version, tauriVersion, appStorageDir };

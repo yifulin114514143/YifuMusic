@@ -1,9 +1,9 @@
-import { convertFileSrc, invoke } from '@tauri-apps/api/core';
+import { convertFileSrc } from '@tauri-apps/api/core';
+
+import CoverBridge from './bridge-cover';
 
 export async function getCover(path: string): Promise<string | null> {
-  const cover = await invoke<string | null>('plugin:cover|get_cover', {
-    path,
-  });
+  const cover = await CoverBridge.get(path);
 
   if (cover === null) {
     return null;

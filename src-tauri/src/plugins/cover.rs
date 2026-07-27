@@ -4,8 +4,8 @@ use std::str::FromStr;
 use base64::prelude::{BASE64_STANDARD, Engine as _};
 use lofty::file::TaggedFileExt;
 use lofty::picture::{MimeType, PictureType};
-use tauri::Runtime;
 use tauri::plugin::{Builder, TauriPlugin};
+use tauri::{AppHandle, Manager, Runtime};
 
 use crate::libs::error::AnyResult;
 use crate::libs::utils::scan_dir;
@@ -66,14 +66,26 @@ fn get_cover_from_filesystem(path: String) -> Option<String> {
 }
 
 #[tauri::command]
-pub async fn get_cover(path: String) -> AnyResult<Option<String>> {
+pub async fn get_cover<R: Runtime>(
+    app_handle: AppHandle<R>,
+    path: String,
+) -> AnyResult<Option<String>> {
+    let asset_protocol_scope = app_handle.asset_protocol_scope();
+    if !asset_protocol_scope.is_allowed(PathBuf::from(path.as_str())) {
+        return Ok(None);
+    }
+
     // 1. Try to get the Cover from the ID3 tag
-    match get_cover_from_id3(path.clone()) {
-        Some(path) => Ok(Some(path)),
+    let cover = get_cover_from_id3(path.clone())
         // 2. Cover was not found, so let's fallback to scanning the directory
         // for a valid cover file
-        None => Ok(get_cover_from_filesystem(path)),
+        .or_else(|| get_cover_from_filesystem(path));
+
+    if let Some(cover_path) = cover.as_deref().filter(|cover| !cover.starts_with("data:")) {
+        asset_protocol_scope.allow_file(PathBuf::from(cover_path))?;
     }
+
+    Ok(cover)
 }
 
 /**

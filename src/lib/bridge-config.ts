@@ -24,6 +24,10 @@ const ConfigBridge = {
     return invoke('plugin:config|get_config');
   },
 
+  async getStorageDir(): Promise<string> {
+    return invoke('plugin:config|get_storage_dir');
+  },
+
   async get<T extends keyof Config>(key: T): Promise<Config[T]> {
     const config = await this.getAll();
     return config[key];

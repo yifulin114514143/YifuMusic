@@ -43,7 +43,7 @@ function ViewSettingsAbout() {
           </ExternalLink>
           {' - '}
           <ExternalLink
-            href={`https://github.com/yifulin114514143/YifuMusic/releases/tag/${version}`}
+            href="https://github.com/yifulin114514143/YifuMusic/releases"
             type="url"
           >{t`release notes`}</ExternalLink>
         </Setting.Description>

@@ -4,29 +4,45 @@
   "description": "Capability for the main window",
   "windows": ["main"],
   "permissions": [
-    "core:app:default",
-    "core:event:default",
-    "core:menu:default",
-    "core:path:default",
-    "core:resources:default",
-    "core:window:default",
-    "core:window:allow-show",
+    "core:app:allow-version",
+    "core:app:allow-tauri-version",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:menu:allow-new",
+    "core:menu:allow-popup",
+    "core:window:allow-is-minimized",
+    "core:window:allow-is-focused",
+    "core:window:allow-theme",
     "core:window:allow-start-dragging",
     "core:window:allow-set-theme",
-    "core:webview:deny-print",
+    "core:window:allow-internal-toggle-maximize",
     "core:webview:allow-set-webview-zoom",
-    "shell:allow-open",
     "clipboard-manager:allow-write-text",
     "dialog:allow-open",
     "dialog:allow-ask",
     "fs:allow-lstat",
-    "opener:allow-open-url",
-    "opener:allow-default-urls",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://github.com/yifulin114514143/YifuMusic"
+        },
+        {
+          "url": "https://github.com/yifulin114514143/YifuMusic/releases"
+        },
+        {
+          "url": "https://github.com/yifulin114514143/YifuMusic/graphs/contributors"
+        },
+        {
+          "url": "https://github.com/yifulin114514143/YifuMusic/issues"
+        }
+      ]
+    },
     "opener:allow-reveal-item-in-dir",
-    "os:allow-os-type",
     "process:allow-restart",
     "log:allow-log",
-    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-notify",
     "app-menu:allow-show",
     "app-menu:allow-hide",
     "app-menu:allow-show-window",
