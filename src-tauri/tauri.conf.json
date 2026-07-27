@@ -1,9 +1,9 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Museeks",
-  "mainBinaryName": "museeks",
+  "productName": "YifuMusic",
+  "mainBinaryName": "yifumusic",
   "version": "0.23.4",
-  "identifier": "io.museeks.app",
+  "identifier": "com.yifulin114514143.yifumusic",
   "build": {
     "beforeDevCommand": "vp run dev",
     "devUrl": "http://localhost:1420",
@@ -35,6 +35,8 @@
   },
   "bundle": {
     "active": true,
+    "publisher": "YifuMusic",
+    "homepage": "https://github.com/yifulin114514143/YifuMusic",
     "category": "Music",
     "targets": ["dmg", "nsis", "appimage", "deb", "rpm"],
     "icon": [
@@ -53,7 +55,7 @@
       },
       "deb": {
         "files": {
-          "/usr/share/metainfo/io.museeks.app.metainfo.xml": "release/flatpak.metainfo.xml"
+          "/usr/share/metainfo/com.yifulin114514143.yifumusic.metainfo.xml": "release/flatpak.metainfo.xml"
         }
       }
     },

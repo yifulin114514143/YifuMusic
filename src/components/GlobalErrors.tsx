@@ -74,7 +74,7 @@ function Issue() {
       <Trans>
         or if it happens again, please{' '}
         <ExternalLink
-          href="https://github.com/martpie/museeks/issues"
+          href="https://github.com/yifulin114514143/YifuMusic/issues"
           type="url"
         >
           report an issue

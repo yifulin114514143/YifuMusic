@@ -102,10 +102,9 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
             let about_metadata = AboutMetadataBuilder::new()
                 .version(version)
-                .authors(Some(vec![package_info.authors.to_string()]))
                 .license("MIT".into())
-                .website("https://museeks.io".into())
-                .website_label("museeks.io".into())
+                .website("https://github.com/yifulin114514143/YifuMusic".into())
+                .website_label("YifuMusic project".into())
                 .icon(Some(icon))
                 .build();
 
@@ -223,7 +222,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
                 #[cfg(target_os = "macos")]
                 {
-                    let museeks_menu = SubmenuBuilder::new(app_handle, "Museeks")
+                    let yifumusic_menu = SubmenuBuilder::new(app_handle, "YifuMusic")
                         .about(Some(about_metadata))
                         .separator()
                         .services()
@@ -235,7 +234,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                         .build()
                         .unwrap();
 
-                    builder.items(&[&museeks_menu])
+                    builder.items(&[&yifumusic_menu])
                 }
 
                 #[cfg(not(target_os = "macos"))]
@@ -306,7 +305,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 "report_an_issue" => {
                     win.app_handle()
                         .opener()
-                        .open_url("https://github.com/martpie/museeks/issues", None::<&str>)
+                        .open_url(
+                            "https://github.com/yifulin114514143/YifuMusic/issues",
+                            None::<&str>,
+                        )
                         .unwrap();
                 }
                 _ => {}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="YifuMusic app icon">
+  <rect x="64" y="64" width="896" height="896" rx="236" fill="#17212F"/>
+  <path d="M274 498C334 418 397 418 457 498C517 578 580 578 640 498" fill="none" stroke="#35C8D1" stroke-linecap="round" stroke-width="76"/>
+  <path d="M640 330V664" fill="none" stroke="#35C8D1" stroke-linecap="round" stroke-width="76"/>
+  <path d="M640 330L786 282V540" fill="none" stroke="#35C8D1" stroke-linecap="round" stroke-linejoin="round" stroke-width="76"/>
+  <ellipse cx="526" cy="700" rx="132" ry="106" fill="#35C8D1" transform="rotate(-22 526 700)"/>
+  <ellipse cx="680" cy="670" rx="112" ry="90" fill="#35C8D1" transform="rotate(-22 680 670)"/>
+  <circle cx="782" cy="286" r="52" fill="#FF7A68"/>
+</svg>

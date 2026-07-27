@@ -49,7 +49,7 @@ fn main() {
                     Target::new(TargetKind::Webview),
                     Target::new(TargetKind::Folder {
                         path: get_storage_dir(),
-                        file_name: Some("museeks".into()),
+                        file_name: Some("yifumusic".into()),
                     }),
                 ])
                 .level(LevelFilter::Info)
@@ -93,7 +93,7 @@ fn main() {
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_state_flags(
-                    StateFlags::all() & !StateFlags::VISIBLE, // Museeks manages its visible state by itself
+                    StateFlags::all() & !StateFlags::VISIBLE, // YifuMusic manages its visible state by itself
                 )
                 .build(),
         );
@@ -114,7 +114,7 @@ fn main() {
             // We intentionally create the window ourselves to set the window theme to the right value
             let window_builder =
                 WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
-                    .title("Museeks")
+                    .title("YifuMusic")
                     .visible(false)
                     .theme(get_theme_from_name(&conf.theme))
                     .inner_size(900.0, 550.0)

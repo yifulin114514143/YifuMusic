@@ -1,12 +1,11 @@
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [package]
-name = "museeks"
+name = "yifumusic"
 version = "0.23.4"
-description = "A simple, clean, and cross-platform music player"
-authors = ["Pierre de la Martinière <pierre.de.la.martiniere@gmail.com>"]
+description = "A local-first, cross-platform music player"
 license = "MIT"
-repository = "https://github.com/martpie/museeks"
+repository = "https://github.com/yifulin114514143/YifuMusic"
 edition = "2024"
 
 [build-dependencies]

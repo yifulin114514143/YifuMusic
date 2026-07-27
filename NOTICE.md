@@ -2,6 +2,8 @@
 
 YifuMusic is a modification of Museeks.
 
+The YifuMusic brand and release identity have been independently established.
+
 Upstream project: https://github.com/martpie/museeks
 
 Museeks is licensed under the MIT License. The root `LICENSE` file retains

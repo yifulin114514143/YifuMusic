@@ -1,0 +1,63 @@
+id: com.yifulin114514143.yifumusic
+
+runtime: org.gnome.Platform
+runtime-version: '48'
+sdk: org.gnome.Sdk
+
+command: yifumusic
+finish-args:
+  # X11 + XShm access
+  - --share=ipc
+  - --socket=fallback-x11
+  # Wayland access
+  - --socket=wayland
+  # OpenGL access
+  - --device=dri
+  # To send and receive notifications
+  - --talk-name=org.freedesktop.Notifications
+  # Network access - to receive and send messages
+  - --share=network
+  # Ensure the app can play audio
+  - --socket=pulseaudio
+  # Webview is black otherwise, may be a Wayland issue
+  - --env=WEBKIT_DISABLE_COMPOSITING_MODE=1
+  # Ensure single-instance works fine
+  - --talk-name=com.yifulin114514143.yifumusic
+  - --own-name=com.yifulin114514143.yifumusic
+
+modules:
+  - name: binary
+    buildsystem: simple
+    sources:
+      - type: file
+        path: ../target/release/bundle/deb/YifuMusic_0.23.4_amd64.deb
+        only-arches:
+          - x86_64
+      - type: file
+        path: ../target/release/bundle/deb/YifuMusic_0.23.4_arm64.deb
+        only-arches:
+          - aarch64
+    build-commands:
+      - set -e
+      # Extract the deb package
+      - mkdir deb-extracted
+      - ar -x *.deb --output deb-extracted
+      - tar -C deb-extracted -xf deb-extracted/data.tar.gz
+
+      # Copy binary
+      - 'install -Dm755 deb-extracted/usr/bin/yifumusic /app/bin/yifumusic'
+
+      # Copy app icons
+      - mkdir -p /app/lib/YifuMusic
+      - cp -r deb-extracted/usr/lib/YifuMusic/. /app/lib/YifuMusic
+      - find /app/lib/YifuMusic -type f -exec chmod 644 {} \;
+
+      # Copy desktop file + ensure the right icon is set
+      - sed -i 's/^Icon=.*/Icon=com.yifulin114514143.yifumusic/' deb-extracted/usr/share/applications/YifuMusic.desktop
+      - install -Dm644 deb-extracted/usr/share/applications/YifuMusic.desktop /app/share/applications/com.yifulin114514143.yifumusic.desktop
+
+      # Copy icons
+      - install -Dm644 deb-extracted/usr/share/icons/hicolor/128x128/apps/yifumusic.png /app/share/icons/hicolor/128x128/apps/com.yifulin114514143.yifumusic.png
+      - install -Dm644 deb-extracted/usr/share/icons/hicolor/32x32/apps/yifumusic.png /app/share/icons/hicolor/32x32/apps/com.yifulin114514143.yifumusic.png
+      - install -Dm644 deb-extracted/usr/share/icons/hicolor/256x256@2/apps/yifumusic.png /app/share/icons/hicolor/256x256@2/apps/com.yifulin114514143.yifumusic.png
+      - install -Dm644 deb-extracted/usr/share/metainfo/com.yifulin114514143.yifumusic.metainfo.xml /app/share/metainfo/com.yifulin114514143.yifumusic.metainfo.xml

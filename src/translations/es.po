@@ -38,12 +38,12 @@ msgstr "La lista \"{name}\" fue creada"
 
 #. placeholder {0}: newRelease.tag_name
 #: src/api/SettingsAPI.ts:168
-msgid "Museeks {0} is available, check https://museeks.io!"
-msgstr "Museeks {0} está disponible, ¡comprueba https://museeks.io!"
+msgid "YifuMusic {0} is available."
+msgstr ""
 
 #: src/api/SettingsAPI.ts:170
-msgid "Museeks {currentVersion} is the latest version available."
-msgstr "Museeks {currentVersion} es la última versión disponible."
+msgid "YifuMusic {currentVersion} is the latest version available."
+msgstr ""
 
 #: src/components/ButtonRepeat.tsx:18
 msgid "Repeat"
@@ -376,9 +376,13 @@ msgstr "Ninguna lista seleccionada"
 msgid "New Playlist"
 msgstr "Nueva Lista"
 
-#: src/routes/settings.about.tsx:36
-msgid "About Museeks"
-msgstr "Acerca de Museeks"
+#: src/routes/settings.about.tsx:33
+msgid "About YifuMusic"
+msgstr ""
+
+#: src/routes/settings.about.tsx:42
+msgid "project repository"
+msgstr ""
 
 #: src/routes/settings.about.tsx:48
 msgid "release notes"
@@ -397,26 +401,22 @@ msgid "Contributors"
 msgstr "Colaboradores"
 
 #: src/routes/settings.about.tsx:72
-msgid "Made with <0/> by Pierre de la Martinière (<1>martpie.io</1>) and a bunch of <2>great people</2>"
-msgstr "Hecho con <0/> por Pierre de la Martinière (<1>martpie.io</1>) y un montón de <2>gente genial</2>"
+msgid "YifuMusic is maintained by <0>project contributors</0>"
+msgstr ""
 
-#: src/routes/settings.about.tsx:88
-msgid "Translations:"
-msgstr "Traducciones:"
-
-#: src/routes/settings.about.tsx:102
+#: src/routes/settings.about.tsx:86
 msgid "Report issue / Ask for a feature"
 msgstr "Reportar error / Pedir una función"
 
-#: src/routes/settings.about.tsx:105
+#: src/routes/settings.about.tsx:89
 msgid "Bugs happen. Please, do not hesitate to report them or to ask for features you would like to see, using the <0>issue tracker</0>."
 msgstr "Los errores ocurren. Por favor, no dudes en reportarlos o pedir funciones que te gustaría ver, usando el <0>gestor de incidencias</0>."
 
-#: src/routes/settings.about.tsx:120
+#: src/routes/settings.about.tsx:104
 msgid "Internals"
 msgstr "Internos"
 
-#: src/routes/settings.about.tsx:125
+#: src/routes/settings.about.tsx:109
 msgid "Open storage directory"
 msgstr "Abrir carpeta de almacenamiento"
 
@@ -453,8 +453,8 @@ msgid "Scan"
 msgstr "Escanear"
 
 #: src/routes/settings.library.tsx:96
-msgid "All track data will be updated from the base files, but your original files won't be modified. Any Museeks-specific edits you may have done will be reset."
-msgstr "Todos los datos de las pistas se actualizarán desde los archivos base, pero tus archivos originales no serán modificados. Cualquier edición específica de Museeks se perderá."
+msgid "All track data will be updated from the base files, but your original files won't be modified. Any YifuMusic-specific edits you may have done will be reset."
+msgstr ""
 
 #: src/routes/settings.library.tsx:98
 msgid "Refresh all tracks?"
@@ -482,16 +482,16 @@ msgid "Danger zone"
 msgstr "Zona de peligro"
 
 #: src/routes/settings.library.tsx:132
-msgid "Delete all tracks and playlists from Museeks."
-msgstr "Eliminar todas las pistas y listas de Museeks."
+msgid "Delete all tracks and playlists from YifuMusic."
+msgstr ""
 
 #: src/routes/settings.library.tsx:137
 msgid "Fully reset the library"
 msgstr "Reiniciar totalmente la biblioteca"
 
 #: src/routes/settings.library.tsx:141
-msgid "All your tracks and playlists will be deleted from Museeks."
-msgstr "Todas tus pistas y listas serán eliminadas de Museeks."
+msgid "All your tracks and playlists will be deleted from YifuMusic."
+msgstr ""
 
 #: src/routes/settings.library.tsx:143
 msgid "Reset library?"

@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.museeks.app</id>
-  <launchable type="desktop-id">io.museeks.app.desktop</launchable>
+  <id>com.yifulin114514143.yifumusic</id>
+  <launchable type="desktop-id">com.yifulin114514143.yifumusic.desktop</launchable>
 
-  <name>Museeks</name>
-  <summary>A simple, clean, and cross-platform music player</summary>
+  <name>YifuMusic</name>
+  <summary>A local-first, cross-platform music player</summary>
 
-  <developer id="io.martpie">
-    <name>Pierre de la Martinière</name>
+  <developer id="com.yifulin114514143">
+    <name>YifuMusic</name>
   </developer>
-  <developer_name>Pierre de la Martinière</developer_name>
 
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
@@ -17,34 +16,13 @@
 
   <description>
     <p>
-      Museeks aims to be a simple and easy to use music player with a clean UI. You will not find tons of features, as it goal is not to compete with more complete and more famous music players.
+      YifuMusic is a local-first music player for macOS, Linux, and Windows.
     </p>
     <p>
-      Here is a little preview though:
+      It prioritizes offline availability, stable playback, and clear permission boundaries.
     </p>
-    <ul>
-      <li>💻 Cross-platform music player (Linux, macOS and Windows)</li>
-      <li>🎧 Supported formats: mp3, mp4, m4a/aac, flac, wav, ogg, 3gpp</li>
-      <li>🔄 Library auto-refresh</li>
-      <li>🌟 Playlists</li>
-      <li>🎼 Queue management</li>
-      <li>➰ Shuffle, loop</li>
-      <li>🌄 Covers</li>
-      <li>🤓 Dark theme</li>
-      <li>🚤 Playback speed control</li>
-      <li>😴 Sleep mode blocker</li>
-      <li>📥 &lt;code&gt;.m3u&lt;/code&gt; import/export</li>
-    </ul>
   </description>
 
-  <screenshots>
-    <screenshot type="default">
-      <caption>A screenshot of Museeks' library view in both light and dark theme</caption>
-      <image type="source">https://github.com/martpie/museeks.io/blob/ebf15ded2d215e90d887b090b68d91447de4145b/public/screenshot-linux-single.png</image>
-    </screenshot>
-  </screenshots>
-
-  <url type="homepage">https://museeks.io</url>
-  <url type="bugtracker">https://github.com/martpie/museeks/issues</url>
-  <url type="translate">https://github.com/martpie/museeks?tab=readme-ov-file#translations</url>
+  <url type="homepage">https://github.com/yifulin114514143/YifuMusic</url>
+  <url type="bugtracker">https://github.com/yifulin114514143/YifuMusic/issues</url>
 </component>

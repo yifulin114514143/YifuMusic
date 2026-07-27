@@ -1,15 +1,14 @@
 {
-  "name": "museeks",
+  "name": "yifumusic",
   "version": "0.23.4",
-  "description": "A simple, clean, and cross-platform music player.",
+  "description": "A local-first, cross-platform music player.",
   "bugs": {
-    "url": "https://github.com/martpie/museeks/issues"
+    "url": "https://github.com/yifulin114514143/YifuMusic/issues"
   },
   "license": "MIT",
-  "author": "Pierre de la Martinière <pierre.de.la.martiniere@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/martpie/museeks"
+    "url": "https://github.com/yifulin114514143/YifuMusic"
   },
   "type": "module",
   "scripts": {
@@ -88,5 +87,5 @@
     "pre-commit": "vp run gen:translations && git add src/translations"
   },
   "packageManager": "pnpm@11.0.9",
-  "productName": "Museeks"
+  "productName": "YifuMusic"
 }

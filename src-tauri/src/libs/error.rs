@@ -74,7 +74,7 @@ pub fn handle_fatal_error<R: Runtime>(app_handle: &tauri::AppHandle<R>, err: Mus
     error!("Something went terribly wrong: {:?}", err);
     let result = app_handle
         .dialog()
-        .message(format!("Something went terribly wrong: \"{}\". Resetting Museeks may help. If this keep happening, please report an issue.", err))
+        .message(format!("Something went terribly wrong: \"{}\". Resetting YifuMusic may help. If this keep happening, please report an issue.", err))
         .kind(MessageDialogKind::Error)
         .buttons(tauri_plugin_dialog::MessageDialogButtons::OkCancelCustom(
             "Reset settings".to_string(),

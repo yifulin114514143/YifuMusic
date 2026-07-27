@@ -183,7 +183,7 @@ impl ConfigManager {
 pub fn get_storage_dir() -> PathBuf {
     // TODO: Replace with PathResolver::app_config_dir() + app identifier, somehow
     let path = dirs::config_dir().expect("Get config dir");
-    path.join("museeks")
+    path.join("yifumusic")
 }
 
 #[tauri::command]

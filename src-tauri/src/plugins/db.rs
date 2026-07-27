@@ -37,7 +37,7 @@ impl DBState {
  * Database setup
  */
 async fn setup() -> AnyResult<DB> {
-    let database_path = get_storage_dir().join("museeks.db");
+    let database_path = get_storage_dir().join("yifumusic.db");
 
     info!("Opening connection to database: {:?}", database_path);
 

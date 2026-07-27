@@ -93,7 +93,7 @@ function ViewSettingsLibrary() {
             disabled={isLibraryRefreshing || libraryFolders.length === 0}
             onClick={useInvalidateCallback(async () => {
               const confirm = await ask(
-                t`All track data will be updated from the base files, but your original files won't be modified. Any Museeks-specific edits you may have done will be reset.`,
+                t`All track data will be updated from the base files, but your original files won't be modified. Any YifuMusic-specific edits you may have done will be reset.`,
                 {
                   title: t`Refresh all tracks?`,
                   kind: 'warning',
@@ -129,7 +129,7 @@ function ViewSettingsLibrary() {
           <Trans>Danger zone</Trans>
         </Setting.Title>
         <Setting.Description>
-          <Trans>Delete all tracks and playlists from Museeks.</Trans>
+          <Trans>Delete all tracks and playlists from YifuMusic.</Trans>
         </Setting.Description>
         <Flexbox>
           <Button
@@ -138,7 +138,7 @@ function ViewSettingsLibrary() {
             disabled={isLibraryRefreshing}
             onClick={useInvalidateCallback(async () => {
               const confirm = await ask(
-                t`All your tracks and playlists will be deleted from Museeks.`,
+                t`All your tracks and playlists will be deleted from YifuMusic.`,
                 {
                   title: t`Reset library?`,
                   kind: 'warning',

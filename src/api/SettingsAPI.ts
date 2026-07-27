@@ -143,7 +143,7 @@ async function checkForUpdate(
 
   try {
     const response = await fetch(
-      'https://api.github.com/repos/martpie/museeks/releases',
+      'https://api.github.com/repos/yifulin114514143/YifuMusic/releases',
     );
 
     if (!response.ok) {
@@ -165,9 +165,9 @@ async function checkForUpdate(
 
     let message: string | undefined;
     if (newRelease) {
-      message = t`Museeks ${newRelease.tag_name} is available, check https://museeks.io!`;
+      message = t`YifuMusic ${newRelease.tag_name} is available.`;
     } else if (!options.silentFail) {
-      message = t`Museeks ${currentVersion} is the latest version available.`;
+      message = t`YifuMusic ${currentVersion} is the latest version available.`;
     }
 
     if (message) {

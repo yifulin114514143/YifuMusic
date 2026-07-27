@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::env;
 
 use home_config::HomeConfig;
 
@@ -9,18 +9,7 @@ use crate::{
 };
 
 pub fn init() -> AnyResult<ConfigManager> {
-    // 1. Ensure Config dir is "museeks" and not Museeks
-    let config_dir = dirs::config_dir().expect("Could not find config directory");
-
-    let old_path = config_dir.join("./Museeks");
-    let new_path = config_dir.join("./museeks");
-
-    if old_path.exists() && !new_path.exists() {
-        fs::rename(&old_path, &new_path)?;
-        println!("Renamed config folder from Museeks to museeks");
-    }
-
-    // 2. Ensure Config is created and return it
+    // Ensure Config is created and return it.
     let conf_path = get_storage_dir();
     let manager = HomeConfig::with_file(conf_path.join("config.toml"));
     let existing_config = manager.toml::<Config>();
@@ -41,7 +30,7 @@ pub fn init() -> AnyResult<ConfigManager> {
         }
     };
 
-    // 3. Ensure Wayland compatibility fixes if the user requests them
+    // Ensure Wayland compatibility fixes if the user requests them.
     if config.get()?.wayland_compat {
         unsafe {
             env::set_var("GDK_BACKEND", "x11");

@@ -6,15 +6,12 @@ import SettingsAPI from '../api/SettingsAPI';
 import * as Setting from '../components/Setting';
 import CheckboxSetting from '../components/SettingCheckbox';
 import Button from '../elements/Button';
-import DefinitionList from '../elements/DefinitionList';
 import ExternalButton from '../elements/ExternalButton';
 import ExternalLink from '../elements/ExternalLink';
 import Flexbox from '../elements/Flexbox';
-import Heart from '../elements/Heart';
 import useInvalidate, { useInvalidateCallback } from '../hooks/useInvalidate';
 import { configQuery } from '../lib/queries';
 import { logAndNotifyError } from '../lib/utils';
-import { NON_DEFAULT_LANGUAGES } from '../translations/languages';
 
 export const Route = createFileRoute('/settings/about')({
   component: ViewSettingsAbout,
@@ -33,17 +30,20 @@ function ViewSettingsAbout() {
     <>
       <Setting.Section>
         <Setting.Title>
-          <Trans>About Museeks</Trans>
+          <Trans>About YifuMusic</Trans>
         </Setting.Title>
         <Setting.Description>
-          Museeks {version}
+          YifuMusic {version}
           {' - '}
-          <ExternalLink href="https://museeks.io" type="url">
-            museeks.io
+          <ExternalLink
+            href="https://github.com/yifulin114514143/YifuMusic"
+            type="url"
+          >
+            {t`project repository`}
           </ExternalLink>
           {' - '}
           <ExternalLink
-            href={`https://github.com/martpie/museeks/releases/tag/${version}`}
+            href={`https://github.com/yifulin114514143/YifuMusic/releases/tag/${version}`}
             type="url"
           >{t`release notes`}</ExternalLink>
         </Setting.Description>
@@ -70,32 +70,16 @@ function ViewSettingsAbout() {
         </Setting.Title>
         <Setting.Description>
           <Trans>
-            Made with <Heart /> by Pierre de la Martinière (
-            <ExternalLink href="https://martpie.io" type="url">
-              martpie.io
-            </ExternalLink>
-            ) and a bunch of{' '}
+            YifuMusic is maintained by{' '}
             <ExternalLink
-              href="https://github.com/martpie/museeks/graphs/contributors"
+              href="https://github.com/yifulin114514143/YifuMusic/graphs/contributors"
               type="url"
             >
-              great people
+              project contributors
             </ExternalLink>
           </Trans>
           .
         </Setting.Description>
-        <Setting.Description>
-          <Trans>Translations:</Trans>
-        </Setting.Description>
-        <DefinitionList>
-          {NON_DEFAULT_LANGUAGES.map((language) => (
-            <DefinitionList.Item
-              key={language.code}
-              label={`${language.label}:`}
-              content={language.contributors.join(', ')}
-            />
-          ))}
-        </DefinitionList>
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
@@ -106,7 +90,7 @@ function ViewSettingsAbout() {
             Bugs happen. Please, do not hesitate to report them or to ask for
             features you would like to see, using the{' '}
             <ExternalLink
-              href="http://github.com/martpie/Museeks/issues"
+              href="https://github.com/yifulin114514143/YifuMusic/issues"
               type="url"
             >
               issue tracker
