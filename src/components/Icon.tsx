@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { error } from '@tauri-apps/plugin-log';
+import { Ellipsis, GripVertical, Trash2, type LucideIcon } from 'lucide-react';
 
 import chevronDown from '../assets/icons/chevron-down.svg?react';
 import chevronUp from '../assets/icons/chevron-up.svg?react';
@@ -29,7 +30,9 @@ const icons: Record<
 > = {
   chevronDown,
   chevronUp,
+  ellipsis: createLucideIcon(Ellipsis),
   globe,
+  gripVertical: createLucideIcon(GripVertical),
   list,
   microphone,
   musicalNotes,
@@ -43,12 +46,25 @@ const icons: Record<
   shuffle,
   skipBack,
   skipForward,
+  trash: createLucideIcon(Trash2),
   volumeHigh,
   volumeLow,
   volumeMedium,
   volumeMute,
   volumeOff,
 };
+
+function createLucideIcon(IconImpl: LucideIcon) {
+  return function LucideIcon(props: React.SVGProps<SVGSVGElement>) {
+    return (
+      <IconImpl
+        {...props}
+        strokeWidth={2}
+        style={{ ...props.style, fill: 'none' }}
+      />
+    );
+  };
+}
 
 export type IconName = keyof typeof icons;
 export type IconSize = keyof typeof stylesBySize;

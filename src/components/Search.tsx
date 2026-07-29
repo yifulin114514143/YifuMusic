@@ -26,6 +26,17 @@ export default function Search() {
     [],
   );
 
+  const onKeyDown = useCallback<React.KeyboardEventHandler<HTMLInputElement>>(
+    (event) => {
+      if (event.key === 'Escape' && search.length > 0) {
+        event.preventDefault();
+        event.stopPropagation();
+        onClear();
+      }
+    },
+    [onClear, search.length],
+  );
+
   // ctrl/cmf+f shortcut
   const onKey = (e: KeyboardEvent) => {
     if (isCtrlKey(e) && e.key.toLowerCase() === 'f') {
@@ -43,6 +54,7 @@ export default function Search() {
         value={search}
         onChange={onChange}
         onFocus={onFocus}
+        onKeyDown={onKeyDown}
         onMouseUp={(e) => e.preventDefault()}
         spellCheck={false}
         ref={inputRef}
@@ -59,6 +71,7 @@ export default function Search() {
           onClick={onClear}
           data-museeks-action
           aria-label={t`Clear search`}
+          title={t`Clear search`}
         >
           &times;
         </button>
@@ -71,7 +84,8 @@ export default function Search() {
 const styles = stylex.create({
   container: {
     position: 'relative',
-    maxWidth: '180px',
+    width: 'min(280px, 32vw)',
+    minWidth: '160px',
     display: 'flex',
     alignItems: 'center',
   },
@@ -102,7 +116,8 @@ const styles = stylex.create({
     borderStyle: 'none',
     backgroundColor: 'transparent',
     padding: 0,
-    height: '21px',
+    minWidth: '32px',
+    minHeight: '32px',
     aspectRatio: '1 / 1',
     lineHeight: '100%',
     textAlign: 'center',

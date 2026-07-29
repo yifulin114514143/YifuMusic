@@ -1,7 +1,7 @@
 /* Colors (default theme) */
 :root {
-  --main-color: hsl(208, 77%, 59%);
-  --focus-color: color-mix(in srgb, var(--main-color) 80%, white);
+  --main-color: hsl(186, 78%, 42%);
+  --focus-color: color-mix(in srgb, var(--main-color) 78%, white);
   --link-color: var(--main-color);
   --bold: 600;
 }
@@ -53,7 +53,7 @@ p {
 
 /* App wrapper */
 #wrap {
-  height: 100vh;
+  height: 100dvh;
   isolation: isolate;
 }
 
@@ -68,19 +68,33 @@ p {
 
 /* For call-to-actions to show the interactibility of an element */
 [data-museeks-action] {
-  transition: transform 0.1s ease-in-out;
+  transition:
+    background-color 120ms ease-out,
+    color 120ms ease-out,
+    opacity 120ms ease-out;
 }
 
 [data-museeks-action]:hover {
-  transform: scale(1.2);
+  transform: none;
 }
 
 [data-museeks-action]:active {
-  transform: scale(1);
+  opacity: 0.78;
 }
 
 /* Active state of some elements that get de-emphasized, is not focused */
 [data-museeks-list]:focus-within {
   --active-item-bg: var(--main-color);
   --active-item-color: white;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

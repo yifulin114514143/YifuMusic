@@ -120,7 +120,7 @@ fn main() {
                     .visible(false)
                     .theme(get_theme_from_name(&conf.theme))
                     .inner_size(900.0, 550.0)
-                    .min_inner_size(900.0, 550.0)
+                    .min_inner_size(640.0, 550.0)
                     .fullscreen(false)
                     .resizable(true)
                     .zoom_hotkeys_enabled(true);

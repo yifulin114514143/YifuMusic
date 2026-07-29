@@ -10,6 +10,7 @@ import type {
   MenuItemOptions,
   PredefinedMenuItemOptions,
 } from '@tauri-apps/api/menu';
+import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useMemo } from 'react';
 
 import PlaylistsAPI from '../api/PlaylistsAPI';
@@ -92,6 +93,20 @@ function ViewPlaylists() {
         {
           text: t`Delete`,
           action: async () => {
+            const confirmed = await ask(
+              t`Are you sure you want to delete "${playlist.name}"?`,
+              {
+                title: t`Delete playlist?`,
+                kind: 'warning',
+                cancelLabel: t`Cancel`,
+                okLabel: t`Delete`,
+              },
+            );
+
+            if (!confirmed) {
+              return;
+            }
+
             await PlaylistsAPI.remove(playlist.id);
 
             await invalidate();
@@ -137,12 +152,18 @@ function ViewPlaylists() {
     playlistContent = (
       <ViewMessage.Notice>
         <p>
-          <Trans>You haven{"'"}t created any playlist yet</Trans>
+          <Trans>No playlists yet</Trans>
         </p>
         <ViewMessage.Sub>
           <Link onClick={createPlaylist}>
-            <Trans>create one now</Trans>
+            <Trans>Create a playlist</Trans>
           </Link>
+        </ViewMessage.Sub>
+        <ViewMessage.Sub>
+          <Trans>
+            Scan a music folder that contains <code>.m3u</code> files in library
+            settings to import them as playlists.
+          </Trans>
         </ViewMessage.Sub>
       </ViewMessage.Notice>
     );

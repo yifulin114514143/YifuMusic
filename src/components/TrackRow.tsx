@@ -1,7 +1,9 @@
 import { useSortable } from '@dnd-kit/sortable';
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import type React from 'react';
 
+import ButtonIcon from '../elements/ButtonIcon';
 import type { Track } from '../generated/typings';
 import useFormattedDuration from '../hooks/useFormattedDuration';
 import PlayingIndicator from './PlayingIndicator';
@@ -13,6 +15,11 @@ export type TrackRowEvents = {
     trackIndex: number,
   ) => void;
   onContextMenu: (
+    event: React.MouseEvent,
+    trackID: string,
+    trackIndex: number,
+  ) => void;
+  onMoreActions: (
     event: React.MouseEvent,
     trackID: string,
     trackIndex: number,
@@ -40,8 +47,10 @@ export default function TrackRow(props: Props) {
     draggable,
     onTrackSelect,
     onContextMenu,
+    onMoreActions,
     onPlaybackStart,
   } = props;
+  const { t } = useLingui();
 
   const duration = useFormattedDuration(track.duration);
 
@@ -104,7 +113,9 @@ export default function TrackRow(props: Props) {
         {props.isPlaying ? <PlayingIndicator /> : null}
       </div>
       <div {...stylex.props(cellStyles.cell, cellStyles.title)}>
-        <span {...stylex.props(cellStyles.titleText)}>{track.title}</span>
+        <span title={track.title} {...stylex.props(cellStyles.titleText)}>
+          {track.title}
+        </span>
         {props.showArtistInTitle === true && track.artists.length > 0 && (
           <span {...stylex.props(cellStyles.artistInTitle)}>
             {'— '}
@@ -112,6 +123,22 @@ export default function TrackRow(props: Props) {
           </span>
         )}
       </div>
+      {props.simplified !== true && (
+        <>
+          <div
+            title={track.artists.join(', ')}
+            {...stylex.props(cellStyles.cell, cellStyles.artist)}
+          >
+            {track.artists.join(', ')}
+          </div>
+          <div
+            title={track.album}
+            {...stylex.props(cellStyles.cell, cellStyles.album)}
+          >
+            {track.album}
+          </div>
+        </>
+      )}
       <div
         {...stylex.props(
           cellStyles.cell,
@@ -122,18 +149,27 @@ export default function TrackRow(props: Props) {
         {duration}
       </div>
       {props.simplified !== true && (
-        <>
-          <div {...stylex.props(cellStyles.cell, cellStyles.artist)}>
-            {track.artists.join(', ')}
-          </div>
-          <div {...stylex.props(cellStyles.cell, cellStyles.album)}>
-            {track.album}
-          </div>
-          <div {...stylex.props(cellStyles.cell, cellStyles.genre)}>
-            {track.genres.join(', ')}
-          </div>
-        </>
+        <div
+          title={track.genres.join(', ')}
+          {...stylex.props(cellStyles.cell, cellStyles.genre)}
+        >
+          {track.genres.join(', ')}
+        </div>
       )}
+      <div {...stylex.props(cellStyles.cell, cellStyles.actions)}>
+        <ButtonIcon
+          icon="ellipsis"
+          iconSize={16}
+          label={t`More actions`}
+          aria-label={t`More actions for ${track.title}`}
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            onMoreActions(event, track.id, index);
+          }}
+          {...stylex.props(cellStyles.moreActions)}
+        />
+      </div>
     </li>
   );
 }
@@ -203,7 +239,7 @@ const cellStyles = stylex.create({
     lineHeight: '24px',
   },
   trackPlaying: {
-    width: '30px',
+    width: '32px',
     flexShrink: 0,
   },
   title: {
@@ -247,6 +283,33 @@ const cellStyles = stylex.create({
   genre: {
     width: '20%',
     flexShrink: 0,
+    display: {
+      default: 'none',
+      '@media (min-width: 1400px)': 'block',
+    },
+  },
+  actions: {
+    width: '40px',
+    flexShrink: 0,
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moreActions: {
+    minWidth: '32px',
+    minHeight: '32px',
+    padding: 0,
+    borderStyle: 'none',
+    borderRadius: 'var(--radius-sm)',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'var(--surface-hover)',
+      ':active': 'var(--surface-selected)',
+    },
+    color: 'var(--text-primary)',
+    lineHeight: 1,
+    cursor: 'pointer',
   },
   rightAligned: {
     textAlign: 'right',

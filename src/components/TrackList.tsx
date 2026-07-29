@@ -224,10 +224,15 @@ export default function TrackList(props: Props) {
    * Context menus
    */
   const onContextMenu = useCallback(
-    async (event: React.MouseEvent, _trackID: string, index: number) => {
+    async (
+      event: React.MouseEvent,
+      _trackID: string,
+      index: number,
+      selectedTrackIDs: Set<string> = selectedTracks,
+    ) => {
       event.preventDefault();
 
-      const selectedCount = selectedTracks.size;
+      const selectedCount = selectedTrackIDs.size;
       const track = tracks[index];
       const currentPlaylistID =
         queueOrigin.type === 'playlist' ? queueOrigin.playlistID : null;
@@ -244,7 +249,7 @@ export default function TrackList(props: Props) {
           async action() {
             await PlaylistsAPI.create(
               t`New playlist`,
-              Array.from(selectedTracks),
+              Array.from(selectedTrackIDs),
             );
             await invalidate();
           },
@@ -266,11 +271,11 @@ export default function TrackList(props: Props) {
               async action() {
                 await PlaylistsAPI.addTracks(
                   playlist.id,
-                  Array.from(selectedTracks),
+                  Array.from(selectedTrackIDs),
                 );
 
                 toastManager.add({
-                  title: t`${selectedTracks.size} track(s) were added to "${playlist.name}"`,
+                  title: t`${selectedTrackIDs.size} track(s) were added to "${playlist.name}"`,
                   type: 'success',
                 });
               },
@@ -303,7 +308,7 @@ export default function TrackList(props: Props) {
           text: t`Add to queue`,
           async action() {
             player.addToQueue(
-              await BridgeDatabase.getTracks(Array.from(selectedTracks)),
+              await BridgeDatabase.getTracks(Array.from(selectedTrackIDs)),
             );
           },
         }),
@@ -311,7 +316,7 @@ export default function TrackList(props: Props) {
           text: t`Play next`,
           async action() {
             player.addNextInQueue(
-              await BridgeDatabase.getTracks(Array.from(selectedTracks)),
+              await BridgeDatabase.getTracks(Array.from(selectedTrackIDs)),
             );
           },
         }),
@@ -357,7 +362,7 @@ export default function TrackList(props: Props) {
           ...extraContextMenu.map((item) =>
             MenuItem.new({
               text: item.label,
-              action: () => item.action(selectedTracks),
+              action: () => item.action(selectedTrackIDs),
             }),
           ),
         );
@@ -385,7 +390,7 @@ export default function TrackList(props: Props) {
           text: t`Remove from library`,
           action: async () => {
             const confirm = await ask(
-              t`Are you sure you want to remove ${selectedTracks.size} track(s) from your library?`,
+              t`Are you sure you want to remove ${selectedTrackIDs.size} track(s) from your library?`,
               {
                 title: t`Remove tracks`,
                 kind: 'warning',
@@ -395,7 +400,7 @@ export default function TrackList(props: Props) {
             );
 
             if (confirm) {
-              await LibraryAPI.removeTracks(Array.from(selectedTracks));
+              await LibraryAPI.removeTracks(Array.from(selectedTrackIDs));
               await invalidate();
             }
           },
@@ -418,6 +423,21 @@ export default function TrackList(props: Props) {
       extraContextMenu,
       t,
     ],
+  );
+
+  const onMoreActions = useCallback(
+    (event: React.MouseEvent, trackID: string, index: number) => {
+      const selectedTrackIDs = selectedTracks.has(trackID)
+        ? selectedTracks
+        : new Set([trackID]);
+
+      if (!selectedTracks.has(trackID)) {
+        setSelectedTracks(selectedTrackIDs);
+      }
+
+      void onContextMenu(event, trackID, index, selectedTrackIDs);
+    },
+    [onContextMenu, selectedTracks],
   );
 
   const rowHeight =
@@ -445,6 +465,7 @@ export default function TrackList(props: Props) {
           onReorder={onReorder}
           onTrackSelect={onTrackSelect}
           onContextMenu={onContextMenu}
+          onMoreActions={onMoreActions}
           onPlaybackStart={onPlaybackStart}
         />
       )}
@@ -458,6 +479,7 @@ export default function TrackList(props: Props) {
           showArtistInTitle={showArtistInTitle || undefined}
           onTrackSelect={onTrackSelect}
           onContextMenu={onContextMenu}
+          onMoreActions={onMoreActions}
           onPlaybackStart={onPlaybackStart}
         />
       )}

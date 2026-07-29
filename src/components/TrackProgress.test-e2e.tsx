@@ -1,9 +1,12 @@
+import { i18n } from '@lingui/core';
+import { I18nProvider } from '@lingui/react';
 import { afterEach, beforeEach, expect, test, vi } from 'vite-plus/test';
 import { page } from 'vite-plus/test/browser';
 import { cleanup, render } from 'vitest-browser-react';
 
 import type { Track } from '../generated/typings';
 import { MOCK_CONFIG } from '../lib/__mocks__/bridge-config';
+import { messages } from '../translations/en.po';
 
 type SliderRootProps = {
   children: React.ReactNode;
@@ -67,7 +70,7 @@ beforeEach(async () => {
       Control: ({ children }: WithChildren) => <div>{children}</div>,
       Track: ({ children }: WithChildren) => <div>{children}</div>,
       Indicator: () => <div />,
-      Thumb: () => <input aria-label="播放进度" type="range" />,
+      Thumb: () => <input aria-label="Playback progress" type="range" />,
     },
   }));
   ({ default: player } = await import('../lib/player'));
@@ -75,6 +78,8 @@ beforeEach(async () => {
   setCurrentTime = vi.fn<(time: number) => void>();
   player.setCurrentTime = setCurrentTime;
   ({ default: TrackProgress } = await import('./TrackProgress'));
+  i18n.load('en', messages);
+  i18n.activate('en');
 });
 
 afterEach(async () => {
@@ -86,7 +91,11 @@ afterEach(async () => {
 });
 
 test('previews multiple slider values without seeking and commits once', async () => {
-  await render(<TrackProgress trackPlaying={TRACK} />);
+  await render(
+    <I18nProvider i18n={i18n}>
+      <TrackProgress trackPlaying={TRACK} />
+    </I18nProvider>,
+  );
 
   await page.getByRole('button', { name: 'Preview slider' }).click();
   expect(setCurrentTime).not.toHaveBeenCalled();

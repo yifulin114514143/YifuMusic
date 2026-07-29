@@ -23,6 +23,10 @@ function ViewSettingsAudio() {
   return (
     <>
       <Setting.Section>
+        <Setting.Title>{t`Playback`}</Setting.Title>
+        <Setting.Description>
+          {t`Adjust how YifuMusic plays your local music.`}
+        </Setting.Description>
         <Setting.Input
           label={t`Playback rate`}
           description={t`Increase the playback rate: a value of 2 will play your music at a 2x speed`}
@@ -45,6 +49,20 @@ function ViewSettingsAudio() {
           description={t`Automatically follow the currently playing track (only when the app is not focused)`}
           value={config.audio_follow_playing_track}
           onChange={useInvalidateCallback(SettingsAPI.toggleFollowPlayingTrack)}
+        />
+      </Setting.Section>
+      <Setting.Section>
+        <Setting.Title>{t`Notifications`}</Setting.Title>
+        <Setting.Description>
+          {t`Choose whether track changes use system notifications.`}
+        </Setting.Description>
+        <CheckboxSetting
+          title={t`Display Notifications`}
+          description={t`Send notifications when the playing track changes`}
+          value={config.notifications}
+          onChange={useInvalidateCallback(
+            SettingsAPI.toggleDisplayNotifications,
+          )}
         />
       </Setting.Section>
     </>

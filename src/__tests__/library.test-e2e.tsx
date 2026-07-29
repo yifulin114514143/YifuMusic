@@ -129,7 +129,7 @@ test('Search should filter tracks in the library', async () => {
   await setupScannedLibrary();
 
   const search = page.getByRole('textbox', { name: 'Search library' });
-  const searchClear = page.getByRole('button', { name: 'Clear search' });
+  const searchClear = page.getByTitle('Clear search');
 
   // Searching by a common word should display all tracks
   await search.fill('Blues');
@@ -158,7 +158,7 @@ test('Search should filter tracks in the library', async () => {
   await expect.element(getTrackAt(0)).not.toBeInTheDocument();
   await expect
     .element(page.getByRole('status'))
-    .toHaveTextContent('Your search returned no results');
+    .toHaveTextContent('No results for "Something that does not exist"');
 
   // Clicking the search clear button should clear the search
   await searchClear.click();
@@ -175,9 +175,9 @@ test('Column headers should sort tracks in the library', async () => {
   const thirdTrack = getTrackAt(2);
 
   const track0content =
-    'Whiskey Blues05:00Captain_SleepyAnother Albumrock, blues';
-  const track1content = 'Majestic Blues05:00Desicomix07Pixabayblues';
-  const track2content = 'Romantic Blues05:00Jean-Paul-VPixabayblues';
+    'Whiskey BluesCaptain_SleepyAnother Album05:00rock, blues';
+  const track1content = 'Majestic BluesDesicomix07Pixabay05:00blues';
+  const track2content = 'Romantic BluesJean-Paul-VPixabay05:00blues';
 
   // By default, we sort by artist, album year, album name, track number, disk number
   await expect.element(firstTrack).toHaveTextContent(track0content);

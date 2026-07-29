@@ -20,9 +20,10 @@ export default function PlayerControls() {
       />
       <ButtonIcon
         icon={isPaused ? 'play' : 'pause'}
-        iconSize={28}
+        iconSize={24}
         label={isPaused ? t`Play` : t`Pause`}
         onClick={() => player.playPause()}
+        xstyle={styles.playPause}
       />
       <ButtonIcon
         icon="skipForward"
@@ -40,7 +41,18 @@ const styles = stylex.create({
     display: 'flex',
     alignItems: 'center',
     position: 'relative',
-    rowGap: '12px',
-    columnGap: '12px',
+    rowGap: '8px',
+    columnGap: '8px',
+  },
+  playPause: {
+    minWidth: '40px',
+    minHeight: '40px',
+    color: 'var(--accent-contrast)',
+    backgroundColor: {
+      default: 'var(--accent)',
+      ':hover': 'var(--accent)',
+      ':active': 'var(--accent)',
+    },
+    borderRadius: '999px',
   },
 });

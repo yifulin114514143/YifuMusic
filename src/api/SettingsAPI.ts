@@ -14,7 +14,35 @@ import toastManager from '../lib/toast-manager';
 import { logAndNotifyError } from '../lib/utils';
 import LibraryAPI from './LibraryAPI';
 
-export const DEFAULT_MAIN_COLOR = '#459ce7';
+export const DEFAULT_MAIN_COLOR = '#18b7bf';
+
+const HEX_COLOR_INPUT_PATTERN = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i;
+
+/**
+ * Pick the readable black or white foreground for a native color input value.
+ * Invalid persisted values leave the theme's built-in contrast token in place.
+ */
+export function getAccentContrast(
+  mainColor: Config['ui_accent_color'],
+): '#000000' | '#ffffff' | null {
+  const match = mainColor?.match(HEX_COLOR_INPUT_PATTERN);
+
+  if (match == null) {
+    return null;
+  }
+
+  const [red, green, blue] = match
+    .slice(1)
+    .map((value) => Number.parseInt(value, 16) / 255);
+  const toLinear = (channel: number) =>
+    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+  const luminance =
+    0.2126 * toLinear(red) + 0.7152 * toLinear(green) + 0.0722 * toLinear(blue);
+  const blackContrast = (luminance + 0.05) / 0.05;
+  const whiteContrast = 1.05 / (luminance + 0.05);
+
+  return blackContrast >= whiteContrast ? '#000000' : '#ffffff';
+}
 
 /**
  * THIS WHOLE MODULE IS DEPRECATED as it has organically grown into something weird
@@ -92,9 +120,17 @@ const setTheme = async (themeID: string): Promise<void> => {
     }
   }
 
-  const theme = (await getCurrentWindow().theme()) ?? 'light';
+  const [theme, mainColor] = await Promise.all([
+    getCurrentWindow()
+      .theme()
+      .then((value) => value ?? 'light'),
+    ConfigBridge.get('ui_accent_color').then(
+      (value) => value ?? DEFAULT_MAIN_COLOR,
+    ),
+  ]);
 
   applyThemeToUI(theme);
+  applyUIMainColorToUI(mainColor);
 };
 
 /**
@@ -124,7 +160,23 @@ const setUIMainColor = async (
 };
 
 const applyUIMainColorToUI = (mainColor: Config['ui_accent_color']) => {
-  document.documentElement.style.setProperty('--main-color', mainColor);
+  const root = document.documentElement;
+
+  if (mainColor === null) {
+    root.style.removeProperty('--main-color');
+    root.style.removeProperty('--accent-contrast');
+    return;
+  }
+
+  root.style.setProperty('--main-color', mainColor);
+
+  const contrast = getAccentContrast(mainColor);
+  if (contrast === null) {
+    root.style.removeProperty('--accent-contrast');
+    return;
+  }
+
+  root.style.setProperty('--accent-contrast', contrast);
 };
 
 /**

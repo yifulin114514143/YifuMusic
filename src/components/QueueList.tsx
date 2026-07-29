@@ -4,11 +4,13 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Trans } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
+import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useId, useState } from 'react';
 
 import Button from '../elements/Button';
+import ButtonIcon from '../elements/ButtonIcon';
 import type { Track } from '../generated/typings';
 import useDndSensors from '../hooks/useDnDSensors';
 import { useTrackListStatus } from '../hooks/useGlobalTrackListStatus';
@@ -27,6 +29,7 @@ type Props = {
 export default function QueueList(props: Props) {
   const { queue, queueCursor } = props;
   const [queueSize, setQueueSize] = useState(INITIAL_QUEUE_SIZE);
+  const { t } = useLingui();
 
   // Get the 20 next tracks displayed
   const shownQueue = queue.slice(queueCursor + 1, queueCursor + 1 + queueSize);
@@ -64,6 +67,20 @@ export default function QueueList(props: Props) {
     [queue],
   );
 
+  const clearQueue = useCallback(async () => {
+    const confirmed = await ask(
+      t`This will remove all upcoming tracks. The current track will stay.`,
+      {
+        title: t`Clear queue?`,
+        kind: 'warning',
+        cancelLabel: t`Cancel`,
+        okLabel: t`Clear`,
+      },
+    );
+
+    if (confirmed) player.clearQueue();
+  }, [t]);
+
   return (
     <DndContext
       onDragEnd={onDragEnd}
@@ -72,12 +89,12 @@ export default function QueueList(props: Props) {
       sensors={sensors}
     >
       <div {...stylex.props(styles.queueHeader)}>
-        <div {...stylex.props(styles.queueHeaderInfos)}>
-          <TrackListStatus {...status} />
+        <div {...stylex.props(styles.queueHeaderTitle)}>
+          <span>{t`Upcoming tracks`}</span>
+          <span {...stylex.props(styles.queueHeaderInfos)}>
+            <TrackListStatus {...status} />
+          </span>
         </div>
-        <Button bSize="small" onClick={() => player.clearQueue()}>
-          <Trans>clear queue</Trans>
-        </Button>
       </div>
       <ul {...stylex.props(styles.queueContent)}>
         <SortableContext
@@ -102,36 +119,74 @@ export default function QueueList(props: Props) {
               )
             }
           >
-            <Trans>see more</Trans>
+            {t`see more`}
           </Button>
         )}
       </ul>
+      <footer
+        aria-label={t`Queue actions`}
+        {...stylex.props(styles.queueActions)}
+      >
+        <ButtonIcon
+          icon="trash"
+          iconSize={16}
+          label={t`Clear queue`}
+          onClick={clearQueue}
+          xstyle={styles.clearQueue}
+        />
+      </footer>
     </DndContext>
   );
 }
 
 const styles = stylex.create({
   queueHeader: {
-    paddingTop: '5px',
-    paddingBottom: '5px',
-    paddingLeft: '10px',
-    paddingRight: '10px',
-    backgroundColor: 'var(--queue-header-bg)',
+    paddingBlock: '8px',
+    paddingInline: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    columnGap: '8px',
+    backgroundColor: 'var(--surface-raised)',
     borderBottomWidth: '1px',
     borderBottomStyle: 'solid',
-    borderBottomColor: 'var(--border-color)',
+    borderBottomColor: 'var(--border-subtle)',
+  },
+  queueHeaderTitle: {
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: '2px',
+    color: 'var(--text-primary)',
+    fontWeight: 600,
   },
   queueHeaderInfos: {
-    float: 'right',
+    color: 'var(--text-secondary)',
     fontSize: '11px',
-    paddingTop: '1px',
-    paddingBottom: '1px',
   },
   queueContent: {
-    maxHeight: '300px',
-    overflow: 'auto',
+    minHeight: 0,
+    flexGrow: 1,
+    overflowY: 'auto',
     listStyle: 'none',
     padding: 0,
     margin: 0,
+  },
+  queueActions: {
+    flexShrink: 0,
+    paddingBlock: '10px',
+    paddingInline: '16px',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--border-subtle)',
+    backgroundColor: 'var(--surface-raised)',
+  },
+  clearQueue: {
+    color: {
+      default: 'var(--text-secondary)',
+      ':hover': 'var(--danger-color)',
+    },
   },
 });

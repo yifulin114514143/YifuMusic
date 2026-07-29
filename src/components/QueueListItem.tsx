@@ -1,8 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import { useCallback } from 'react';
 
+import ButtonIcon from '../elements/ButtonIcon';
 import type { Track } from '../generated/typings';
 import player from '../lib/player';
 import Cover from './Cover';
@@ -15,14 +17,21 @@ type Props = {
 
 export default function QueueListItem(props: Props) {
   const { track } = props;
+  const { t } = useLingui();
 
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: track.id,
-      data: {
-        type: 'queue-track',
-      },
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+  } = useSortable({
+    id: track.id,
+    data: {
+      type: 'queue-track',
+    },
+  });
 
   const itemStyle = {
     transform: CSS.Transform.toString(transform),
@@ -44,29 +53,60 @@ export default function QueueListItem(props: Props) {
         props.index > 0 && styles.queueItemWithTopBorder,
         stylex.defaultMarker(),
       )}
-      {...attributes}
-      // DnD props for re-ordering
       ref={setNodeRef}
       style={itemStyle}
       onDoubleClick={play}
-      {...listeners}
     >
       <div {...stylex.props(styles.queueItemCover)}>
         <Cover track={track} iconSize={12} />
       </div>
       <div {...stylex.props(styles.queueItemInfo)}>
-        <div {...stylex.props(styles.queueItemInfoTitle)}>{track.title}</div>
-        <div {...stylex.props(styles.queueItemInfoOtherInfos)}>
+        <div title={track.title} {...stylex.props(styles.queueItemInfoTitle)}>
+          {track.title}
+        </div>
+        <div
+          title={`${track.artists.join(', ')} - ${track.album}`}
+          {...stylex.props(styles.queueItemInfoOtherInfos)}
+        >
           <span>{track.artists.join(', ')}</span> - <span>{track.album}</span>
         </div>
       </div>
-      <button
-        type="button"
-        {...stylex.props(styles.queueItemRemove)}
-        onClick={remove}
-      >
-        &times;
-      </button>
+      <div {...stylex.props(styles.queueItemActions)}>
+        <ButtonIcon
+          ref={setActivatorNodeRef}
+          icon="gripVertical"
+          iconSize={16}
+          label={t`Reorder ${track.title}`}
+          {...attributes}
+          {...listeners}
+          xstyle={styles.queueItemDragHandle}
+        />
+        <ButtonIcon
+          icon="play"
+          iconSize={16}
+          label={t`Play ${track.title}`}
+          onPointerDown={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            void play();
+          }}
+          xstyle={styles.queueItemAction}
+        />
+        <ButtonIcon
+          icon="trash"
+          iconSize={16}
+          label={t`Remove from queue`}
+          aria-label={t`Remove ${track.title} from queue`}
+          onPointerDown={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            remove();
+          }}
+          xstyle={styles.queueItemRemove}
+        />
+      </div>
     </li>
   );
 }
@@ -79,6 +119,9 @@ const styles = stylex.create({
     position: 'relative',
     cursor: 'pointer',
     alignItems: 'center',
+    backgroundColor: {
+      ':hover': 'var(--surface-hover)',
+    },
   },
   queueItemWithTopBorder: {
     borderTopWidth: '1px',
@@ -89,7 +132,7 @@ const styles = stylex.create({
     margin: '8px',
     width: '32px',
     aspectRatio: '1',
-    borderRadius: '3px',
+    borderRadius: 'var(--radius-sm)',
     overflow: 'hidden',
     fontSize: '16px',
   },
@@ -115,20 +158,24 @@ const styles = stylex.create({
     opacity: 0.7,
     fontSize: '0.875rem',
   },
+  queueItemActions: {
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: '2px',
+    paddingRight: '5px',
+  },
+  queueItemAction: {
+    color: 'var(--text-primary)',
+  },
+  queueItemDragHandle: {
+    color: 'var(--text-secondary)',
+    cursor: 'grab',
+  },
   queueItemRemove: {
-    color: 'var(--text-color)',
-    borderStyle: 'none',
-    backgroundColor: 'transparent',
-    width: '25px',
-    height: '25px',
-    lineHeight: '10px',
-    padding: '3px',
-    marginRight: '5px',
-    visibility: {
-      default: 'hidden',
-      [stylex.when.ancestor(':hover')]: 'visible',
+    color: {
+      default: 'var(--text-secondary)',
+      ':hover': 'var(--danger-color)',
     },
-    fontSize: '14px',
-    textDecoration: 'none',
   },
 });

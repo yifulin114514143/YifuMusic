@@ -28,10 +28,16 @@ export default function PlayingBarInfo(props: Props) {
         <div {...stylex.props(styles.duration)}>{formattedProgress}</div>
 
         <div {...stylex.props(styles.metas)}>
-          <strong {...stylex.props(styles.metadata, styles.metadataTitle)}>
+          <strong
+            title={trackPlaying.title}
+            {...stylex.props(styles.metadata, styles.metadataTitle)}
+          >
             {trackPlaying.title}
           </strong>
-          <div {...stylex.props(styles.metadata)}>
+          <div
+            title={`${trackPlaying.artists.join(', ')} — ${trackPlaying.album}`}
+            {...stylex.props(styles.metadata)}
+          >
             <Link
               inheritColor
               type="normal"
@@ -86,7 +92,7 @@ const styles = stylex.create({
     minWidth: 0,
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     paddingTop: 0,
     paddingBottom: 0,
     paddingLeft: '8px',
@@ -97,7 +103,7 @@ const styles = stylex.create({
     columnGap: '4px',
     display: 'flex',
     alignItems: 'flex-end',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     pointerEvents: 'none',
   },
   metas: {
@@ -108,7 +114,7 @@ const styles = stylex.create({
     textOverflow: 'ellipsis',
     overflow: 'hidden',
     verticalAlign: 'middle',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   metadataTitle: {
     fontWeight: 'var(--bold)',
@@ -131,5 +137,9 @@ const styles = stylex.create({
     fontVariantNumeric: 'tabular-nums',
     whiteSpace: 'nowrap',
     opacity: 0.7,
+    display: {
+      default: 'block',
+      '@media (max-width: 699px)': 'none',
+    },
   },
 });

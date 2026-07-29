@@ -12,11 +12,11 @@ import TrackListStatus from './TrackListStatus';
 
 type NavItemProps = {
   to: LinkProps['to'];
-  title: string;
+  label: string;
   children: ReactNode;
 };
 
-function NavItem({ to, title, children }: NavItemProps) {
+function NavItem({ to, label, children }: NavItemProps) {
   return (
     <NavigationMenu.Item {...stylex.props(styles.navigationItem)}>
       <NavigationMenu.Link
@@ -24,12 +24,13 @@ function NavItem({ to, title, children }: NavItemProps) {
           <Link
             {...renderProps}
             to={to}
-            title={title}
-            aria-label={title}
+            title={label}
+            aria-label={label}
             draggable={false}
             {...stylex.props(styles.navigationLink)}
           >
-            {children}
+            <span {...stylex.props(styles.navigationIcon)}>{children}</span>
+            <span {...stylex.props(styles.navigationLabel)}>{label}</span>
           </Link>
         )}
       />
@@ -39,34 +40,59 @@ function NavItem({ to, title, children }: NavItemProps) {
 
 export default function Navigation() {
   const { t } = useLingui();
+  const platform = window.__MUSEEKS_PLATFORM;
 
   return (
-    <div {...stylex.props(styles.navigation)}>
-      <div {...stylex.props(styles.viewLinksContainer)}>
-        <NavigationMenu.Root
-          orientation="horizontal"
-          aria-label={t`Main navigation`}
-        >
+    <aside
+      aria-label={t`YifuMusic sidebar`}
+      {...stylex.props(styles.navigation)}
+    >
+      <div
+        {...stylex.props(
+          styles.brand,
+          platform === 'macos' && styles.brandMacos,
+        )}
+      >
+        <span {...stylex.props(styles.brandMark)}>
+          <Icon name="musicalNotes" size={20} />
+        </span>
+        <span {...stylex.props(styles.brandName)}>YifuMusic</span>
+      </div>
+
+      <NavigationMenu.Root
+        orientation="vertical"
+        aria-label={t`Main navigation`}
+        {...stylex.props(styles.navigationRoot)}
+      >
+        <div {...stylex.props(styles.viewLinksContainer)}>
+          <span {...stylex.props(styles.groupLabel)}>{t`Library`}</span>
           <NavigationMenu.List {...stylex.props(styles.viewLinks)}>
-            <NavItem to="/library" title={t`Library`}>
+            <NavItem to="/library" label={t`Library`}>
               <Icon name="musicalNotes" size={16} />
             </NavItem>
-            <NavItem to="/artists" title={t`Artists`}>
+            <NavItem to="/artists" label={t`Artists`}>
               <Icon name="microphone" size={16} />
             </NavItem>
-            <NavItem to="/playlists" title={t`Playlists`}>
+            <NavItem to="/playlists" label={t`Playlists`}>
               <Icon name="playlist" size={16} />
             </NavItem>
-            <NavItem to="/settings" title={t`Settings`}>
+          </NavigationMenu.List>
+        </div>
+
+        <div {...stylex.props(styles.systemLinks)}>
+          <span {...stylex.props(styles.groupLabel)}>{t`System`}</span>
+          <NavigationMenu.List {...stylex.props(styles.viewLinks)}>
+            <NavItem to="/settings" label={t`Settings`}>
               <Icon name="settings" size={16} />
             </NavItem>
           </NavigationMenu.List>
-        </NavigationMenu.Root>
-      </div>
+        </div>
+      </NavigationMenu.Root>
+
       <div {...stylex.props(styles.status)} aria-label={t`Library status`}>
         <Status />
       </div>
-    </div>
+    </aside>
   );
 }
 
@@ -79,7 +105,6 @@ function Status() {
   const { current, total } = refresh;
 
   if (refreshing) {
-    // Sketchy
     const isScanning = total === 0;
     const progress = total > 0 ? Math.round((current / total) * 100) : 100;
 
@@ -108,83 +133,181 @@ function Status() {
 
 const styles = stylex.create({
   navigation: {
-    order: 2,
-    backgroundColor: 'var(--footer-bg)',
-    borderTopWidth: '1px',
-    borderTopStyle: 'solid',
-    borderTopColor: 'var(--border-color)',
-    flexGrow: 0,
-    flexShrink: 0,
-    flexBasis: 'auto',
-    paddingBlock: '0',
-    paddingInline: '15px',
+    minHeight: 0,
+    overflow: 'hidden',
     display: 'flex',
-    alignItems: 'stretch',
+    flexDirection: 'column',
+    paddingBlock: {
+      default: '16px',
+      '@media (max-width: 899px)': '12px',
+    },
+    paddingInline: {
+      default: '12px',
+      '@media (max-width: 899px)': '8px',
+    },
+    backgroundColor: 'var(--surface-raised)',
+    borderRightWidth: '1px',
+    borderRightStyle: 'solid',
+    borderRightColor: 'var(--border-subtle)',
+    alignItems: {
+      default: 'stretch',
+      '@media (max-width: 899px)': 'center',
+    },
+  },
+  brand: {
+    minHeight: '40px',
+    marginBottom: {
+      default: '28px',
+      '@media (max-width: 899px)': '20px',
+    },
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: '10px',
+  },
+  brandMacos: {
+    paddingLeft: {
+      default: '64px',
+      '@media (max-width: 899px)': 0,
+    },
+    paddingTop: {
+      '@media (max-width: 899px)': '40px',
+    },
+  },
+  brandMark: {
+    width: '36px',
+    height: '36px',
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--accent-contrast)',
+    backgroundColor: 'var(--accent)',
+    borderRadius: 'var(--radius-md)',
+  },
+  brandName: {
+    color: 'var(--text-primary)',
+    fontSize: '16px',
+    lineHeight: 1,
+    fontWeight: 700,
+    whiteSpace: 'nowrap',
+    display: {
+      default: 'inline',
+      '@media (max-width: 899px)': 'none',
+    },
+  },
+  navigationRoot: {
+    minHeight: 0,
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
   },
   viewLinksContainer: {
     display: 'flex',
-    alignItems: 'stretch',
-    width: '30%',
+    flexDirection: 'column',
+    rowGap: '8px',
+    minHeight: 0,
   },
   viewLinks: {
     display: 'flex',
-    alignItems: 'stretch',
+    flexDirection: 'column',
+    rowGap: '4px',
     listStyle: 'none',
     padding: 0,
     margin: 0,
   },
-  navigationItem: {
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--border-color)',
-    borderBlockWidth: '0',
-    borderInlineWidth: '1px',
-    marginLeft: {
-      default: '-1px',
-      ':first-child': '0',
+  groupLabel: {
+    paddingInline: '8px',
+    color: 'var(--text-secondary)',
+    fontSize: '11px',
+    fontWeight: 700,
+    lineHeight: 1,
+    display: {
+      default: 'inline',
+      '@media (max-width: 899px)': 'none',
     },
   },
+  navigationItem: {
+    minWidth: 0,
+  },
   navigationLink: {
-    color: {
-      default: 'inherit',
-      ':hover': 'inherit',
-      ':focus': 'inherit',
-      '[data-status="active"]': 'var(--main-color)',
+    minHeight: '40px',
+    width: {
+      '@media (max-width: 899px)': '40px',
     },
     paddingBlock: '8px',
-    paddingInline: '12px',
-    lineHeight: 1,
+    paddingInline: {
+      default: '10px',
+      '@media (max-width: 899px)': 0,
+    },
+    color: 'var(--text-secondary)',
+    textDecoration: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: '10px',
+    borderRadius: 'var(--radius-sm)',
+    boxShadow: {
+      default: 'inset 3px 0 0 transparent',
+      ':hover': 'inset 3px 0 0 var(--accent)',
+      '[data-status="active"]': 'inset 3px 0 0 var(--accent)',
+    },
+    backgroundColor: {
+      ':hover': 'var(--surface-hover)',
+      '[data-status="active"]': 'var(--surface-selected)',
+    },
+    fontWeight: {
+      default: 500,
+      '[data-status="active"]': 700,
+    },
+    justifyContent: {
+      default: 'flex-start',
+      '@media (max-width: 899px)': 'center',
+    },
+  },
+  navigationIcon: {
+    width: '20px',
+    height: '20px',
+    flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: {
-      ':active': 'var(--footer-nav-bg-color-active)',
-      '[data-status="active"]': 'var(--footer-nav-bg-color-active)',
+  },
+  navigationLabel: {
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    display: {
+      default: 'inline',
+      '@media (max-width: 899px)': 'none',
     },
-    zIndex: {
-      ':active': 1,
+  },
+  systemLinks: {
+    marginTop: 'auto',
+    paddingTop: {
+      default: '24px',
+      '@media (max-width: 899px)': '16px',
     },
   },
   status: {
-    width: '40%',
-    textAlign: 'center',
-    fontSize: '12px',
-    paddingTop: '7px',
-    paddingBottom: '7px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: '16px',
+    paddingInline: '8px',
+    color: 'var(--text-secondary)',
+    fontSize: '11px',
+    lineHeight: 1.4,
+    display: {
+      default: 'flex',
+      '@media (max-width: 899px)': 'none',
+    },
+    justifyContent: 'flex-start',
   },
   statusLibraryRefresh: {
     display: 'flex',
     flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: '0%',
+    minWidth: 0,
     alignItems: 'center',
   },
   statusLibraryRefreshProgress: {
     flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: '0%',
+    minWidth: 0,
   },
 });

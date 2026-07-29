@@ -37,15 +37,30 @@ export default function ButtonIcon(props: Props) {
 
 const styles = stylex.create({
   button: {
-    backgroundColor: 'transparent',
+    minWidth: '32px',
+    minHeight: '32px',
+    padding: '4px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'var(--surface-hover)',
+      ':active': 'var(--surface-selected)',
+    },
     borderStyle: 'none',
     borderWidth: '0',
-    color: 'var(--text)',
+    borderRadius: 'var(--radius-sm)',
+    color: 'var(--text-primary)',
     textAlign: 'center',
-    padding: '0',
     lineHeight: 1,
+    cursor: 'pointer',
+    opacity: {
+      ':disabled': 0.45,
+    },
   },
   icon: {
     verticalAlign: 'middle',
+    pointerEvents: 'none',
   },
 });

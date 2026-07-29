@@ -1,4 +1,5 @@
 import { Slider } from '@base-ui/react/slider';
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -14,6 +15,7 @@ type Props = {
 
 export default function TrackProgress(props: Props) {
   const { trackPlaying } = props;
+  const { t } = useLingui();
 
   const elapsed = usePlayingTrackCurrentTime();
   const duration = usePlayerState((state) => state.duration);
@@ -103,7 +105,7 @@ export default function TrackProgress(props: Props) {
             {tooltipContent}
           </div>
         </Slider.Track>
-        <Slider.Thumb aria-label="播放进度" />
+        <Slider.Thumb aria-label={t`Playback progress`} />
       </Slider.Control>
     </Slider.Root>
   );

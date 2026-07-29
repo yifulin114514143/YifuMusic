@@ -88,6 +88,7 @@ function ViewSettingsUI() {
       <Setting.Section>
         <Setting.Select
           label={t`Language`}
+          description={t`Choose the language used by YifuMusic`}
           value={config.language}
           onChange={(e) => {
             SettingsAPI.setLanguage(e.target.value)
@@ -151,16 +152,6 @@ function ViewSettingsUI() {
             <Trans>Playlists</Trans>
           </option>
         </Setting.Select>
-      </Setting.Section>
-      <Setting.Section>
-        <CheckboxSetting
-          title={t`Display Notifications`}
-          description={t`Send notifications when the playing track changes`}
-          value={config.notifications}
-          onChange={useInvalidateCallback(
-            SettingsAPI.toggleDisplayNotifications,
-          )}
-        />
       </Setting.Section>
       <Setting.Section>
         <CheckboxSetting

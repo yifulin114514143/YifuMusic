@@ -1,5 +1,4 @@
 import * as stylex from '@stylexjs/stylex';
-import type React from 'react';
 import { useMemo } from 'react';
 
 import type { Track } from '../generated/typings';
@@ -13,8 +12,6 @@ type Props = {
 
 export default function Queue(props: Props) {
   const { queue, queueCursor } = props;
-  let content: React.ReactNode;
-
   const isQueueEmpty = useMemo(() => {
     if (queueCursor == null) {
       return null;
@@ -23,27 +20,25 @@ export default function Queue(props: Props) {
     return queue.slice(queueCursor + 1).length === 0;
   }, [queue, queueCursor]);
 
-  if (isQueueEmpty || queueCursor == null) {
-    content = <QueueEmpty />;
-  } else {
-    content = <QueueList queue={queue} queueCursor={queueCursor} />;
-  }
-
-  return <div {...stylex.props(styles.queue)}>{content}</div>;
+  return (
+    <div {...stylex.props(styles.queue)}>
+      {isQueueEmpty || queueCursor == null ? (
+        <QueueEmpty />
+      ) : (
+        <QueueList queue={queue} queueCursor={queueCursor} />
+      )}
+    </div>
+  );
 }
 
 const styles = stylex.create({
   queue: {
-    width: '300px',
-    backgroundColor: 'var(--queue-bg)',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--border-color)',
-    borderRadius: 'var(--border-radius)',
-    textOverflow: 'ellipsis',
-    overflowX: 'hidden',
+    minHeight: 0,
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: 'var(--surface-raised)',
     fontSize: '12px',
-    boxShadow: '0 5px 3px -5px rgba(0 0 0 0.5)',
     textAlign: 'left',
   },
 });

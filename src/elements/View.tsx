@@ -63,12 +63,15 @@ const styles = stylex.create({
   view: {
     height: '100%',
     maxHeight: '100%',
-    backgroundColor: 'var(--background)',
+    minHeight: 0,
+    backgroundColor: 'var(--surface-canvas)',
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 'auto',
     overflow: 'auto',
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
   },
   centeredContent: {
     position: 'relative',
@@ -81,10 +84,14 @@ const styles = stylex.create({
     overflow: 'hidden',
   },
   viewContent: {
+    minHeight: 0,
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 'auto',
     minWidth: 0,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
 });
 
@@ -92,8 +99,12 @@ const layoutVariants = stylex.create({
   'full-width': {},
   centered: {
     display: 'grid',
-    gridTemplateColumns: '350px',
+    gridTemplateColumns: {
+      default: '350px',
+      '@media (max-width: 599px)': 'minmax(0, 1fr)',
+    },
     justifyContent: 'center',
     scrollbarGutter: 'stable',
+    overflowY: 'auto',
   },
 });

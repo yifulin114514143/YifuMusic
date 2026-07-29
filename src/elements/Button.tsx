@@ -27,6 +27,7 @@ export default function Button(props: Props) {
 
 const styles = stylex.create({
   button: {
+    minHeight: '32px',
     borderRadius: 'var(--border-radius)',
     borderStyle: 'solid',
     borderWidth: '1px',
@@ -51,7 +52,7 @@ const relevancyVariants = stylex.create({
   },
   danger: {
     color: 'white',
-    backgroundColor: '#b63333',
+    backgroundColor: 'var(--danger-color)',
   },
 });
 

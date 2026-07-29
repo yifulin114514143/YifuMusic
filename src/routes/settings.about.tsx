@@ -49,6 +49,7 @@ function ViewSettingsAbout() {
         </Setting.Description>
         <CheckboxSetting
           title={t`Automatically check for updates`}
+          description={t`Check for an available YifuMusic release when the app starts`}
           value={config.auto_update_checker}
           onChange={useInvalidateCallback(SettingsAPI.toggleAutoUpdateChecker)}
         />
@@ -63,6 +64,23 @@ function ViewSettingsAbout() {
             <Trans>Check for update</Trans>
           </Button>
         </div>
+      </Setting.Section>
+      <Setting.Section>
+        <Setting.Title>
+          <Trans>Licenses and notices</Trans>
+        </Setting.Title>
+        <Setting.Description>
+          <Trans>
+            YifuMusic is a modification of Museeks and is distributed under the
+            MIT License.
+          </Trans>
+        </Setting.Description>
+        <Setting.Description>
+          <Trans>
+            The root LICENSE and NOTICE.md retain the upstream license and
+            acknowledgement.
+          </Trans>
+        </Setting.Description>
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>

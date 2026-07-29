@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 
 import ButtonIcon from '../elements/ButtonIcon';
@@ -6,12 +7,13 @@ import player from '../lib/player';
 
 export default function ButtonPlaybackMode() {
   const mode = usePlayerState((state) => state.playbackMode);
+  const { t } = useLingui();
   const label =
     mode === 'repeat-one'
-      ? '播放模式：单曲循环'
+      ? t`Playback mode: Repeat one`
       : mode === 'repeat-all'
-        ? '播放模式：列表循环'
-        : '播放模式：顺序播放';
+        ? t`Playback mode: Repeat all`
+        : t`Playback mode: Sequential`;
   const pressed =
     mode === 'repeat-one' ? 'mixed' : mode === 'repeat-all' ? true : false;
 

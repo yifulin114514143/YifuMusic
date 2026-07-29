@@ -27,11 +27,6 @@ export default function TrackListHeader({ sortable = true }: Props) {
         sortBy={sortable ? 'Title' : null}
       />
       <TrackListHeaderCell
-        xstyle={styles.cellDuration}
-        title={t`Duration`}
-        sortBy={sortable ? 'Duration' : null}
-      />
-      <TrackListHeaderCell
         xstyle={styles.cellArtist}
         title={t`Artist`}
         sortBy={sortable ? 'Artist' : null}
@@ -42,9 +37,19 @@ export default function TrackListHeader({ sortable = true }: Props) {
         sortBy={sortable ? 'Album' : null}
       />
       <TrackListHeaderCell
+        xstyle={styles.cellDuration}
+        title={t`Duration`}
+        sortBy={sortable ? 'Duration' : null}
+      />
+      <TrackListHeaderCell
         xstyle={styles.cellGenre}
         title={t`Genre`}
         sortBy={sortable ? 'Genre' : null}
+      />
+      <TrackListHeaderCell
+        xstyle={styles.cellActions}
+        title={t`More actions`}
+        sortBy={null}
       />
     </div>
   );
@@ -64,16 +69,12 @@ const styles = stylex.create({
     zIndex: 5,
   },
   cellTrackPlaying: {
-    width: '30px',
+    width: '32px',
   },
   cellTrack: {
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: '0%',
-  },
-  cellDuration: {
-    width: '7%',
-    minWidth: '70px',
   },
   cellArtist: {
     width: '20%',
@@ -81,7 +82,18 @@ const styles = stylex.create({
   cellAlbum: {
     width: '20%',
   },
+  cellDuration: {
+    width: '7%',
+    minWidth: '70px',
+  },
   cellGenre: {
     width: '20%',
+    display: {
+      default: 'none',
+      '@media (min-width: 1400px)': 'block',
+    },
+  },
+  cellActions: {
+    width: '40px',
   },
 });

@@ -47,6 +47,7 @@ export default function TrackListDefault(props: Props) {
     onReorder,
     onTrackSelect,
     onContextMenu,
+    onMoreActions,
     onPlaybackStart,
   } = props;
 
@@ -143,6 +144,7 @@ export default function TrackListDefault(props: Props) {
                   index={virtualItem.index}
                   onTrackSelect={onTrackSelect}
                   onContextMenu={onContextMenu}
+                  onMoreActions={onMoreActions}
                   onPlaybackStart={onPlaybackStart}
                   draggable={reorderable}
                   hasSelectedAbove={

@@ -47,6 +47,9 @@ function ViewSettingsLibrary() {
         <Setting.Title>
           <Trans>Files</Trans>
         </Setting.Title>
+        <Setting.Description>
+          <Trans>Choose local music folders for YifuMusic to scan.</Trans>
+        </Setting.Description>
         {libraryFolders.length === 0 && (
           <Setting.Description>
             <Trans>There are no folders in your library.</Trans>
@@ -61,6 +64,7 @@ function ViewSettingsLibrary() {
                     <button
                       type="button"
                       {...stylex.props(styles.libraryFoldersRemove)}
+                      aria-label={t`Remove ${folder}`}
                       title={t`Remove`}
                       data-museeks-action
                       onClick={() =>
@@ -118,8 +122,12 @@ function ViewSettingsLibrary() {
         </Setting.Description>
       </Setting.Section>
       <Setting.Section>
+        <Setting.Title>
+          <Trans>Library refresh</Trans>
+        </Setting.Title>
         <CheckboxSetting
           title={t`Automatically refresh library on startup`}
+          description={t`Scan the configured music folders whenever YifuMusic starts.`}
           value={config.library_autorefresh}
           onChange={useInvalidateCallback(SettingsAPI.toggleLibraryAutorefresh)}
         />
@@ -172,10 +180,11 @@ const styles = stylex.create({
     borderColor: 'var(--border-color)',
     overflowX: 'auto',
     whiteSpace: 'pre',
-    width: '120%',
+    boxSizing: 'border-box',
+    width: '100%',
   },
   libraryFoldersRemove: {
-    color: 'red',
+    color: 'var(--danger-color)',
     borderStyle: 'none',
     backgroundColor: 'transparent',
     appearance: 'none',

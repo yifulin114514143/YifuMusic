@@ -8,16 +8,21 @@ import { MOCK_CONFIG } from '../lib/__mocks__/bridge-config.ts';
 import { messages } from '../translations/en.po';
 
 type Whatever = () => void | Promise<void>;
+type Viewport = { width: number; height: number };
 
 /**
  * E2E test setup, stubbing globals, bridges, setting up i18n and rendering the app
  */
-export function beforeEachSetup() {
+export function beforeEachSetup(viewport?: Viewport) {
   afterEach(async () => {
     await cleanup();
   });
 
   beforeEach(async () => {
+    if (viewport !== undefined) {
+      await page.viewport(viewport.width, viewport.height);
+    }
+
     // Stub Museeks Globals
     vi.stubGlobal('__MUSEEKS_INITIAL_CONFIG', MOCK_CONFIG);
     vi.stubGlobal('__MUSEEKS_INITIAL_QUEUE', []);

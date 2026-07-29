@@ -1,19 +1,27 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { Menu, MenuItem } from '@tauri-apps/api/menu';
+import { revealItemInDir } from '@tauri-apps/plugin-opener';
 import type React from 'react';
 import { useCallback, useState } from 'react';
 
 import LibraryAPI from '../api/LibraryAPI';
+import PlaylistsAPI from '../api/PlaylistsAPI';
+import ContentHeader from '../components/ContentHeader';
+import Cover from '../components/Cover';
 import * as Setting from '../components/Setting';
 import SettingCheckbox from '../components/SettingCheckbox';
 import Button from '../elements/Button';
+import ButtonIcon from '../elements/ButtonIcon';
 import Flexbox from '../elements/Flexbox';
 import Separator from '../elements/Separator';
 import View from '../elements/View';
 import { parseDuration } from '../hooks/useFormattedDuration';
 import useInvalidate from '../hooks/useInvalidate';
 import DatabaseBridge from '../lib/bridge-database';
+import player from '../lib/player';
+import { logAndNotifyError } from '../lib/utils';
 import type { TrackMutation } from '../types/museeks';
 
 // We assume no artist or genre has a comma in its name (fingers crossed)
@@ -28,18 +36,21 @@ export const Route = createFileRoute('/tracks/$trackID')({
       throw new Error('Track ID should not be null');
     }
 
-    const [track] = await DatabaseBridge.getTracks([trackID]);
+    const [[track], playlists] = await Promise.all([
+      DatabaseBridge.getTracks([trackID]),
+      DatabaseBridge.getAllPlaylists(),
+    ]);
 
     if (track == null) {
       throw new Error('Track not found');
     }
 
-    return { track };
+    return { track, playlists };
   },
 });
 
 function ViewTrackDetails() {
-  const { track } = Route.useLoaderData();
+  const { track, playlists } = Route.useLoaderData();
   const invalidate = useInvalidate();
   const { t } = useLingui();
 
@@ -77,8 +88,98 @@ function ViewTrackDetails() {
     [router],
   );
 
+  const playTrack = useCallback(() => {
+    void player.start([track], track.id, { type: 'library' });
+  }, [track]);
+
+  const addToQueue = useCallback(() => {
+    player.addToQueue([track]);
+  }, [track]);
+
+  const addToPlaylist = useCallback(async () => {
+    const items = await Promise.all(
+      playlists.map((playlist) =>
+        MenuItem.new({
+          text: playlist.name,
+          async action() {
+            await PlaylistsAPI.addTracks(playlist.id, [track.id]);
+            await invalidate();
+          },
+        }),
+      ),
+    );
+
+    const menu = await Menu.new({ items });
+    await menu.popup().catch(logAndNotifyError);
+  }, [invalidate, playlists, track.id]);
+
   return (
     <View hasPadding layout="centered">
+      <ContentHeader
+        title={track.title}
+        description={track.artists.join(', ')}
+        meta={`${track.album} / ${parseDuration(track.duration)}`}
+        actions={
+          <>
+            <Button type="button" onClick={handleCancel}>
+              {t`Back`}
+            </Button>
+            <ButtonIcon icon="play" label={t`Play`} onClick={playTrack} />
+            <ButtonIcon
+              icon="list"
+              label={t`Add to queue`}
+              onClick={addToQueue}
+            />
+            <Button
+              type="button"
+              disabled={playlists.length === 0}
+              title={
+                playlists.length === 0
+                  ? t`Create a playlist before adding tracks`
+                  : t`Add to playlist`
+              }
+              onClick={() => void addToPlaylist()}
+            >
+              {t`Add to playlist`}
+            </Button>
+            <Button
+              type="button"
+              onClick={() =>
+                revealItemInDir(track.path).catch(logAndNotifyError)
+              }
+            >
+              {t`Show in file manager`}
+            </Button>
+          </>
+        }
+      />
+      <section aria-label={t`Track summary`} {...stylex.props(styles.summary)}>
+        <div {...stylex.props(styles.summaryCover)}>
+          <Cover track={track} iconSize={24} />
+        </div>
+        <dl {...stylex.props(styles.summaryMetadata)}>
+          <div>
+            <dt>{t`Album`}</dt>
+            <dd>{track.album}</dd>
+          </div>
+          <div>
+            <dt>{t`Artists`}</dt>
+            <dd>{track.artists.join(', ')}</dd>
+          </div>
+          <div>
+            <dt>{t`Genre`}</dt>
+            <dd>{track.genres.join(', ')}</dd>
+          </div>
+          <div>
+            <dt>{t`Year`}</dt>
+            <dd>{track.year ?? t`Unknown`}</dd>
+          </div>
+          <div>
+            <dt>{t`Duration`}</dt>
+            <dd>{parseDuration(track.duration)}</dd>
+          </div>
+        </dl>
+      </section>
       <form onSubmit={handleSubmit} {...stylex.props(styles.detailsForm)}>
         <h2>
           <Trans>Edit "{track.title}"</Trans>
@@ -281,9 +382,40 @@ function parseNullableNumber(str: string): number | null {
 }
 
 const styles = stylex.create({
+  summary: {
+    display: 'grid',
+    gridTemplateColumns: 'auto minmax(0, 1fr)',
+    columnGap: '16px',
+    paddingBlock: '16px',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--border-subtle)',
+  },
+  summaryCover: {
+    width: '48px',
+    height: '48px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--text-secondary)',
+    backgroundColor: 'var(--surface-sunken)',
+    borderRadius: 'var(--radius-sm)',
+  },
+  summaryMetadata: {
+    minWidth: 0,
+    margin: 0,
+    display: 'grid',
+    gridTemplateColumns: {
+      default: 'repeat(2, minmax(0, 1fr))',
+      '@media (max-width: 599px)': 'minmax(0, 1fr)',
+    },
+    rowGap: '8px',
+    columnGap: '16px',
+  },
   detailsForm: {
     display: 'flex',
     flexDirection: 'column',
+    paddingTop: '24px',
   },
   detailsActions: {
     display: 'flex',

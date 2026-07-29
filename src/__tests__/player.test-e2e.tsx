@@ -10,12 +10,14 @@ import {
 beforeEachSetup();
 
 test('Double click on a track should play it and display its metadata', async () => {
+  const playerHeader = page.getByRole('banner', { name: 'Player' });
+
   // By default, the player is paused
   await expect
-    .element(page.getByRole('button', { name: 'Play' }))
+    .element(playerHeader.getByRole('button', { name: 'Play', exact: true }))
     .toBeInTheDocument();
   await expect
-    .element(page.getByRole('button', { name: 'Pause' }))
+    .element(playerHeader.getByRole('button', { name: 'Pause', exact: true }))
     .not.toBeInTheDocument();
 
   await setupScannedLibrary();
@@ -24,10 +26,10 @@ test('Double click on a track should play it and display its metadata', async ()
   await getTrackByName(/Whiskey Blues/).dblClick();
 
   await expect
-    .element(page.getByRole('button', { name: 'Play' }))
+    .element(playerHeader.getByRole('button', { name: 'Play', exact: true }))
     .not.toBeInTheDocument();
   await expect
-    .element(page.getByRole('button', { name: 'Pause' }))
+    .element(playerHeader.getByRole('button', { name: 'Pause', exact: true }))
     .toBeInTheDocument();
 
   // Check the track info is there
@@ -48,7 +50,7 @@ test('Double click on a track should play it and display its metadata', async ()
   player.pause();
   await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
-  const slider = page.getByRole('slider', { name: '播放进度' });
+  const slider = page.getByRole('slider', { name: 'Playback progress' });
   const sliderElement = slider.element() as HTMLInputElement;
   expect(sliderElement.max).toBe('150');
   expect(player.getState().duration).toBe(150);
@@ -72,10 +74,10 @@ test('Double click on a track should play it and display its metadata', async ()
   Reflect.deleteProperty(audio, 'duration');
   await getTrackByName(/Romantic Blues/).dblClick();
   await expect
-    .element(page.getByRole('button', { name: 'Play' }))
+    .element(playerHeader.getByRole('button', { name: 'Play', exact: true }))
     .not.toBeInTheDocument();
   await expect
-    .element(page.getByRole('button', { name: 'Pause' }))
+    .element(playerHeader.getByRole('button', { name: 'Pause', exact: true }))
     .toBeInTheDocument();
 
   // Check the new track info is there
@@ -86,7 +88,7 @@ test('Double click on a track should play it and display its metadata', async ()
     .element(page.getByRole('banner'))
     .toHaveTextContent('Jean-Paul-V — Pixabay');
 
-  const nextSlider = page.getByRole('slider', { name: '播放进度' });
+  const nextSlider = page.getByRole('slider', { name: 'Playback progress' });
   const nextSliderElement = nextSlider.element() as HTMLInputElement;
   expect(nextSliderElement.value).toBe('0');
   expect(nextSliderElement.max).toBe('300');
@@ -98,12 +100,14 @@ test('Double click on a track should play it and display its metadata', async ()
   });
 
   // Pause
-  await page.getByRole('button', { name: 'Pause' }).click();
+  await playerHeader
+    .getByRole('button', { name: 'Pause', exact: true })
+    .click();
   await expect
-    .element(page.getByRole('button', { name: 'Play' }))
+    .element(playerHeader.getByRole('button', { name: 'Play', exact: true }))
     .toBeInTheDocument();
   await expect
-    .element(page.getByRole('button', { name: 'Pause' }))
+    .element(playerHeader.getByRole('button', { name: 'Pause', exact: true }))
     .not.toBeInTheDocument();
 });
 
@@ -115,7 +119,7 @@ test('timeupdate synchronizes real duration to the playing UI without metadata e
   await setupScannedLibrary();
   await getTrackByName(/Whiskey Blues/).dblClick();
 
-  const slider = page.getByRole('slider', { name: '播放进度' });
+  const slider = page.getByRole('slider', { name: 'Playback progress' });
   const sliderElement = slider.element() as HTMLInputElement;
   expect(sliderElement.max).toBe('300');
 
@@ -143,10 +147,12 @@ test('Playback mode button cycles repeat modes and persists the selected state',
   await setupScannedLibrary();
   await getTrackByName(/Whiskey Blues/).dblClick();
 
-  const sequential = page.getByRole('button', { name: '播放模式：顺序播放' });
+  const sequential = page.getByRole('button', {
+    name: 'Playback mode: Sequential',
+  });
   await sequential.click();
   await expect
-    .element(page.getByRole('button', { name: '播放模式：列表循环' }))
+    .element(page.getByRole('button', { name: 'Playback mode: Repeat all' }))
     .toHaveAttribute('aria-pressed', 'true');
 
   const { default: configBridge } = await import('../lib/bridge-config');
@@ -156,9 +162,9 @@ test('Playback mode button cycles repeat modes and persists the selected state',
     audio_repeat: 'All',
   });
 
-  await page.getByRole('button', { name: '播放模式：列表循环' }).click();
+  await page.getByRole('button', { name: 'Playback mode: Repeat all' }).click();
   await expect
-    .element(page.getByRole('button', { name: '播放模式：单曲循环' }))
+    .element(page.getByRole('button', { name: 'Playback mode: Repeat one' }))
     .toHaveAttribute('aria-pressed', 'mixed');
 });
 
@@ -168,7 +174,7 @@ test('shuffle button toggles the real player mode and persists it', async () => 
   await setupScannedLibrary();
   await getTrackByName(/Whiskey Blues/).dblClick();
 
-  const shuffle = page.getByRole('button', { name: '随机播放' });
+  const shuffle = page.getByRole('button', { name: 'Shuffle' });
   await expect.element(shuffle).toHaveAttribute('aria-pressed', 'false');
 
   await shuffle.click();
