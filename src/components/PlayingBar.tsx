@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import type { Track } from '../generated/typings';
 import ButtonPlaybackMode from './ButtonPlaybackMode';
+import ButtonShuffle from './ButtonShuffle';
 import Cover from './Cover';
 import PlayingBarInfos from './PlayingBarInfo';
 
@@ -20,6 +21,7 @@ export default function PlayingBar(props: Props) {
       <PlayingBarInfos trackPlaying={trackPlaying} />
       <div {...stylex.props(styles.playerOptions)}>
         <ButtonPlaybackMode />
+        <ButtonShuffle />
       </div>
     </div>
   );

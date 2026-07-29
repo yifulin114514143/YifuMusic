@@ -2,7 +2,10 @@ import { listen } from '@tauri-apps/api/event';
 import { useEffect } from 'react';
 
 import type { IPCEvent, Track } from '../generated/typings';
+import MediaControlsBridge from '../lib/bridge-media-controls';
+import { dispatchMediaControlCommand } from '../lib/media-control-command';
 import player from '../lib/player';
+import { logAndNotifyError } from '../lib/utils';
 
 /**
  * Handle back-end events attempting to control the player
@@ -24,6 +27,11 @@ function IPCPlayerEvents() {
           }
         },
       ),
+      MediaControlsBridge.listenToCommands((command) => {
+        void dispatchMediaControlCommand(command, player).catch(
+          logAndNotifyError,
+        );
+      }),
     ];
 
     return function cleanup() {

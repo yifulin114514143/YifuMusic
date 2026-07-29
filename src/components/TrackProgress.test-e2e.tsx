@@ -24,7 +24,7 @@ const TRACK: Track = {
   artists: ['Test Artist'],
   genres: [],
   year: null,
-  duration: 120,
+  duration: 269.815873015873,
   track_no: 1,
   track_of: 1,
   disk_no: 1,
@@ -58,7 +58,7 @@ beforeEach(async () => {
           />
           <button
             aria-label="Commit slider"
-            onClick={() => onValueCommitted(60)}
+            onClick={() => onValueCommitted(264)}
             type="button"
           />
           {children}
@@ -70,8 +70,8 @@ beforeEach(async () => {
       Thumb: () => <input aria-label="播放进度" type="range" />,
     },
   }));
-
   ({ default: player } = await import('../lib/player'));
+  player.addToQueue([TRACK]);
   setCurrentTime = vi.fn<(time: number) => void>();
   player.setCurrentTime = setCurrentTime;
   ({ default: TrackProgress } = await import('./TrackProgress'));
@@ -93,5 +93,5 @@ test('previews multiple slider values without seeking and commits once', async (
 
   await page.getByRole('button', { name: 'Commit slider' }).click();
   expect(setCurrentTime).toHaveBeenCalledTimes(1);
-  expect(setCurrentTime).toHaveBeenCalledWith(60);
+  expect(setCurrentTime).toHaveBeenCalledWith(264);
 });

@@ -47,6 +47,27 @@ fn main() {
                 tauri_build::InlinedPlugin::new().commands(&["set"]),
             )
             .plugin(
+                "media-controls",
+                tauri_build::InlinedPlugin::new().commands(&[
+                    "set_metadata",
+                    "set_playback",
+                    "clear",
+                ]),
+            )
+            .plugin(
+                "native-audio",
+                tauri_build::InlinedPlugin::new().commands(&[
+                    "load",
+                    "play",
+                    "pause",
+                    "seek",
+                    "get_state",
+                    "set_volume",
+                    "set_playback_rate",
+                    "stop",
+                ]),
+            )
+            .plugin(
                 "sleepblocker",
                 tauri_build::InlinedPlugin::new().commands(&["enable", "disable"]),
             ),

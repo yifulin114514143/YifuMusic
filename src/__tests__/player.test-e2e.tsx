@@ -1,5 +1,5 @@
-import { expect, test, vi } from 'vite-plus/test';
-import { page, userEvent } from 'vite-plus/test/browser';
+import { expect, test } from 'vite-plus/test';
+import { page } from 'vite-plus/test/browser';
 
 import {
   beforeEachSetup,
@@ -69,6 +69,7 @@ test('Double click on a track should play it and display its metadata', async ()
   expect(player.getState().currentTime).toBe(45);
 
   // Click on another one
+  Reflect.deleteProperty(audio, 'duration');
   await getTrackByName(/Romantic Blues/).dblClick();
   await expect
     .element(page.getByRole('button', { name: 'Play' }))
@@ -106,51 +107,79 @@ test('Double click on a track should play it and display its metadata', async ()
     .not.toBeInTheDocument();
 });
 
-test('Playback mode menu is interactive and keeps menu actions outside drag regions', async () => {
+test('timeupdate synchronizes real duration to the playing UI without metadata events', async () => {
+  const player = (await import('../lib/player')).default;
+  const audio = (player as unknown as { audio: HTMLAudioElement }).audio;
+  Reflect.deleteProperty(audio, 'duration');
+
   await setupScannedLibrary();
   await getTrackByName(/Whiskey Blues/).dblClick();
 
+  const slider = page.getByRole('slider', { name: '播放进度' });
+  const sliderElement = slider.element() as HTMLInputElement;
+  expect(sliderElement.max).toBe('300');
+
+  const duration = 269.815873015873;
+  Object.defineProperty(audio, 'duration', {
+    configurable: true,
+    value: duration,
+  });
+  audio.currentTime = 260.013;
+  audio.dispatchEvent(new Event('timeupdate'));
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+  expect(player.getState()).toMatchObject({
+    mediaDuration: duration,
+    duration,
+  });
+  expect(Number(sliderElement.max)).toBeCloseTo(duration, 10);
+  await expect
+    .element(page.getByRole('banner').getByText('04:29', { exact: true }))
+    .toBeVisible();
+  Reflect.deleteProperty(audio, 'duration');
+});
+
+test('Playback mode button cycles repeat modes and persists the selected state', async () => {
+  await setupScannedLibrary();
+  await getTrackByName(/Whiskey Blues/).dblClick();
+
+  const sequential = page.getByRole('button', { name: '播放模式：顺序播放' });
+  await sequential.click();
+  await expect
+    .element(page.getByRole('button', { name: '播放模式：列表循环' }))
+    .toHaveAttribute('aria-pressed', 'true');
+
+  const { default: configBridge } = await import('../lib/bridge-config');
+  expect(await configBridge.getAll()).toMatchObject({
+    audio_playback_mode: 'repeat-all',
+    audio_shuffle: false,
+    audio_repeat: 'All',
+  });
+
+  await page.getByRole('button', { name: '播放模式：列表循环' }).click();
+  await expect
+    .element(page.getByRole('button', { name: '播放模式：单曲循环' }))
+    .toHaveAttribute('aria-pressed', 'mixed');
+});
+
+test('shuffle button toggles the real player mode and persists it', async () => {
   const player = (await import('../lib/player')).default;
-  const setPlaybackMode = vi
-    .spyOn(player, 'setPlaybackMode')
-    .mockResolvedValue();
+  await player.setPlaybackMode('sequential');
+  await setupScannedLibrary();
+  await getTrackByName(/Whiskey Blues/).dblClick();
 
-  const trigger = page.getByRole('button', { name: /播放模式/ });
-  await expect.element(trigger).toHaveAttribute('data-museeks-action', 'true');
-  await trigger.click();
+  const shuffle = page.getByRole('button', { name: '随机播放' });
+  await expect.element(shuffle).toHaveAttribute('aria-pressed', 'false');
 
-  const menu = page.getByRole('menu', { name: '播放模式' });
-  await expect.element(menu).toBeInTheDocument();
-  for (const label of ['顺序播放', '随机播放', '单曲循环', '列表循环']) {
-    await expect
-      .element(page.getByRole('menuitemradio', { name: label }))
-      .toHaveAttribute('data-museeks-action', 'true');
-  }
+  await shuffle.click();
 
-  await userEvent.keyboard('[ArrowDown]');
-  await userEvent.keyboard('[Enter]');
-  expect(setPlaybackMode).toHaveBeenCalledWith('shuffle');
+  await expect.element(shuffle).toHaveAttribute('aria-pressed', 'true');
+  expect(player.getState().playbackMode).toBe('shuffle');
 
-  await trigger.click();
-  await userEvent.keyboard('[ArrowDown]');
-  await userEvent.keyboard('[Space]');
-  expect(setPlaybackMode).toHaveBeenLastCalledWith('shuffle');
-
-  await trigger.click();
-  await page.getByRole('menuitemradio', { name: '顺序播放' }).click();
-  expect(setPlaybackMode).toHaveBeenCalledWith('sequential');
-
-  await trigger.click();
-  await page.getByRole('menuitemradio', { name: '单曲循环' }).click();
-  expect(setPlaybackMode).toHaveBeenCalledWith('repeat-one');
-
-  await trigger.click();
-  await page.getByRole('menuitemradio', { name: '列表循环' }).click();
-  expect(setPlaybackMode).toHaveBeenCalledWith('repeat-all');
-
-  await trigger.click();
-  await userEvent.keyboard('[Escape]');
-  await expect.element(menu).not.toBeInTheDocument();
-
-  setPlaybackMode.mockRestore();
+  const { default: configBridge } = await import('../lib/bridge-config');
+  expect(await configBridge.getAll()).toMatchObject({
+    audio_playback_mode: 'shuffle',
+    audio_shuffle: true,
+    audio_repeat: 'None',
+  });
 });

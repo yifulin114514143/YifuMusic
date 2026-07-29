@@ -59,6 +59,10 @@ const ConfigBridge = {
     this.config[key] = value;
     return;
   },
+
+  async multiSet(updates: Partial<Config>): Promise<void> {
+    this.config = { ...this.config, ...updates };
+  },
 };
 
 export default ConfigBridge;

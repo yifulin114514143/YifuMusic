@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { usePlayerState } from '../hooks/usePlayer';
 import ConfigBridge from '../lib/bridge-config';
 import { getCover } from '../lib/cover';
-import player from '../lib/player';
+import player, { type PlayerMediaError } from '../lib/player';
 import { goToPlayingTrack } from '../lib/queue-origin';
 import toastManager from '../lib/toast-manager';
 import { logAndNotifyError } from '../lib/utils';
@@ -27,17 +27,22 @@ function PlayerEvents() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    function handleAudioError(error: MediaError) {
+    function handleAudioError(error: PlayerMediaError) {
+      if (error.kind === 'native') {
+        toastManager.add({ title: error.message, type: 'danger' });
+        return;
+      }
+
       player.stop();
 
-      switch (error.code) {
-        case error.MEDIA_ERR_ABORTED:
+      switch (error.error.code) {
+        case error.error.MEDIA_ERR_ABORTED:
           toastManager.add({ title: AUDIO_ERRORS.aborted, type: 'warning' });
           break;
-        case error.MEDIA_ERR_DECODE:
+        case error.error.MEDIA_ERR_DECODE:
           toastManager.add({ title: AUDIO_ERRORS.corrupt, type: 'danger' });
           break;
-        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+        case error.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
           toastManager.add({ title: AUDIO_ERRORS.notFound, type: 'danger' });
           break;
         default:

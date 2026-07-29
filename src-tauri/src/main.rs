@@ -76,6 +76,8 @@ fn main() {
         .plugin(plugins::debug::init())
         .plugin(plugins::default_view::init())
         .plugin(plugins::file_associations::init())
+        .plugin(plugins::media_controls::init())
+        .plugin(plugins::native_audio::init())
         .plugin(plugins::sleepblocker::init())
         // Tauri integrations with the Operating System
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -156,7 +158,12 @@ fn main() {
             #[allow(unused_variables)]
             |app_handle, event| {
                 #[cfg(target_os = "macos")]
-                plugins::file_associations::handle_run_event(app_handle, event);
+                {
+                    if matches!(&event, tauri::RunEvent::Exit) {
+                        plugins::media_controls::clear_on_exit(app_handle);
+                    }
+                    plugins::file_associations::handle_run_event(app_handle, event);
+                }
             },
         );
 }

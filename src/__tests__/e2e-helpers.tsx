@@ -63,6 +63,8 @@ export function beforeEachSetup() {
     vi.doMock('../lib/bridge-database');
     vi.doMock('../lib/bridge-config');
     vi.doMock('../lib/cover');
+    vi.doMock('../lib/bridge-media-controls');
+    vi.doMock('../lib/bridge-native-audio');
 
     // Initial Location
     window.location.hash = '#/library';

@@ -41,9 +41,10 @@ export default function TrackProgress(props: Props) {
 
   const jumpAudioTo = useCallback(
     (value: number) => {
+      const target = Math.max(0, Math.min(value, max));
       setIsDragging(false);
-      setPreviewTime(Math.max(0, Math.min(value, max)));
-      player.setCurrentTime(value);
+      setPreviewTime(target);
+      player.setCurrentTime(target);
     },
     [max],
   );
@@ -60,12 +61,12 @@ export default function TrackProgress(props: Props) {
 
       const percent = (offsetX / barWidth) * 100;
 
-      const time = (percent * (duration ?? 0)) / 100;
+      const time = (percent * max) / 100;
 
       setTooltipTargetTime(time);
       setTooltipX(percent);
     },
-    [duration],
+    [max],
   );
 
   const hideTooltip = useCallback(() => {

@@ -4,6 +4,8 @@ import { describe, expect, test } from 'vite-plus/test';
 import capabilitySource from '../../../src-tauri/capabilities/main.json?raw';
 import coverPluginSource from '../../../src-tauri/src/plugins/cover.rs?raw';
 import databasePluginSource from '../../../src-tauri/src/plugins/db.rs?raw';
+import mediaControlsPluginSource from '../../../src-tauri/src/plugins/media_controls.rs?raw';
+import nativeAudioPluginSource from '../../../src-tauri/src/plugins/native_audio.rs?raw';
 import tauriConfigSource from '../../../src-tauri/tauri.conf.json?raw';
 
 type Permission =
@@ -76,6 +78,17 @@ const expectedPermissionIdentifiers = [
   'database:allow-delete-playlist',
   'database:allow-reset',
   'default-view:allow-set',
+  'media-controls:allow-set-metadata',
+  'media-controls:allow-set-playback',
+  'media-controls:allow-clear',
+  'native-audio:allow-load',
+  'native-audio:allow-play',
+  'native-audio:allow-pause',
+  'native-audio:allow-seek',
+  'native-audio:allow-get-state',
+  'native-audio:allow-set-volume',
+  'native-audio:allow-set-playback-rate',
+  'native-audio:allow-stop',
   'sleepblocker:allow-enable',
   'sleepblocker:allow-disable',
 ];
@@ -184,6 +197,16 @@ describe('stage 2 capability boundary', () => {
     expect(coverPluginSource).toContain('return Ok(None);');
     expect(coverPluginSource).not.toContain('AssetAccessDenied');
     expect(coverPluginSource).toContain('asset_protocol_scope.allow_file');
+    expect(nativeAudioPluginSource).toContain(
+      'app_handle.asset_protocol_scope().is_allowed(&path)',
+    );
+    expect(mediaControlsPluginSource).toContain(
+      'asset_protocol_scope.is_allowed(&track_path)',
+    );
+    expect(mediaControlsPluginSource).toContain(
+      'asset_protocol_scope.allow_file(&cover_path)',
+    );
+    expect(mediaControlsPluginSource).not.toContain('allow_directory');
   });
 
   test('allows core invoke imports only in bridge modules', () => {
@@ -206,6 +229,8 @@ describe('stage 2 capability boundary', () => {
       'src/lib/bridge-config.ts',
       'src/lib/bridge-cover.ts',
       'src/lib/bridge-database.ts',
+      'src/lib/bridge-media-controls.ts',
+      'src/lib/bridge-native-audio.ts',
       'src/lib/bridge-settings.ts',
     ]);
   });

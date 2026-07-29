@@ -13,6 +13,7 @@ pub mod app_close;
 pub mod app_menu;
 pub mod cover;
 pub mod file_associations;
+pub mod media_controls;
 
 /**
  * Stores
@@ -24,5 +25,6 @@ pub mod db;
  * Settings-related plugins
  */
 pub mod default_view;
+pub mod native_audio;
 pub mod sleepblocker;
 pub mod stream_server;

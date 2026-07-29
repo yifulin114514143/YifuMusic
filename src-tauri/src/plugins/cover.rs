@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
 use base64::prelude::{BASE64_STANDARD, Engine as _};
@@ -42,14 +42,8 @@ fn get_cover_from_id3(path: String) -> Option<String> {
     Some(format!("data:{};base64,{}", format, cover_base64))
 }
 
-#[memoize::memoize]
-fn get_cover_from_filesystem(path: String) -> Option<String> {
-    let dir_path = PathBuf::from_str(&path)
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf();
-
+pub fn get_cover_path_from_filesystem(path: &Path) -> Option<PathBuf> {
+    let dir_path = path.parent()?.to_path_buf();
     scan_dir(&dir_path, &SUPPORTED_COVER_EXTENSIONS)
         .iter()
         .find(|file| {
@@ -62,7 +56,12 @@ fn get_cover_from_filesystem(path: String) -> Option<String> {
 
             SUPPORTED_COVER_NAMES.contains(&file_stem.as_str())
         })
-        .map(|path| path.to_str().unwrap().into())
+        .cloned()
+}
+
+fn get_cover_from_filesystem(path: String) -> Option<String> {
+    get_cover_path_from_filesystem(&PathBuf::from_str(&path).ok()?)
+        .and_then(|cover_path| cover_path.to_str().map(Into::into))
 }
 
 #[tauri::command]
