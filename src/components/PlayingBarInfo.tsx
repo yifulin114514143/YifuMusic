@@ -1,23 +1,28 @@
 import * as stylex from '@stylexjs/stylex';
 
 import Link from '../elements/Link';
-import type { Repeat, Track } from '../generated/typings';
+import type { Track } from '../generated/typings';
 import useFormattedDuration from '../hooks/useFormattedDuration';
+import { usePlayerState } from '../hooks/usePlayer';
 import usePlayingTrackCurrentTime from '../hooks/usePlayingTrackCurrentTime';
 import TrackProgress from './TrackProgress';
 
 type Props = {
   trackPlaying: Track;
-  shuffle: boolean;
-  repeat: Repeat;
 };
 
 export default function PlayingBarInfo(props: Props) {
   const { trackPlaying } = props;
   const elapsed = usePlayingTrackCurrentTime();
-  const formattedDuration = useFormattedDuration(trackPlaying.duration);
+  const mediaDuration = usePlayerState((state) => state.mediaDuration);
+  const isMetadataLoaded = usePlayerState((state) => state.isMetadataLoaded);
+  const displayDuration =
+    mediaDuration ?? (isMetadataLoaded ? null : trackPlaying.duration);
+  const formattedDurationValue = useFormattedDuration(displayDuration);
+  const formattedDuration =
+    displayDuration === null ? '--:--' : formattedDurationValue;
   const formattedProgress = useFormattedDuration(
-    Math.min(trackPlaying.duration, elapsed),
+    Math.min(displayDuration ?? elapsed, elapsed),
   );
 
   return (

@@ -6,36 +6,44 @@ import type { Repeat, Track } from '../generated/typings';
 import type { QueueOrigin } from '../types/museeks';
 import ConfigBridge from './bridge-config';
 import { getCover } from './cover';
+import {
+  createPlaybackState,
+  getLegacyConfigFromPlaybackMode,
+  getPlaybackModeFromLegacyConfig,
+  selectNextTrack,
+  selectPreviousTrack,
+  type PlaybackMode,
+  type PlaybackState,
+  type PlaybackTransition,
+} from './playback-mode';
+import { getEffectiveDuration, normalizeSeekTime } from './player-contract';
 import { logAndNotifyError } from './utils';
-import { shuffleTracks } from './utils-player';
 
 interface PlayerOptions {
   playbackRate?: number;
   volume?: number;
   muted?: boolean;
-  repeat?: Repeat;
-  shuffle?: boolean;
+  playbackMode?: PlaybackMode;
+  audio?: HTMLAudioElement;
+  random?: () => number;
 }
 
-/**
- * Player state that gets emitted on changes
- */
 export interface PlayerState {
   queue: Track[];
   queueCursor: number | null;
   queueOrigin: QueueOrigin | null;
-  repeat: Repeat;
-  shuffle: boolean;
+  playbackMode: PlaybackMode;
   volume: number;
   muted: boolean;
   isPaused: boolean;
+  currentTime: number;
+  mediaDuration: number | null;
+  isMetadataLoaded: boolean;
+  isSeeking: boolean;
+  mediaError: string | null;
 }
 
-/**
- * Events emitted by the Player
- */
 export interface PlayerEvents {
-  // Playback events
   play: () => void;
   pause: () => void;
   stop: () => void;
@@ -43,63 +51,41 @@ export interface PlayerEvents {
   error: (error: MediaError) => void;
   timeupdate: (currentTime: number) => void;
   loadstart: () => void;
-
-  // State change event (for React hooks)
+  durationchange: (duration: number | null) => void;
   stateChange: (state: PlayerState) => void;
-
-  // Track change event
   trackChange: (track: Track | null) => void;
 }
 
-/**
- * Enhanced Player class that manages both audio playback and queue state.
- * Extends EventEmitter to notify React components of state changes.
- */
-class Player extends EventEmitter<PlayerEvents> {
+export class Player extends EventEmitter<PlayerEvents> {
   private readonly audio: HTMLAudioElement;
-
-  // Queue state
-  private queue: Track[];
-  private oldQueue: Track[]; // Backup for shuffle/unshuffle
-  private queueCursor: number | null;
-  private queueOrigin: QueueOrigin | null;
-
-  // Playback modes
-  private repeat: Repeat;
-  private shuffle: boolean;
-
-  // Cached state for useSyncExternalStore
+  private readonly random: () => number;
+  private queue: Track[] = [];
+  private queueCursor: number | null = null;
+  private queueOrigin: QueueOrigin | null = null;
+  private playbackMode: PlaybackMode;
+  private playbackState: PlaybackState<Track> | null = null;
   private state: PlayerState | null = null;
+  private mediaDuration: number | null = null;
+  private isMetadataLoaded = false;
+  private isSeeking = false;
+  private currentTime = 0;
+  private mediaError: string | null = null;
 
-  constructor(options?: PlayerOptions) {
+  constructor(options: PlayerOptions = {}) {
     super();
+    this.audio = options.audio ?? new Audio();
+    this.random = options.random ?? Math.random;
+    this.playbackMode = options.playbackMode ?? getInitialPlaybackMode();
 
-    const mergedOptions = {
-      playbackRate: 1,
-      volume: 1,
-      muted: false,
-      repeat: 'None' as Repeat,
-      shuffle: false,
-      ...options,
-    };
-
-    this.audio = new Audio();
-    this.queue = [];
-    this.oldQueue = [];
-    this.queueCursor = null;
-    this.queueOrigin = null;
-    this.repeat = mergedOptions.repeat;
-    this.shuffle = mergedOptions.shuffle;
-
-    this.audio.defaultPlaybackRate = mergedOptions.playbackRate;
-    this.audio.playbackRate = mergedOptions.playbackRate;
-    this.audio.volume = mergedOptions.volume;
-    this.audio.muted = mergedOptions.muted;
+    const playbackRate = options.playbackRate ?? 1;
+    this.audio.defaultPlaybackRate = playbackRate;
+    this.audio.playbackRate = playbackRate;
+    this.audio.volume = options.volume ?? 1;
+    this.audio.muted = options.muted ?? false;
 
     this.setupAudioListeners();
     this.setupMediaSession();
 
-    // Bind methods that are used as callbacks
     this.play = this.play.bind(this);
     this.pause = this.pause.bind(this);
     this.playPause = this.playPause.bind(this);
@@ -113,8 +99,7 @@ class Player extends EventEmitter<PlayerEvents> {
     this.removeFromQueue = this.removeFromQueue.bind(this);
     this.clearQueue = this.clearQueue.bind(this);
     this.setQueue = this.setQueue.bind(this);
-    this.toggleShuffle = this.toggleShuffle.bind(this);
-    this.toggleRepeat = this.toggleRepeat.bind(this);
+    this.setPlaybackMode = this.setPlaybackMode.bind(this);
     this.setTrack = this.setTrack.bind(this);
     this.setCurrentTime = this.setCurrentTime.bind(this);
     this.setVolume = this.setVolume.bind(this);
@@ -123,76 +108,76 @@ class Player extends EventEmitter<PlayerEvents> {
     this.setPlaybackRate = this.setPlaybackRate.bind(this);
   }
 
-  /**
-   * Setup internal audio element event listeners
-   */
   private setupAudioListeners() {
+    this.audio.addEventListener('loadstart', () => {
+      this.currentTime = 0;
+      this.mediaDuration = null;
+      this.isMetadataLoaded = false;
+      this.isSeeking = false;
+      this.mediaError = null;
+      this.emit('loadstart');
+      this.emitStateChange();
+    });
+    this.audio.addEventListener('loadedmetadata', () =>
+      this.syncMediaDuration(),
+    );
+    this.audio.addEventListener('durationchange', () =>
+      this.syncMediaDuration(),
+    );
+    this.audio.addEventListener('seeking', () => {
+      this.isSeeking = true;
+      this.emitStateChange();
+    });
+    this.audio.addEventListener('seeked', () => {
+      this.isSeeking = false;
+      this.syncCurrentTime();
+      this.emitStateChange();
+    });
+    this.audio.addEventListener('timeupdate', () => {
+      this.syncCurrentTime();
+      this.emit('timeupdate', this.currentTime);
+      this.emitStateChange();
+    });
     this.audio.addEventListener('play', () => {
       this.emit('play');
       this.emitStateChange();
     });
-
     this.audio.addEventListener('pause', () => {
       this.emit('pause');
       this.emitStateChange();
     });
-
-    this.audio.addEventListener('ended', async () => {
+    this.audio.addEventListener('ended', () => {
       this.emit('ended');
-      // Auto-advance to next track
-      await this.next();
+      void this.next();
     });
-
     this.audio.addEventListener('error', () => {
-      if (this.audio.error) {
-        this.emit('error', this.audio.error);
-      }
-    });
-
-    this.audio.addEventListener('timeupdate', () => {
-      this.emit('timeupdate', this.audio.currentTime);
-    });
-
-    this.audio.addEventListener('loadstart', () => {
-      this.emit('loadstart');
-    });
-
-    // Emit volume changes
-    this.audio.addEventListener('volumechange', () => {
+      const error = this.audio.error;
+      this.currentTime = 0;
+      this.mediaDuration = null;
+      this.isMetadataLoaded = false;
+      this.isSeeking = false;
+      this.mediaError = error?.message || 'Unable to load this track';
+      if (error) this.emit('error', error);
       this.emitStateChange();
     });
+    this.audio.addEventListener('volumechange', () => this.emitStateChange());
   }
 
-  /**
-   * Setup MediaSession integration (for OS media controls, MPRIS, etc.)
-   */
   private setupMediaSession() {
-    if (!('mediaSession' in navigator)) {
-      return;
-    }
-
-    // Update playback state when audio plays
+    if (!('mediaSession' in navigator)) return;
     this.audio.addEventListener('play', () => {
       navigator.mediaSession.playbackState = 'playing';
     });
-
-    // Update playback state when audio pauses
     this.audio.addEventListener('pause', () => {
       navigator.mediaSession.playbackState = 'paused';
     });
-
-    // Sync metadata when track loads
-    this.audio.addEventListener('loadstart', async () => {
-      await this.syncMediaSession();
+    this.audio.addEventListener('loadstart', () => {
+      void this.syncMediaSession();
     });
-
-    // Setup action handlers
     navigator.mediaSession.setActionHandler('play', () => {
       this.play().catch(logAndNotifyError);
     });
-    navigator.mediaSession.setActionHandler('pause', () => {
-      this.pause();
-    });
+    navigator.mediaSession.setActionHandler('pause', () => this.pause());
     navigator.mediaSession.setActionHandler('previoustrack', () => {
       this.previous().catch(logAndNotifyError);
     });
@@ -201,21 +186,12 @@ class Player extends EventEmitter<PlayerEvents> {
     });
   }
 
-  /**
-   * Sync current track metadata with MediaSession API
-   */
   private async syncMediaSession() {
-    if (!('mediaSession' in navigator) || !('MediaMetadata' in globalThis)) {
+    if (!('mediaSession' in navigator) || !('MediaMetadata' in globalThis))
       return;
-    }
-
     const track = this.getTrack();
-    if (!track) {
-      return;
-    }
-
+    if (!track) return;
     const cover = await getCover(track.path);
-
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
       artist: track.artists.join(', '),
@@ -224,49 +200,47 @@ class Player extends EventEmitter<PlayerEvents> {
     });
   }
 
-  /**
-   * Emit state change event for React hooks
-   */
+  private syncCurrentTime() {
+    const time = this.audio.currentTime;
+    this.currentTime = Number.isFinite(time) && time >= 0 ? time : 0;
+  }
+
+  private syncMediaDuration() {
+    const duration = this.audio.duration;
+    this.mediaDuration =
+      Number.isFinite(duration) && duration >= 0 ? duration : null;
+    this.isMetadataLoaded = true;
+    this.emit('durationchange', this.mediaDuration);
+    this.emitStateChange();
+  }
+
   private emitStateChange() {
-    // Invalidate cache when state changes
     this.state = null;
     this.emit('stateChange', this.getState());
   }
 
-  /**
-   * Get current player state snapshot with caching for useSyncExternalStore.
-   * Returns the same reference when called multiple times without state changes.
-   */
   getState(): PlayerState {
-    // Return cached state if available
-    if (this.state !== null) {
-      return this.state;
-    }
-
-    // Create new state object
+    if (this.state) return this.state;
     this.state = {
       queue: [...this.queue],
       queueCursor: this.queueCursor,
       queueOrigin: this.queueOrigin,
-      repeat: this.repeat,
-      shuffle: this.shuffle,
+      playbackMode: this.playbackMode,
       volume: this.audio.volume,
       muted: this.audio.muted,
       isPaused: this.audio.paused,
+      currentTime: this.currentTime,
+      mediaDuration: this.mediaDuration,
+      isMetadataLoaded: this.isMetadataLoaded,
+      isSeeking: this.isSeeking,
+      mediaError: this.mediaError,
     };
-
     return this.state;
   }
 
-  // ============================================================================
-  // Playback controls
-  // ============================================================================
-
   async play() {
-    if (!this.audio.src) {
+    if (!this.audio.src)
       throw new Error('Trying to play a track but no audio.src is defined');
-    }
-
     await this.audio.play();
   }
 
@@ -276,356 +250,267 @@ class Player extends EventEmitter<PlayerEvents> {
 
   stop() {
     this.audio.pause();
-
     this.queue = [];
     this.queueCursor = null;
     this.queueOrigin = null;
+    this.playbackState = null;
+    this.resetMediaState();
+    this.emit('trackChange', null);
     this.emit('stop');
     this.emitStateChange();
   }
 
   async playPause() {
     try {
-      if (this.audio.paused && this.queue.length > 0) {
-        await this.play();
-      } else {
-        this.pause();
-      }
+      if (this.audio.paused && this.queue.length > 0) await this.play();
+      else this.pause();
     } catch (error) {
       logAndNotifyError(error);
     }
   }
 
-  /**
-   * Jump to next track in queue
-   */
+  private transition(transition: PlaybackTransition): Promise<void> {
+    if (transition.kind === 'stop') {
+      this.stop();
+      return Promise.resolve();
+    }
+    const track = this.queue[transition.index];
+    if (!track) {
+      this.stop();
+      return Promise.resolve();
+    }
+    this.queueCursor = transition.index;
+    return this.setTrack(track)
+      .then(() => this.play())
+      .catch(logAndNotifyError);
+  }
+
   async next() {
-    if (this.queueCursor === null) {
-      return;
+    if (this.queueCursor === null || this.queue.length === 0) return;
+    if (!this.playbackState) {
+      this.playbackState = createPlaybackState(
+        this.queue,
+        this.queueCursor,
+        this.playbackMode,
+        this.random,
+      );
     }
-
-    let newQueueCursor: number;
-
-    if (this.repeat === 'One') {
-      newQueueCursor = this.queueCursor;
-    } else if (
-      this.repeat === 'All' &&
-      this.queueCursor === this.queue.length - 1
-    ) {
-      // Last track with repeat all -> go to first
-      newQueueCursor = 0;
-    } else {
-      newQueueCursor = this.queueCursor + 1;
-    }
-
-    const track = this.queue[newQueueCursor];
-
-    if (track !== undefined) {
-      this.queueCursor = newQueueCursor;
-      await this.setTrack(track);
-      await this.play();
-    } else {
-      this.stop();
-    }
+    this.playbackState.currentIndex = this.queueCursor;
+    await this.transition(selectNextTrack(this.playbackState));
   }
 
-  /**
-   * Jump to previous track, or restart current track if > 5 seconds
-   */
   async previous() {
-    if (this.queueCursor === null) {
+    if (this.queueCursor === null || this.queue.length === 0) return;
+    if (this.playbackMode === 'repeat-one' || this.audio.currentTime >= 5) {
+      this.setCurrentTime(0);
+      await this.play().catch(logAndNotifyError);
       return;
     }
-
-    let newQueueCursor = this.queueCursor;
-
-    // If track started less than 5 seconds ago, play the previous track
-    if (this.audio.currentTime < 5) {
-      newQueueCursor = this.queueCursor - 1;
+    if (!this.playbackState) {
+      this.playbackState = createPlaybackState(
+        this.queue,
+        this.queueCursor,
+        this.playbackMode,
+        this.random,
+      );
     }
-
-    const track = this.queue[newQueueCursor];
-
-    if (track !== undefined) {
-      this.queueCursor = newQueueCursor;
-      await this.setTrack(track);
-      await this.play();
-    } else {
-      this.stop();
-    }
+    this.playbackState.currentIndex = this.queueCursor;
+    await this.transition(selectPreviousTrack(this.playbackState));
   }
 
-  // ============================================================================
-  // Queue management
-  // ============================================================================
-
-  /**
-   * Start playing a new queue
-   */
   async start(
     tracks: Track[],
     trackID: string | null,
     queueOrigin: QueueOrigin,
   ) {
-    if (tracks.length === 0) {
-      return;
-    }
-
-    const targetTrackID = trackID ?? tracks[0].id;
-    const queuePosition = tracks.findIndex((t) => t.id === targetTrackID);
-
-    if (queuePosition === -1) {
-      return;
-    }
-
-    let queue = [...tracks];
-    let queueCursor = queuePosition;
-    const oldQueue = [...tracks];
-
-    // Apply shuffle if enabled
-    if (this.shuffle) {
-      queue = shuffleTracks(queue, queueCursor);
-      queueCursor = 0;
-    }
-
-    this.queue = queue;
-    this.oldQueue = oldQueue;
+    if (tracks.length === 0) return;
+    const queueCursor = tracks.findIndex(
+      (track) => track.id === (trackID ?? tracks[0].id),
+    );
+    if (queueCursor === -1) return;
+    this.queue = [...tracks];
     this.queueCursor = queueCursor;
     this.queueOrigin = queueOrigin;
-
-    const track = queue[queueCursor];
-    await this.setTrack(track);
+    this.resetPlaybackState();
+    await this.setTrack(this.queue[queueCursor]);
     await this.play().catch(logAndNotifyError);
   }
 
-  /**
-   * Start playing from a specific position in the current queue
-   */
   async startFromQueue(index: number) {
     const track = this.queue[index];
-    if (!track) {
-      return;
-    }
-
+    if (!track) return;
     this.queueCursor = index;
+    this.resetPlaybackState();
     await this.setTrack(track);
     await this.play();
   }
 
-  /**
-   * Add tracks to the end of the queue
-   */
   addToQueue(tracks: Track[]) {
     this.queue = [...this.queue, ...tracks];
-
-    // If queue was empty, set cursor to 0
     if (this.queueCursor === null && tracks.length > 0) {
       this.queueCursor = 0;
+      this.resetPlaybackState();
     }
-
     this.emitStateChange();
   }
 
-  /**
-   * Add tracks after the currently playing track
-   */
   addNextInQueue(tracks: Track[]) {
     if (this.queueCursor === null) {
-      this.queue = tracks;
-      this.queueCursor = 0;
+      this.queue = [...tracks];
+      this.queueCursor = tracks.length > 0 ? 0 : null;
     } else {
       this.queue.splice(this.queueCursor + 1, 0, ...tracks);
     }
-
+    this.resetPlaybackState();
     this.emitStateChange();
   }
 
-  /**
-   * Remove a track from the queue
-   */
   removeFromQueue(index: number) {
-    if (this.queueCursor === null) {
-      return;
-    }
-
-    // Convert relative index to absolute
+    if (this.queueCursor === null) return;
     const absoluteIndex = this.queueCursor + index + 1;
+    if (absoluteIndex < 0 || absoluteIndex >= this.queue.length) return;
     this.queue.splice(absoluteIndex, 1);
+    this.resetPlaybackState();
     this.emitStateChange();
   }
 
-  /**
-   * Clear all tracks after the current one
-   */
   clearQueue() {
-    if (this.queueCursor === null) {
-      return;
-    }
-
+    if (this.queueCursor === null) return;
     this.queue = this.queue.slice(0, this.queueCursor + 1);
+    this.resetPlaybackState();
     this.emitStateChange();
   }
 
-  /**
-   * Set the entire queue (used for reordering)
-   */
   setQueue(tracks: Track[]) {
-    this.queue = tracks;
+    const currentID = this.getTrack()?.id;
+    this.queue = [...tracks];
+    this.queueCursor =
+      currentID == null
+        ? null
+        : this.queue.findIndex((track) => track.id === currentID);
+    if (this.queueCursor === -1)
+      this.queueCursor = this.queue.length > 0 ? 0 : null;
+    this.resetPlaybackState();
     this.emitStateChange();
   }
 
-  /**
-   * Get the current queue
-   */
-  getQueue(): Track[] {
+  getQueue() {
     return [...this.queue];
   }
-
-  /**
-   * Get queue cursor
-   */
-  getQueueCursor(): number | null {
+  getQueueCursor() {
     return this.queueCursor;
   }
-
-  /**
-   * Get queue origin
-   */
-  getQueueOrigin(): QueueOrigin | null {
+  getQueueOrigin() {
     return this.queueOrigin;
   }
 
-  // ============================================================================
-  // Shuffle & Repeat
-  // ============================================================================
+  async setPlaybackMode(mode: PlaybackMode) {
+    const nextMode =
+      mode === 'shuffle' && this.queue.length < 2 ? 'sequential' : mode;
+    this.playbackMode = nextMode;
+    this.resetPlaybackState();
+    this.emitStateChange();
+    await ConfigBridge.multiSet({
+      audio_playback_mode: nextMode,
+      ...getLegacyConfigFromPlaybackMode(nextMode),
+    });
+  }
 
-  /**
-   * Toggle shuffle mode
-   */
+  getPlaybackMode() {
+    return this.playbackMode;
+  }
+
   async toggleShuffle() {
-    const nextShuffleState = !this.shuffle;
-
-    if (this.queueCursor === null) {
-      this.shuffle = nextShuffleState;
-      this.emitStateChange();
-      await ConfigBridge.set('audio_shuffle', nextShuffleState);
-      return;
-    }
-
-    const trackPlayingID = this.queue[this.queueCursor].id;
-
-    if (nextShuffleState) {
-      // Enable shuffle
-      const newQueue = shuffleTracks([...this.queue], this.queueCursor);
-      this.oldQueue = this.queue;
-      this.queue = newQueue;
-      this.queueCursor = 0;
-    } else {
-      // Disable shuffle - restore original order
-      const currentTrackIndex = this.oldQueue.findIndex(
-        (track) => track.id === trackPlayingID,
-      );
-      this.queue = [...this.oldQueue];
-      this.queueCursor = currentTrackIndex;
-    }
-
-    this.shuffle = nextShuffleState;
-    this.emitStateChange();
-    await ConfigBridge.set('audio_shuffle', nextShuffleState);
+    await this.setPlaybackMode(
+      this.playbackMode === 'shuffle' ? 'sequential' : 'shuffle',
+    );
   }
 
-  /**
-   * Toggle repeat mode (cycles through None -> All -> One -> None)
-   */
   async toggleRepeat() {
-    let nextRepeatState: Repeat = 'None';
-
-    // Cycle through modes
-    switch (this.repeat) {
-      case 'None':
-        nextRepeatState = 'All';
-        break;
-      case 'All':
-        nextRepeatState = 'One';
-        break;
-      case 'One':
-        nextRepeatState = 'None';
-        break;
-    }
-
-    this.repeat = nextRepeatState;
-    this.emitStateChange();
-    await ConfigBridge.set('audio_repeat', nextRepeatState);
+    const next: PlaybackMode =
+      this.playbackMode === 'sequential'
+        ? 'repeat-all'
+        : this.playbackMode === 'repeat-all'
+          ? 'repeat-one'
+          : 'sequential';
+    await this.setPlaybackMode(next);
   }
 
-  /**
-   * Get shuffle state
-   */
-  getShuffle(): boolean {
-    return this.shuffle;
+  getShuffle() {
+    return this.playbackMode === 'shuffle';
   }
-
-  /**
-   * Get repeat state
-   */
   getRepeat(): Repeat {
-    return this.repeat;
+    if (this.playbackMode === 'repeat-one') return 'One';
+    if (this.playbackMode === 'repeat-all') return 'All';
+    return 'None';
   }
-
-  // ============================================================================
-  // Track management
-  // ============================================================================
 
   async setTrack(track: Track) {
-    // On Linux, use a local HTTP server for audio streaming because
-    // WebKitGTK's asset protocol doesn't support media streaming properly.
-    // See: https://github.com/tauri-apps/tauri/issues/3725
+    this.resetMediaState();
     if (window.__MUSEEKS_STREAM_SERVER_URL != null) {
       this.audio.src = `${window.__MUSEEKS_STREAM_SERVER_URL}/stream?track_id=${encodeURIComponent(track.id)}`;
     } else {
       this.audio.src = convertFileSrc(track.path);
     }
-
     this.emit('trackChange', track);
     this.emitStateChange();
   }
 
-  /**
-   * Get the currently playing track (from queue at cursor position)
-   */
   getTrack(): Track | null {
-    if (this.queue.length > 0 && this.queueCursor !== null) {
-      return this.queue[this.queueCursor];
-    }
-    return null;
+    return this.queueCursor === null
+      ? null
+      : (this.queue[this.queueCursor] ?? null);
   }
-
-  // ============================================================================
-  // Audio controls
-  // ============================================================================
 
   setCurrentTime(time: number) {
-    this.audio.currentTime = time;
+    const fallbackDuration = this.getTrack()?.duration ?? null;
+    const target = normalizeSeekTime(
+      time,
+      this.mediaDuration,
+      fallbackDuration,
+    );
+    if (target === null) return;
+    try {
+      this.audio.currentTime = target;
+      this.currentTime = target;
+      this.emit('timeupdate', this.currentTime);
+      this.emitStateChange();
+    } catch {
+      // Browsers can reject a seek before media metadata is available.
+    }
   }
 
-  getCurrentTime(): number {
-    return this.audio.currentTime;
+  getCurrentTime() {
+    return this.currentTime;
+  }
+  getDuration() {
+    return getEffectiveDuration(
+      this.getTrack()?.duration ?? 0,
+      this.mediaDuration,
+      this.isMetadataLoaded,
+    );
+  }
+  getMediaDuration() {
+    return this.mediaDuration;
+  }
+  isMetadataReady() {
+    return this.isMetadataLoaded;
+  }
+  isCurrentlySeeking() {
+    return this.isSeeking;
   }
 
   setVolume(volume: number) {
-    this.audio.volume = volume;
+    this.audio.volume = Math.max(0, Math.min(1, volume));
     this.emitStateChange();
-    this.saveVolumeDebounced(volume);
+    this.saveVolumeDebounced(this.audio.volume);
   }
 
-  /**
-   * Debounced volume save to avoid too many writes to config
-   */
   private readonly saveVolumeDebounced = debounce((volume: number) => {
     void ConfigBridge.set('audio_volume', volume);
   }, 500);
 
-  getVolume(): number {
+  getVolume() {
     return this.audio.volume;
   }
 
@@ -638,51 +523,79 @@ class Player extends EventEmitter<PlayerEvents> {
   async unmute() {
     this.audio.muted = false;
     this.emitStateChange();
-    await ConfigBridge.set('audio_muted', this.audio.muted);
+    await ConfigBridge.set('audio_muted', false);
   }
 
-  isMuted(): boolean {
+  isMuted() {
     return this.audio.muted;
   }
-
-  isPaused(): boolean {
+  isPaused() {
     return this.audio.paused;
   }
 
   async setPlaybackRate(rate: number) {
-    // Validate range
-    if (!Number.isNaN(rate) && rate >= 0.5 && rate <= 5) {
-      this.audio.playbackRate = rate;
-      this.audio.defaultPlaybackRate = rate;
-      this.emitStateChange();
-      await ConfigBridge.set('audio_playback_rate', rate);
-    } else {
-      this.audio.playbackRate = 1.0;
-      this.audio.defaultPlaybackRate = 1.0;
-      this.emitStateChange();
-      await ConfigBridge.set('audio_playback_rate', null);
-    }
+    const valid = Number.isFinite(rate) && rate >= 0.5 && rate <= 5;
+    const nextRate = valid ? rate : 1;
+    this.audio.playbackRate = nextRate;
+    this.audio.defaultPlaybackRate = nextRate;
+    this.emitStateChange();
+    await ConfigBridge.set('audio_playback_rate', valid ? rate : null);
   }
 
-  getPlaybackRate(): number {
+  getPlaybackRate() {
     return this.audio.playbackRate;
+  }
+
+  private resetMediaState() {
+    this.currentTime = 0;
+    this.mediaDuration = null;
+    this.isMetadataLoaded = false;
+    this.isSeeking = false;
+    this.mediaError = null;
+  }
+
+  private resetPlaybackState() {
+    if (this.queueCursor === null || this.queue.length === 0) {
+      this.playbackState = null;
+      return;
+    }
+    this.playbackState = createPlaybackState(
+      this.queue,
+      this.queueCursor,
+      this.playbackMode,
+      this.random,
+    );
   }
 }
 
-export type PlayerInstance = InstanceType<typeof Player>;
+function getInitialPlaybackMode(): PlaybackMode {
+  const config = window.__MUSEEKS_INITIAL_CONFIG as Partial<{
+    audio_playback_mode: PlaybackMode;
+    audio_shuffle: boolean;
+    audio_repeat: Repeat;
+  }>;
+  if (
+    config.audio_playback_mode === 'sequential' ||
+    config.audio_playback_mode === 'shuffle' ||
+    config.audio_playback_mode === 'repeat-one' ||
+    config.audio_playback_mode === 'repeat-all'
+  ) {
+    return config.audio_playback_mode;
+  }
+  return getPlaybackModeFromLegacyConfig(
+    config.audio_shuffle ?? false,
+    config.audio_repeat ?? 'None',
+  );
+}
 
-/**
- * Create and export singleton player instance
- */
 const playerInstance = new Player({
   volume: ConfigBridge.getInitial('audio_volume'),
   playbackRate: ConfigBridge.getInitial('audio_playback_rate') ?? 1,
   muted: ConfigBridge.getInitial('audio_muted'),
-  repeat: ConfigBridge.getInitial('audio_repeat'),
-  shuffle: ConfigBridge.getInitial('audio_shuffle'),
+  playbackMode: getInitialPlaybackMode(),
 });
 
-export default playerInstance;
+export type PlayerInstance = InstanceType<typeof Player>;
 
-// Expose for debugging
+export default playerInstance;
 window.__MUSEEKS_PLAYER = playerInstance;

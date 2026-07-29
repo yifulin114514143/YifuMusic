@@ -16,7 +16,11 @@ pub fn init() -> AnyResult<ConfigManager> {
 
     let config = match existing_config {
         Ok(config) => {
-            // Backfill any missing keys populated by serde defaults.
+            // Backfill missing keys and migrate the legacy playback pair.
+            let mut config = config;
+            if config.audio_playback_mode.is_none() {
+                config.audio_playback_mode = Some(config.resolved_playback_mode());
+            }
             manager.save_toml(&config).unwrap();
 
             ConfigManager::new(manager, config)

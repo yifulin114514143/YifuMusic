@@ -1,9 +1,10 @@
 import { Slider } from '@base-ui/react/slider';
 import * as stylex from '@stylexjs/stylex';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { Track } from '../generated/typings';
 import useFormattedDuration from '../hooks/useFormattedDuration';
+import { usePlayerState } from '../hooks/usePlayer';
 import usePlayingTrackCurrentTime from '../hooks/usePlayingTrackCurrentTime';
 import player from '../lib/player';
 
@@ -15,10 +16,40 @@ export default function TrackProgress(props: Props) {
   const { trackPlaying } = props;
 
   const elapsed = usePlayingTrackCurrentTime();
+  const mediaDuration = usePlayerState((state) => state.mediaDuration);
+  const isMetadataLoaded = usePlayerState((state) => state.isMetadataLoaded);
+  const duration =
+    mediaDuration ?? (isMetadataLoaded ? null : trackPlaying.duration);
+  const max = duration ?? 1;
+  const disabled = duration === null || duration <= 0;
+  const [previewTime, setPreviewTime] = useState(elapsed);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const jumpAudioTo = useCallback((value: number) => {
-    player.setCurrentTime(value);
-  }, []);
+  useEffect(() => {
+    setPreviewTime(0);
+    setIsDragging(false);
+  }, [trackPlaying.id]);
+
+  useEffect(() => {
+    if (!isDragging) setPreviewTime(Math.min(elapsed, max));
+  }, [elapsed, isDragging, max]);
+
+  const previewAudioTo = useCallback(
+    (value: number) => {
+      setIsDragging(true);
+      setPreviewTime(Math.max(0, Math.min(value, max)));
+    },
+    [max],
+  );
+
+  const jumpAudioTo = useCallback(
+    (value: number) => {
+      setIsDragging(false);
+      setPreviewTime(Math.max(0, Math.min(value, max)));
+      player.setCurrentTime(value);
+    },
+    [max],
+  );
 
   const [tooltipTargetTime, setTooltipTargetTime] = useState<null | number>(
     null,
@@ -32,12 +63,12 @@ export default function TrackProgress(props: Props) {
 
       const percent = (offsetX / barWidth) * 100;
 
-      const time = (percent * trackPlaying.duration) / 100;
+      const time = (percent * (duration ?? 0)) / 100;
 
       setTooltipTargetTime(time);
       setTooltipX(percent);
     },
-    [trackPlaying],
+    [duration],
   );
 
   const hideTooltip = useCallback(() => {
@@ -50,10 +81,12 @@ export default function TrackProgress(props: Props) {
   return (
     <Slider.Root
       min={0}
-      max={trackPlaying.duration}
+      max={max}
+      disabled={disabled}
       step={1}
-      value={elapsed}
-      onValueChange={jumpAudioTo}
+      value={Math.min(previewTime, max)}
+      onValueChange={previewAudioTo}
+      onValueCommitted={jumpAudioTo}
     >
       <Slider.Control
         {...stylex.props(styles.trackRoot)}
@@ -72,7 +105,7 @@ export default function TrackProgress(props: Props) {
             {tooltipContent}
           </div>
         </Slider.Track>
-        <Slider.Thumb />
+        <Slider.Thumb aria-label="播放进度" />
       </Slider.Control>
     </Slider.Root>
   );

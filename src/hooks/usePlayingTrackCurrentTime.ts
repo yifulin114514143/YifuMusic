@@ -12,11 +12,18 @@ export default function usePlayingTrackCurrentTime(): number {
     function tick(time: number) {
       setCurrentTime(time);
     }
+    function reset() {
+      setCurrentTime(player.getCurrentTime());
+    }
 
     player.on('timeupdate', tick);
+    player.on('trackChange', reset);
+    player.on('loadstart', reset);
 
     return () => {
       player.off('timeupdate', tick);
+      player.off('trackChange', reset);
+      player.off('loadstart', reset);
     };
   }, []);
 

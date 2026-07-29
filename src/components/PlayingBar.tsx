@@ -1,9 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import type { Track } from '../generated/typings';
-import { usePlayerState } from '../hooks/usePlayer';
-import ButtonRepeat from './ButtonRepeat';
-import ButtonShuffle from './ButtonShuffle';
+import ButtonPlaybackMode from './ButtonPlaybackMode';
 import Cover from './Cover';
 import PlayingBarInfos from './PlayingBarInfo';
 
@@ -12,8 +10,6 @@ type Props = {
 };
 
 export default function PlayingBar(props: Props) {
-  const repeat = usePlayerState((state) => state.repeat);
-  const shuffle = usePlayerState((state) => state.shuffle);
   const trackPlaying = props.trackPlaying;
 
   return (
@@ -21,14 +17,9 @@ export default function PlayingBar(props: Props) {
       <div {...stylex.props(styles.playingBarCover)}>
         <Cover track={trackPlaying} noHorizontalBorder iconSize={16} />
       </div>
-      <PlayingBarInfos
-        trackPlaying={trackPlaying}
-        shuffle={shuffle}
-        repeat={repeat}
-      />
+      <PlayingBarInfos trackPlaying={trackPlaying} />
       <div {...stylex.props(styles.playerOptions)}>
-        <ButtonRepeat />
-        <ButtonShuffle />
+        <ButtonPlaybackMode />
       </div>
     </div>
   );

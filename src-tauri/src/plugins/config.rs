@@ -20,6 +20,16 @@ pub enum Repeat {
     None,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, TS)]
+#[ts(export, export_to = "../../src/generated/typings.ts")]
+#[serde(rename_all = "kebab-case")]
+pub enum PlaybackMode {
+    Sequential,
+    Shuffle,
+    RepeatOne,
+    RepeatAll,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, TS)]
 #[ts(export, export_to = "../../src/generated/typings.ts")]
 pub enum SortBy {
@@ -64,6 +74,9 @@ pub struct Config {
     pub audio_playback_rate: Option<f32>,
     pub audio_follow_playing_track: bool,
     pub audio_muted: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub audio_playback_mode: Option<PlaybackMode>,
+    // Retained only to migrate configurations written before Stage 3.
     pub audio_shuffle: bool,
     pub audio_repeat: Repeat,
     pub audio_stream_server: bool,
@@ -93,6 +106,7 @@ impl Default for Config {
             audio_playback_rate: Some(1.0),
             audio_follow_playing_track: false,
             audio_muted: false,
+            audio_playback_mode: Some(PlaybackMode::Sequential),
             audio_shuffle: false,
             audio_repeat: Repeat::None,
             #[cfg(target_os = "linux")]
@@ -111,6 +125,45 @@ impl Default for Config {
             wayland_compat: false,
             menu_bar_visible: false,
         }
+    }
+}
+
+impl Config {
+    pub fn resolved_playback_mode(&self) -> PlaybackMode {
+        self.audio_playback_mode.unwrap_or({
+            if self.audio_shuffle {
+                PlaybackMode::Shuffle
+            } else {
+                match self.audio_repeat {
+                    Repeat::One => PlaybackMode::RepeatOne,
+                    Repeat::All => PlaybackMode::RepeatAll,
+                    Repeat::None => PlaybackMode::Sequential,
+                }
+            }
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Config, PlaybackMode};
+
+    #[test]
+    fn legacy_config_maps_to_one_playback_mode() {
+        let shuffle: Config = serde_json::from_value(serde_json::json!({
+            "audio_shuffle": true,
+            "audio_repeat": "All"
+        }))
+        .unwrap();
+        assert_eq!(shuffle.audio_playback_mode, None);
+        assert_eq!(shuffle.resolved_playback_mode(), PlaybackMode::Shuffle);
+
+        let repeat_all: Config = serde_json::from_value(serde_json::json!({
+            "audio_shuffle": false,
+            "audio_repeat": "All"
+        }))
+        .unwrap();
+        assert_eq!(repeat_all.resolved_playback_mode(), PlaybackMode::RepeatAll);
     }
 }
 

@@ -8,6 +8,7 @@ export const MOCK_CONFIG: Config = {
   audio_playback_rate: 1.0,
   audio_follow_playing_track: false,
   audio_muted: false,
+  audio_playback_mode: 'sequential',
   audio_shuffle: false,
   audio_repeat: 'None',
   audio_stream_server: false,

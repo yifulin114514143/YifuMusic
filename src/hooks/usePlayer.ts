@@ -40,8 +40,12 @@ export function usePlayingTrackCurrentTime(): number {
   return useSyncExternalStore(
     (callback) => {
       player.on('timeupdate', callback);
+      player.on('trackChange', callback);
+      player.on('loadstart', callback);
       return () => {
         player.off('timeupdate', callback);
+        player.off('trackChange', callback);
+        player.off('loadstart', callback);
       };
     },
     () => player.getCurrentTime(),

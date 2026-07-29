@@ -45,14 +45,6 @@ msgstr ""
 msgid "YifuMusic {currentVersion} is the latest version available."
 msgstr ""
 
-#: src/components/ButtonRepeat.tsx:18
-msgid "Repeat"
-msgstr "Повтор"
-
-#: src/components/ButtonShuffle.tsx:12
-msgid "Shuffle"
-msgstr "Шафл"
-
 #: src/components/Cover.tsx:34
 msgid "Album cover"
 msgstr "Обложка альбома"
