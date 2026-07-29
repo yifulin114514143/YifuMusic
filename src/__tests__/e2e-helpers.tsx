@@ -1,6 +1,7 @@
 import { i18n } from '@lingui/core';
-import { beforeEach, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-react';
+import { cleanup } from 'vitest-browser-react';
 import { page } from 'vitest/context';
 
 import { MOCK_CONFIG } from '../lib/__mocks__/bridge-config.ts';
@@ -12,6 +13,10 @@ type Whatever = () => void | Promise<void>;
  * E2E test setup, stubbing globals, bridges, setting up i18n and rendering the app
  */
 export function beforeEachSetup() {
+  afterEach(async () => {
+    await cleanup();
+  });
+
   beforeEach(async () => {
     // Stub Museeks Globals
     vi.stubGlobal('__MUSEEKS_INITIAL_CONFIG', MOCK_CONFIG);

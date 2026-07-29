@@ -62,6 +62,12 @@ test('Double click on a track should play it and display its metadata', async ()
   expect(sliderElement.max).toBe('147');
   expect(player.getState().duration).toBe(147);
 
+  audio.currentTime = 45;
+  audio.dispatchEvent(new Event('timeupdate'));
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  expect(sliderElement.value).toBe('45');
+  expect(player.getState().currentTime).toBe(45);
+
   // Click on another one
   await getTrackByName(/Romantic Blues/).dblClick();
   await expect
@@ -78,6 +84,17 @@ test('Double click on a track should play it and display its metadata', async ()
   await expect
     .element(page.getByRole('banner'))
     .toHaveTextContent('Jean-Paul-V — Pixabay');
+
+  const nextSlider = page.getByRole('slider', { name: '播放进度' });
+  const nextSliderElement = nextSlider.element() as HTMLInputElement;
+  expect(nextSliderElement.value).toBe('0');
+  expect(nextSliderElement.max).toBe('300');
+  expect(player.getState()).toMatchObject({
+    currentTime: 0,
+    duration: 300,
+    mediaDuration: null,
+    isMetadataLoaded: false,
+  });
 
   // Pause
   await page.getByRole('button', { name: 'Pause' }).click();
@@ -113,6 +130,11 @@ test('Playback mode menu is interactive and keeps menu actions outside drag regi
   await userEvent.keyboard('[ArrowDown]');
   await userEvent.keyboard('[Enter]');
   expect(setPlaybackMode).toHaveBeenCalledWith('shuffle');
+
+  await trigger.click();
+  await userEvent.keyboard('[ArrowDown]');
+  await userEvent.keyboard('[Space]');
+  expect(setPlaybackMode).toHaveBeenLastCalledWith('shuffle');
 
   await trigger.click();
   await page.getByRole('menuitemradio', { name: '顺序播放' }).click();

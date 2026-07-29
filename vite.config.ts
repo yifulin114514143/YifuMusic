@@ -6,7 +6,7 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import browserslist from 'browserslist';
 import { browserslistToTargets } from 'lightningcss';
 import svgr from 'vite-plugin-svgr';
-import { defineConfig, type PluginOption } from 'vite-plus';
+import { defineConfig, type PluginOption, type ViteDevServer } from 'vite-plus';
 
 const CSS_TARGETS = browserslistToTargets(
   browserslist(['edge >=115', 'chrome >=115', 'safari >=13']),
@@ -28,23 +28,27 @@ function decoratorPreset(options: Record<string, unknown>) {
   };
 }
 
+const STYLEX_PLUGIN = stylex.vite({
+  useCSSLayers: false, // Ideally true, but this creates issues with global styles
+  propertyValidationMode: 'throw',
+  // Stylex is not well integrated in the Vite CSS pipeline
+  // https://github.com/facebook/stylex/issues/1378
+  lightningcssOptions: {
+    minify: true,
+    targets: CSS_TARGETS,
+  },
+});
+
+const ROUTER_PLUGIN = tanstackRouter({
+  target: 'react',
+  generatedRouteTree: './src/generated/route-tree.ts',
+  autoCodeSplitting: true,
+});
+
 export const VITE_PLUGINS: PluginOption[] = [
-  stylex.vite({
-    useCSSLayers: false, // Ideally true, but this creates issues with global styles
-    propertyValidationMode: 'throw',
-    // Stylex is not well integrated in the Vite CSS pipeline
-    // https://github.com/facebook/stylex/issues/1378
-    lightningcssOptions: {
-      minify: true,
-      targets: CSS_TARGETS,
-    },
-  }),
+  STYLEX_PLUGIN,
   lingui(),
-  tanstackRouter({
-    target: 'react',
-    generatedRouteTree: './src/generated/route-tree.ts',
-    autoCodeSplitting: true,
-  }),
+  ROUTER_PLUGIN,
   react(),
   svgr(),
   babel({
@@ -52,6 +56,42 @@ export const VITE_PLUGINS: PluginOption[] = [
     plugins: ['@lingui/babel-plugin-lingui-macro'],
   }),
 ];
+
+const VITE_TEST_STYLEX_PLUGIN = {
+  ...STYLEX_PLUGIN,
+  configureServer(server: ViteDevServer) {
+    const intervals: ReturnType<typeof setInterval>[] = [];
+    const nativeSetInterval = globalThis.setInterval;
+    globalThis.setInterval = ((...args: Parameters<typeof setInterval>) => {
+      const interval = nativeSetInterval(...args);
+      intervals.push(interval);
+      return interval;
+    }) as typeof setInterval;
+
+    try {
+      STYLEX_PLUGIN.configureServer?.call(this, server);
+    } finally {
+      globalThis.setInterval = nativeSetInterval;
+    }
+
+    let cleaned = false;
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
+      intervals.forEach((interval) => clearInterval(interval));
+    };
+    const close = server.close.bind(server);
+    server.close = async () => {
+      cleanup();
+      return close();
+    };
+    server.httpServer?.once('close', cleanup);
+  },
+};
+
+export const VITE_TEST_PLUGINS = VITE_PLUGINS.map((plugin) =>
+  plugin === STYLEX_PLUGIN ? VITE_TEST_STYLEX_PLUGIN : plugin,
+).filter((plugin) => plugin !== ROUTER_PLUGIN);
 
 // https://vitejs.dev/config/
 export default defineConfig({
