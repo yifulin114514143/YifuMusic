@@ -14,10 +14,7 @@ type Props = {
 export default function PlayingBarInfo(props: Props) {
   const { trackPlaying } = props;
   const elapsed = usePlayingTrackCurrentTime();
-  const mediaDuration = usePlayerState((state) => state.mediaDuration);
-  const isMetadataLoaded = usePlayerState((state) => state.isMetadataLoaded);
-  const displayDuration =
-    mediaDuration ?? (isMetadataLoaded ? null : trackPlaying.duration);
+  const displayDuration = usePlayerState((state) => state.duration);
   const formattedDurationValue = useFormattedDuration(displayDuration);
   const formattedDuration =
     displayDuration === null ? '--:--' : formattedDurationValue;

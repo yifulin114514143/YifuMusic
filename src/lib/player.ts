@@ -37,6 +37,7 @@ export interface PlayerState {
   muted: boolean;
   isPaused: boolean;
   currentTime: number;
+  duration: number | null;
   mediaDuration: number | null;
   isMetadataLoaded: boolean;
   isSeeking: boolean;
@@ -157,6 +158,7 @@ export class Player extends EventEmitter<PlayerEvents> {
       this.isMetadataLoaded = false;
       this.isSeeking = false;
       this.mediaError = error?.message || 'Unable to load this track';
+      this.emit('timeupdate', 0);
       if (error) this.emit('error', error);
       this.emitStateChange();
     });
@@ -230,6 +232,7 @@ export class Player extends EventEmitter<PlayerEvents> {
       muted: this.audio.muted,
       isPaused: this.audio.paused,
       currentTime: this.currentTime,
+      duration: this.getTrustedDuration(),
       mediaDuration: this.mediaDuration,
       isMetadataLoaded: this.isMetadataLoaded,
       isSeeking: this.isSeeking,
@@ -484,6 +487,10 @@ export class Player extends EventEmitter<PlayerEvents> {
     return this.currentTime;
   }
   getDuration() {
+    return this.getTrustedDuration();
+  }
+  private getTrustedDuration() {
+    if (this.mediaError !== null) return null;
     return getEffectiveDuration(
       this.getTrack()?.duration ?? 0,
       this.mediaDuration,

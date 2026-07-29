@@ -118,6 +118,14 @@ describe('player media events', () => {
       currentTime: 45,
       mediaDuration: 150,
       isMetadataLoaded: true,
+      duration: 150,
+    });
+
+    audio.duration = 147;
+    audio.dispatchEvent(new Event('durationchange'));
+    expect(player.getState()).toMatchObject({
+      mediaDuration: 147,
+      duration: 147,
     });
 
     await player.startFromQueue(1);
@@ -126,6 +134,7 @@ describe('player media events', () => {
       mediaDuration: null,
       isMetadataLoaded: false,
       isSeeking: false,
+      duration: 121,
     });
   });
 
@@ -160,6 +169,7 @@ describe('player media events', () => {
       mediaDuration: null,
       isMetadataLoaded: false,
       isSeeking: false,
+      duration: null,
       mediaError: 'decode failed',
     });
   });

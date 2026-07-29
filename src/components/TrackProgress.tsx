@@ -16,10 +16,7 @@ export default function TrackProgress(props: Props) {
   const { trackPlaying } = props;
 
   const elapsed = usePlayingTrackCurrentTime();
-  const mediaDuration = usePlayerState((state) => state.mediaDuration);
-  const isMetadataLoaded = usePlayerState((state) => state.isMetadataLoaded);
-  const duration =
-    mediaDuration ?? (isMetadataLoaded ? null : trackPlaying.duration);
+  const duration = usePlayerState((state) => state.duration);
   const max = duration ?? 1;
   const disabled = duration === null || duration <= 0;
   const [previewTime, setPreviewTime] = useState(elapsed);
