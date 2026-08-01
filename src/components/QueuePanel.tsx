@@ -25,7 +25,8 @@ const FOCUSABLE_SELECTOR = [
 
 export default function QueuePanel() {
   const { t } = useLingui();
-  const { queueOpen, shouldFocusQueue, closeQueue } = useAppShell();
+  const { queueOpen, shouldFocusQueue, closeQueue, nowPlayingOpen } =
+    useAppShell();
   const queue = usePlayerState((state) => state.queue);
   const queueCursor = usePlayerState((state) => state.queueCursor);
   const isPaused = usePlayerState((state) => state.isPaused);
@@ -38,11 +39,13 @@ export default function QueuePanel() {
     queueCursor === null ? null : (queue[queueCursor] ?? null);
 
   useEffect(() => {
-    if (queueOpen && shouldFocusQueue) closeButtonRef.current?.focus();
-  }, [queueOpen, shouldFocusQueue]);
+    if (queueOpen && shouldFocusQueue && !nowPlayingOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [nowPlayingOpen, queueOpen, shouldFocusQueue]);
 
   useEffect(() => {
-    if (!queueOpen) return;
+    if (!queueOpen || nowPlayingOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -53,7 +56,7 @@ export default function QueuePanel() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [closeQueue, queueOpen]);
+  }, [closeQueue, nowPlayingOpen, queueOpen]);
 
   useEffect(() => {
     let isWideLayout = window.innerWidth >= 1180;
@@ -103,7 +106,7 @@ export default function QueuePanel() {
 
   return (
     <>
-      {queueOpen && (
+      {queueOpen && !nowPlayingOpen && (
         <button
           aria-label={t`Close queue`}
           type="button"
@@ -111,10 +114,11 @@ export default function QueuePanel() {
           {...stylex.props(styles.backdrop)}
         />
       )}
-      {queueOpen && (
+      {queueOpen && !nowPlayingOpen && (
         <aside
           aria-label={t`Queue`}
           aria-modal={!isWideLayout ? true : undefined}
+          data-reference-layout="moekoe-queue-popup"
           role={isWideLayout ? 'complementary' : 'dialog'}
           onKeyDown={trapModalFocus}
           {...stylex.props(styles.panel)}
@@ -131,7 +135,7 @@ export default function QueuePanel() {
             </div>
             <ButtonIcon
               ref={closeButtonRef}
-              icon="chevronDown"
+              icon="close"
               iconSize={20}
               label={t`Collapse queue`}
               onClick={closeQueue}
@@ -184,23 +188,16 @@ const styles = stylex.create({
       default: 'none',
       '@media (max-width: 1179px)': 'block',
     },
-    position: {
-      default: 'static',
-      '@media (max-width: 1179px)': 'fixed',
-    },
-    inset: {
-      '@media (max-width: 1179px)': 0,
-    },
-    bottom: {
-      '@media (max-width: 1179px)': '84px',
-    },
+    position: 'fixed',
+    inset: 0,
+    bottom: '86px',
     zIndex: {
       '@media (max-width: 1179px)': 20,
     },
     borderStyle: 'none',
     backgroundColor: {
       default: 'transparent',
-      '@media (max-width: 1179px)': 'rgba(9, 12, 15, 0.4)',
+      '@media (max-width: 1179px)': 'rgba(12, 18, 25, 0.28)',
     },
     cursor: 'default',
   },
@@ -210,41 +207,39 @@ const styles = stylex.create({
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    borderLeftWidth: '1px',
-    borderLeftStyle: 'solid',
-    borderLeftColor: 'var(--border-subtle)',
-    backgroundColor: 'var(--surface-raised)',
-    boxShadow: 'var(--shadow-panel)',
-    position: {
-      default: 'relative',
-      '@media (max-width: 1179px)': 'fixed',
-    },
-    top: {
-      '@media (max-width: 1179px)': 0,
-    },
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'var(--border-subtle)',
+    borderRadius: '10px',
+    backgroundColor: 'var(--queue-bg)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+    position: 'fixed',
+    top: 'auto',
     right: {
-      '@media (max-width: 1179px)': 0,
+      default: '20px',
+      '@media (max-width: 1179px)': '12px',
     },
     bottom: {
-      '@media (max-width: 1179px)': '84px',
+      default: '100px',
+      '@media (max-width: 1179px)': '90px',
     },
     width: {
-      '@media (max-width: 1179px)': 'min(360px, calc(100vw - 24px))',
+      default: '300px',
+      '@media (max-width: 1179px)': 'min(360px, calc(100vw - 88px))',
+    },
+    maxHeight: {
+      default: '400px',
+      '@media (max-width: 1179px)': 'min(480px, calc(100dvh - 108px))',
     },
     zIndex: {
       '@media (max-width: 1179px)': 21,
     },
-    transform: {
-      '@media (max-width: 1179px)': 'translateX(0)',
-    },
-    transition: {
-      '@media (max-width: 1179px)': 'transform 160ms ease-out',
-    },
+    transition: 'opacity 160ms ease-out, transform 160ms ease-out',
   },
   header: {
-    minHeight: '56px',
-    paddingBlock: '12px',
-    paddingInline: '16px',
+    minHeight: '46px',
+    paddingBlock: '7px',
+    paddingInline: '10px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -272,13 +267,14 @@ const styles = stylex.create({
     borderRadius: 'var(--radius-sm)',
   },
   nowPlaying: {
-    margin: '12px',
-    padding: '10px',
+    marginBlock: '6px',
+    marginInline: '10px',
+    padding: '8px',
     display: 'flex',
     alignItems: 'center',
     columnGap: '10px',
-    borderRadius: 'var(--radius-md)',
-    backgroundColor: 'var(--accent-subtle)',
+    borderRadius: '5px',
+    backgroundColor: 'color-mix(in srgb, var(--main-color) 8%, transparent)',
     borderWidth: '1px',
     borderStyle: 'solid',
     borderColor: 'var(--border-subtle)',

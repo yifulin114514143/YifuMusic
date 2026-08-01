@@ -1,27 +1,66 @@
 import { i18n } from '@lingui/core';
-import { afterEach, beforeEach, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, expect, vi } from 'vite-plus/test';
 import { render } from 'vitest-browser-react';
 import { cleanup } from 'vitest-browser-react';
 import { page } from 'vitest/context';
 
 import { MOCK_CONFIG } from '../lib/__mocks__/bridge-config.ts';
-import { messages } from '../translations/en.po';
+import { messages } from '../translations/zh-CN.po';
 
 type Whatever = () => void | Promise<void>;
-type Viewport = { width: number; height: number };
+type SetupOptions = {
+  width?: number;
+  height?: number;
+  navigationMode?: 'side' | 'top' | null;
+  sidebarCollapsed?: boolean;
+};
+
+const E2E_MOCKED_MODULES = [
+  '../lib/bridge-database',
+  '../lib/bridge-config',
+  '../lib/cover',
+  '../lib/bridge-media-controls',
+  '../lib/bridge-native-audio',
+  '../lib/bridge-desktop-lyrics',
+  '../lib/bridge-lyrics',
+  '../lib/bridge-tray',
+] as const;
 
 /**
  * E2E test setup, stubbing globals, bridges, setting up i18n and rendering the app
  */
-export function beforeEachSetup(viewport?: Viewport) {
+export function beforeEachSetup(options?: SetupOptions) {
   afterEach(async () => {
     await cleanup();
+    vi.restoreAllMocks();
+    vi.resetModules();
+    for (const modulePath of E2E_MOCKED_MODULES) {
+      vi.doUnmock(modulePath);
+    }
+    vi.unstubAllGlobals();
+    window.localStorage.clear();
+    window.sessionStorage.clear();
   });
 
   beforeEach(async () => {
-    if (viewport !== undefined) {
-      await page.viewport(viewport.width, viewport.height);
+    vi.resetModules();
+
+    if (options?.width !== undefined && options.height !== undefined) {
+      await page.viewport(options.width, options.height);
     }
+
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+    if (options?.navigationMode !== null) {
+      window.localStorage.setItem(
+        'yifu-navigation-mode',
+        options?.navigationMode ?? 'side',
+      );
+    }
+    window.localStorage.setItem(
+      'sidebarCollapsed',
+      options?.sidebarCollapsed === true ? '1' : '0',
+    );
 
     // Stub Museeks Globals
     vi.stubGlobal('__MUSEEKS_INITIAL_CONFIG', MOCK_CONFIG);
@@ -61,8 +100,8 @@ export function beforeEachSetup(viewport?: Viewport) {
     });
 
     // Activate Lingui
-    i18n.load('en', messages);
-    i18n.activate('en');
+    i18n.load('zh-CN', messages);
+    i18n.activate('zh-CN');
 
     // Mock Bridges
     vi.doMock('../lib/bridge-database');
@@ -70,6 +109,9 @@ export function beforeEachSetup(viewport?: Viewport) {
     vi.doMock('../lib/cover');
     vi.doMock('../lib/bridge-media-controls');
     vi.doMock('../lib/bridge-native-audio');
+    vi.doMock('../lib/bridge-desktop-lyrics');
+    vi.doMock('../lib/bridge-lyrics');
+    vi.doMock('../lib/bridge-tray');
 
     // Initial Location
     window.location.hash = '#/library';
@@ -86,14 +128,19 @@ export function beforeEachSetup(viewport?: Viewport) {
  * Various helpers for triggering common actions on e2e tests
  * -------------------------------------------------------------------------- */
 
-// Get the main navigation element for main navigation between library, settings, etc
+// Get the primary navigation element for the top-level destinations.
 export function getMainNavigation() {
-  return page.getByRole('navigation', { name: 'Main navigation' });
+  return page.getByRole('navigation', { name: '主导航' });
+}
+
+// Get the system navigation element that contains the settings destination.
+export function getSystemNavigation() {
+  return page.getByRole('navigation', { name: '系统导航' });
 }
 
 // Get the track list element
 export function getTrackList() {
-  return page.getByRole('listbox', { name: 'Track list' });
+  return page.getByRole('listbox', { name: '音轨列表' });
 }
 
 // Get a track row by its title
@@ -109,13 +156,16 @@ export function getTrackAt(index: number) {
 // Get a sort button from the track list header by column name
 export function getSortButton(name: string) {
   return page
-    .getByRole('group', { name: 'Track list sorting options' })
+    .getByRole('group', { name: '音轨列表排序选项' })
     .getByRole('button', { name });
 }
 
 // Trigger a fake scan of the library based on mocks
 export async function setupScannedLibrary() {
-  await getMainNavigation().getByRole('link', { name: 'Settings' }).click();
-  await page.getByRole('button', { name: 'Scan' }).click();
-  await getMainNavigation().getByRole('link', { name: 'Library' }).click();
+  await getSystemNavigation()
+    .getByRole('link', { name: '设置', exact: true })
+    .click();
+  await page.getByRole('button', { name: '扫描' }).click();
+  await getMainNavigation().getByRole('link', { name: '音乐库' }).click();
+  await expect.element(getTrackAt(0)).toBeVisible();
 }

@@ -18,6 +18,7 @@ import * as ReactDOM from 'react-dom/client';
 
 import { loadTranslation } from './lib/i18n';
 import queryClient from './lib/query-client';
+import { messages as zhCNMessages } from './translations/zh-CN.po';
 
 /*
 |--------------------------------------------------------------------------
@@ -71,10 +72,16 @@ export const app = (
     return;
   }
 
-  await Promise.allSettled([
-    logger.attachConsole(),
-    loadTranslation(window.__MUSEEKS_INITIAL_CONFIG.language),
-  ]);
+  const initialLanguage = window.__MUSEEKS_INITIAL_CONFIG.language;
+  const loadInitialTranslation =
+    initialLanguage === 'zh-CN'
+      ? Promise.resolve().then(() => {
+          i18n.load('zh-CN', zhCNMessages);
+          i18n.activate('zh-CN');
+        })
+      : loadTranslation(initialLanguage);
+
+  await Promise.allSettled([logger.attachConsole(), loadInitialTranslation]);
 
   const wrap = document.getElementById('wrap');
 

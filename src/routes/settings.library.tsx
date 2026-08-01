@@ -7,8 +7,8 @@ import { useCallback } from 'react';
 
 import LibraryAPI from '../api/LibraryAPI';
 import SettingsAPI from '../api/SettingsAPI';
+import Icon from '../components/Icon';
 import * as Setting from '../components/Setting';
-import CheckboxSetting from '../components/SettingCheckbox';
 import Button from '../elements/Button';
 import Flexbox from '../elements/Flexbox';
 import useInvalidate, { useInvalidateCallback } from '../hooks/useInvalidate';
@@ -43,9 +43,16 @@ function ViewSettingsLibrary() {
 
   return (
     <>
+      <Setting.PageHeader
+        title={t`Library`}
+        description={t`Choose local music folders for YifuMusic to scan.`}
+      />
       <Setting.Section>
         <Setting.Title>
-          <Trans>Files</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="hardDrive" size={16} />
+            <Trans>Files</Trans>
+          </span>
         </Setting.Title>
         <Setting.Description>
           <Trans>Choose local music folders for YifuMusic to scan.</Trans>
@@ -123,9 +130,12 @@ function ViewSettingsLibrary() {
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
-          <Trans>Library refresh</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="refresh" size={16} />
+            自动扫描
+          </span>
         </Setting.Title>
-        <CheckboxSetting
+        <Setting.Toggle
           title={t`Automatically refresh library on startup`}
           description={t`Scan the configured music folders whenever YifuMusic starts.`}
           value={config.library_autorefresh}
@@ -134,7 +144,10 @@ function ViewSettingsLibrary() {
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
-          <Trans>Danger zone</Trans>
+          <span {...stylex.props(styles.dangerTitle)}>
+            <Icon name="trash" size={16} />
+            <Trans>Danger zone</Trans>
+          </span>
         </Setting.Title>
         <Setting.Description>
           <Trans>Delete all tracks and playlists from YifuMusic.</Trans>
@@ -169,6 +182,18 @@ function ViewSettingsLibrary() {
 }
 
 const styles = stylex.create({
+  cardTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    columnGap: '8px',
+    color: 'var(--text-primary)',
+  },
+  dangerTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    columnGap: '8px',
+    color: 'var(--danger-color)',
+  },
   libraryFolders: {
     listStyle: 'none',
     paddingBlock: '4px',

@@ -1,10 +1,11 @@
 import { Trans, useLingui } from '@lingui/react/macro';
+import * as stylex from '@stylexjs/stylex';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useLoaderData } from '@tanstack/react-router';
 
 import SettingsAPI from '../api/SettingsAPI';
+import Icon from '../components/Icon';
 import * as Setting from '../components/Setting';
-import CheckboxSetting from '../components/SettingCheckbox';
 import Button from '../elements/Button';
 import ExternalButton from '../elements/ExternalButton';
 import ExternalLink from '../elements/ExternalLink';
@@ -28,9 +29,16 @@ function ViewSettingsAbout() {
 
   return (
     <>
+      <Setting.PageHeader
+        title={t`About YifuMusic`}
+        description={`YifuMusic ${version}`}
+      />
       <Setting.Section>
         <Setting.Title>
-          <Trans>About YifuMusic</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="refresh" size={16} />
+            版本与更新
+          </span>
         </Setting.Title>
         <Setting.Description>
           YifuMusic {version}
@@ -47,7 +55,7 @@ function ViewSettingsAbout() {
             type="url"
           >{t`release notes`}</ExternalLink>
         </Setting.Description>
-        <CheckboxSetting
+        <Setting.Toggle
           title={t`Automatically check for updates`}
           description={t`Check for an available YifuMusic release when the app starts`}
           value={config.auto_update_checker}
@@ -67,7 +75,10 @@ function ViewSettingsAbout() {
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
-          <Trans>Licenses and notices</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="fileText" size={16} />
+            <Trans>Licenses and notices</Trans>
+          </span>
         </Setting.Title>
         <Setting.Description>
           <Trans>
@@ -84,7 +95,10 @@ function ViewSettingsAbout() {
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
-          <Trans>Contributors</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="globe" size={16} />
+            <Trans>Contributors</Trans>
+          </span>
         </Setting.Title>
         <Setting.Description>
           <Trans>
@@ -101,7 +115,10 @@ function ViewSettingsAbout() {
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
-          <Trans>Report issue / Ask for a feature</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="fileText" size={16} />
+            <Trans>Report issue / Ask for a feature</Trans>
+          </span>
         </Setting.Title>
         <Setting.Description>
           <Trans>
@@ -119,7 +136,10 @@ function ViewSettingsAbout() {
       </Setting.Section>
       <Setting.Section>
         <Setting.Title>
-          <Trans>Internals</Trans>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="settings" size={16} />
+            <Trans>Internals</Trans>
+          </span>
         </Setting.Title>
         <Setting.Description>Tauri {tauriVersion}</Setting.Description>
         <Flexbox gap={4}>
@@ -131,3 +151,12 @@ function ViewSettingsAbout() {
     </>
   );
 }
+
+const styles = stylex.create({
+  cardTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    columnGap: '8px',
+    color: 'var(--text-primary)',
+  },
+});

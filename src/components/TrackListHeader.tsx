@@ -59,7 +59,7 @@ const styles = stylex.create({
   trackListHeader: {
     borderBottomWidth: '1px',
     borderBottomStyle: 'solid',
-    borderBottomColor: 'var(--border-color)',
+    borderBottomColor: 'var(--border-strong)',
     color: 'var(--tracks-header-color)',
     backgroundColor: 'var(--tracks-header-bg)',
     display: 'flex',
@@ -69,7 +69,7 @@ const styles = stylex.create({
     zIndex: 5,
   },
   cellTrackPlaying: {
-    width: '32px',
+    width: '40px',
   },
   cellTrack: {
     flexGrow: 1,
@@ -83,8 +83,8 @@ const styles = stylex.create({
     width: '20%',
   },
   cellDuration: {
-    width: '7%',
-    minWidth: '70px',
+    width: '95px',
+    minWidth: '95px',
   },
   cellGenre: {
     width: '20%',

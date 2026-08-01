@@ -1,40 +1,107 @@
 import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import type React from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Keybinding from 'react-keybinding-component';
 
 import LibraryAPI from '../api/LibraryAPI';
 import useLibraryStore from '../lib/store';
 import { isCtrlKey } from '../lib/utils-events';
+import Icon from './Icon';
 
-export default function Search() {
+type Props = {
+  compact?: boolean;
+};
+
+export default function Search({ compact = false }: Props) {
   const search = useLibraryStore((state) => state.search);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLingui();
+  const [isFocused, setIsFocused] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isCompactOpen, setIsCompactOpen] = useState(false);
+  const isCompactExpanded =
+    compact && (isCompactOpen || isFocused || isHovering);
 
-  const onClear = useCallback(() => LibraryAPI.search(''), []);
+  const onClear = useCallback(() => {
+    LibraryAPI.search('');
+
+    if (location.pathname === '/search') {
+      void navigate({
+        to: '/search',
+        search: {},
+        replace: true,
+      });
+    }
+  }, [location.pathname, navigate]);
   const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
-      LibraryAPI.search(event.currentTarget.value);
+      const value = event.currentTarget.value;
+      LibraryAPI.search(value);
+
+      if (location.pathname === '/search') {
+        void navigate({
+          to: '/search',
+          search: (previous) => ({
+            ...previous,
+            q: value.trim() || undefined,
+          }),
+          replace: true,
+        });
+      }
+    },
+    [location.pathname, navigate],
+  );
+
+  const onFocus = useCallback<React.FocusEventHandler<HTMLInputElement>>(
+    (event) => {
+      setIsFocused(true);
+      setIsCompactOpen(true);
+      event.currentTarget.select();
     },
     [],
   );
 
-  const onFocus = useCallback<React.FocusEventHandler<HTMLInputElement>>(
-    (e) => e.currentTarget.select(),
-    [],
-  );
+  const onBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(() => {
+    setIsFocused(false);
+  }, []);
+
+  const focusCompactSearch = useCallback(() => {
+    setIsCompactOpen(true);
+    setIsFocused(true);
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  const onSubmit = useCallback(() => {
+    const query = search.trim();
+
+    if (query.length === 0) return;
+
+    void navigate({
+      to: '/search',
+      search: { q: query },
+    });
+  }, [navigate, search]);
 
   const onKeyDown = useCallback<React.KeyboardEventHandler<HTMLInputElement>>(
     (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        onSubmit();
+        return;
+      }
+
       if (event.key === 'Escape' && search.length > 0) {
         event.preventDefault();
         event.stopPropagation();
         onClear();
       }
     },
-    [onClear, search.length],
+    [onClear, onSubmit, search.length],
   );
 
   // ctrl/cmf+f shortcut
@@ -47,13 +114,52 @@ export default function Search() {
   };
 
   return (
-    <div {...stylex.props(styles.container)}>
+    <div
+      data-reference-layout={
+        compact ? 'moekoe-top-search' : 'moekoe-sidebar-search'
+      }
+      data-expanded={compact ? isCompactExpanded : undefined}
+      onMouseEnter={compact ? () => setIsHovering(true) : undefined}
+      onMouseLeave={compact ? () => setIsHovering(false) : undefined}
+      onBlurCapture={
+        compact
+          ? (event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                setIsCompactOpen(false);
+              }
+            }
+          : undefined
+      }
+      {...stylex.props(
+        styles.container,
+        compact && styles.containerCompact,
+        !compact && isFocused && styles.containerFocused,
+        compact &&
+          (isCompactExpanded
+            ? styles.containerCompactExpanded
+            : styles.containerCompactCollapsed),
+      )}
+    >
+      {compact && (
+        <button
+          aria-label="打开搜索"
+          aria-expanded={isCompactExpanded}
+          title="打开搜索"
+          type="button"
+          onClick={focusCompactSearch}
+          data-museeks-action
+          {...stylex.props(styles.compactTrigger)}
+        >
+          <Icon name="search" size={12} />
+        </button>
+      )}
       <input
         type="text"
         placeholder={t`search...`}
         value={search}
         onChange={onChange}
         onFocus={onFocus}
+        onBlur={onBlur}
         onKeyDown={onKeyDown}
         onMouseUp={(e) => e.preventDefault()}
         spellCheck={false}
@@ -61,10 +167,15 @@ export default function Search() {
         aria-label={t`Search library`}
         {...stylex.props(
           styles.input,
+          compact && styles.inputCompact,
+          compact &&
+            (isCompactExpanded
+              ? styles.inputCompactExpanded
+              : styles.inputCompactCollapsed),
           search.length > 0 && styles.inputNotEmpty,
         )}
       />
-      {search.length > 0 && (
+      {(!compact || isCompactExpanded) && search.length > 0 && (
         <button
           type="button"
           {...stylex.props(styles.clear)}
@@ -76,6 +187,18 @@ export default function Search() {
           &times;
         </button>
       )}
+      {(!compact || isCompactExpanded) && search.trim().length > 0 && (
+        <button
+          type="button"
+          {...stylex.props(styles.submit)}
+          onClick={onSubmit}
+          data-museeks-action
+          aria-label="查看完整搜索结果"
+          title="查看完整搜索结果"
+        >
+          <Icon name="search" size={16} />
+        </button>
+      )}
       <Keybinding preventInputConflict onKey={onKey} />
     </div>
   );
@@ -84,31 +207,81 @@ export default function Search() {
 const styles = stylex.create({
   container: {
     position: 'relative',
-    width: 'min(280px, 32vw)',
-    minWidth: '160px',
+    width: {
+      default: '200px',
+      '@media (max-width: 767px)': '154px',
+    },
+    minWidth: 0,
     display: 'flex',
     alignItems: 'center',
+    transition: 'width 180ms ease-out',
+  },
+  containerFocused: {
+    width: {
+      default: '250px',
+      '@media (max-width: 767px)': 'min(220px, 42vw)',
+    },
+  },
+  containerCompact: {
+    height: '26px',
+    overflow: 'hidden',
+    borderRadius: '999px',
+    transition:
+      'flex-basis 200ms ease-out, width 200ms ease-out, padding 200ms ease-out, column-gap 200ms ease-out, border-color 200ms ease-out',
+  },
+  containerCompactCollapsed: {
+    rowGap: 0,
+    columnGap: 0,
+    padding: 0,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'transparent',
+    backgroundColor: 'transparent',
+  },
+  containerCompactExpanded: {
+    rowGap: 0,
+    paddingInline: '8px',
+    columnGap: '6px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'var(--border-strong)',
+    backgroundColor: 'transparent',
   },
   input: {
     display: 'block',
     fontSize: 'inherit',
     width: '100%',
-    paddingBlock: '6px',
-    paddingInline: '12px',
+    minHeight: '36px',
+    paddingBlock: '7px',
+    paddingInline: '16px',
     backgroundColor: 'var(--search-bg)',
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: 'var(--border-color)',
+    borderColor: 'var(--border-strong)',
     color: 'var(--text)',
-    borderRadius: 'var(--border-radius)',
+    borderRadius: '999px',
     lineHeight: '16px',
   },
+  inputCompact: {
+    minHeight: '26px',
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    fontSize: '12px',
+    transition: 'width 200ms ease-out, opacity 150ms ease-out',
+  },
+  inputCompactCollapsed: {
+    minWidth: 0,
+  },
+  inputCompactExpanded: {
+    minWidth: 0,
+  },
   inputNotEmpty: {
-    borderBottomColor: 'var(--main-color)',
+    borderColor: 'var(--accent)',
   },
   clear: {
     position: 'absolute',
-    right: '4px',
+    right: '30px',
     zIndex: 10, // to be above the input, even when focused
     fontSize: '15px',
     color: 'var(--text)',
@@ -122,5 +295,36 @@ const styles = stylex.create({
     lineHeight: '100%',
     textAlign: 'center',
     fontFamily: 'Arial, sans-serif',
+  },
+  submit: {
+    position: 'absolute',
+    right: '4px',
+    zIndex: 10,
+    minWidth: '28px',
+    minHeight: '28px',
+    padding: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--text-secondary)',
+    backgroundColor: 'transparent',
+    borderStyle: 'none',
+    borderWidth: 0,
+    borderRadius: '999px',
+    cursor: 'pointer',
+  },
+  compactTrigger: {
+    width: '16px',
+    height: '24px',
+    flexShrink: 0,
+    padding: 0,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--text-secondary)',
+    borderWidth: 0,
+    borderStyle: 'none',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
   },
 });

@@ -61,14 +61,16 @@ export default function View(props: Props) {
 
 const styles = stylex.create({
   view: {
-    height: '100%',
-    maxHeight: '100%',
-    minHeight: 0,
+    minHeight: '100%',
+    padding: {
+      default: '20px',
+      '@media (max-width: 699px)': '14px',
+    },
     backgroundColor: 'var(--surface-canvas)',
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 'auto',
-    overflow: 'auto',
+    overflow: 'visible',
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
@@ -77,11 +79,15 @@ const styles = stylex.create({
     position: 'relative',
   },
   hasPadding: {
-    padding: '40px',
+    padding: {
+      default: '20px',
+      '@media (max-width: 699px)': '14px',
+    },
   },
   viewWithSideNav: {
     display: 'flex',
-    overflow: 'hidden',
+    padding: 0,
+    overflow: 'visible',
   },
   viewContent: {
     minHeight: 0,
@@ -89,7 +95,11 @@ const styles = stylex.create({
     flexShrink: 1,
     flexBasis: 'auto',
     minWidth: 0,
-    overflow: 'hidden',
+    padding: {
+      default: '20px',
+      '@media (max-width: 699px)': '14px',
+    },
+    overflow: 'visible',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -105,6 +115,6 @@ const layoutVariants = stylex.create({
     },
     justifyContent: 'center',
     scrollbarGutter: 'stable',
-    overflowY: 'auto',
+    overflowY: 'visible',
   },
 });

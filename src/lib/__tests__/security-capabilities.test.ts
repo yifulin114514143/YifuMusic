@@ -1,12 +1,17 @@
 import * as ts from 'typescript';
 import { describe, expect, test } from 'vite-plus/test';
 
+import desktopLyricsCapabilitySource from '../../../src-tauri/capabilities/desktop-lyrics.json?raw';
 import capabilitySource from '../../../src-tauri/capabilities/main.json?raw';
 import coverPluginSource from '../../../src-tauri/src/plugins/cover.rs?raw';
 import databasePluginSource from '../../../src-tauri/src/plugins/db.rs?raw';
+import desktopLyricsPluginSource from '../../../src-tauri/src/plugins/desktop_lyrics.rs?raw';
+import lyricsPluginSource from '../../../src-tauri/src/plugins/lyrics.rs?raw';
 import mediaControlsPluginSource from '../../../src-tauri/src/plugins/media_controls.rs?raw';
 import nativeAudioPluginSource from '../../../src-tauri/src/plugins/native_audio.rs?raw';
+import trayPluginSource from '../../../src-tauri/src/plugins/tray.rs?raw';
 import tauriConfigSource from '../../../src-tauri/tauri.conf.json?raw';
+import desktopLyricsBridgeSource from '../bridge-desktop-lyrics.ts?raw';
 
 type Permission =
   | string
@@ -60,6 +65,11 @@ const expectedPermissionIdentifiers = [
   'config:allow-set-config',
   'config:allow-get-config',
   'cover:allow-get-cover',
+  'desktop-lyrics:allow-open',
+  'desktop-lyrics:allow-sync-state',
+  'tray:allow-sync-state',
+  'lyrics:allow-get-sibling-lyrics',
+  'lyrics:allow-select-and-read',
   'database:allow-scan-library',
   'database:allow-get-all-tracks',
   'database:allow-get-tracks',
@@ -91,6 +101,20 @@ const expectedPermissionIdentifiers = [
   'native-audio:allow-stop',
   'sleepblocker:allow-enable',
   'sleepblocker:allow-disable',
+];
+
+const expectedDesktopLyricsPermissionIdentifiers = [
+  'core:event:allow-listen',
+  'core:event:allow-unlisten',
+  'desktop-lyrics:allow-close',
+  'desktop-lyrics:allow-start-dragging',
+  'desktop-lyrics:allow-get-state',
+  'desktop-lyrics:allow-control',
+  'desktop-lyrics:allow-set-mouse-passthrough',
+  'desktop-lyrics:allow-get-window-geometry',
+  'desktop-lyrics:allow-update-window-geometry',
+  'desktop-lyrics:allow-set-always-on-top',
+  'desktop-lyrics:allow-set-resizable',
 ];
 
 const expectedOpenerUrls = [
@@ -183,6 +207,62 @@ describe('stage 2 capability boundary', () => {
     ]);
   });
 
+  test('scopes the desktop lyrics window to state, playback, and restricted geometry controls', () => {
+    const capability = JSON.parse(desktopLyricsCapabilitySource) as Capability;
+    const permissionIdentifiers = capability.permissions.map(
+      getPermissionIdentifier,
+    );
+
+    expect(permissionIdentifiers).toStrictEqual(
+      expectedDesktopLyricsPermissionIdentifiers,
+    );
+    expect(permissionIdentifiers).not.toContain('core:event:allow-emit');
+    expect(permissionIdentifiers).not.toContain('core:window:allow-close');
+    expect(permissionIdentifiers).not.toContain(
+      'core:window:allow-start-dragging',
+    );
+    expect(permissionIdentifiers).not.toContain(
+      'core:window:allow-start-resize-dragging',
+    );
+    expect(permissionIdentifiers).not.toContain(
+      'core:window:allow-set-ignore-cursor-events',
+    );
+    expect(permissionIdentifiers).not.toContain('fs:allow-read-text-file');
+    expect(desktopLyricsPluginSource).toContain(
+      'fn ensure_desktop_lyrics_label(label: &str)',
+    );
+    expect(desktopLyricsPluginSource).toContain(
+      'label != DESKTOP_LYRICS_WINDOW_LABEL',
+    );
+    expect(desktopLyricsPluginSource).toContain(
+      'fn close<R: Runtime>(window: WebviewWindow<R>)',
+    );
+    expect(desktopLyricsPluginSource).toContain(
+      'fn start_dragging<R: Runtime>(window: WebviewWindow<R>)',
+    );
+    expect(desktopLyricsBridgeSource).not.toContain('@tauri-apps/api/window');
+    expect(desktopLyricsBridgeSource).not.toContain('startResizeDragging');
+    expect(desktopLyricsPluginSource).toContain(
+      'WebviewUrl::App("desktop-lyrics.html".into())',
+    );
+    expect(desktopLyricsPluginSource).toContain('.always_on_top(true)');
+    expect(desktopLyricsPluginSource).toContain('.transparent(true)');
+    expect(desktopLyricsPluginSource).toContain(
+      '.visible_on_all_workspaces(true)',
+    );
+    expect(desktopLyricsPluginSource).toContain(
+      'app_handle.emit_to("main", DESKTOP_LYRICS_ACTION_EVENT, action)',
+    );
+    expect(desktopLyricsPluginSource).toContain('set_ignore_cursor_events');
+    expect(trayPluginSource).toContain(
+      'TrayIconBuilder::with_id(TRAY_ICON_ID)',
+    );
+    expect(trayPluginSource).toContain('.show_menu_on_left_click(false)');
+    expect(trayPluginSource).toContain('IPCEvent::PlaybackPrevious');
+    expect(trayPluginSource).toContain('IPCEvent::PlaybackPlayPause');
+    expect(trayPluginSource).toContain('IPCEvent::PlaybackNext');
+  });
+
   test('keeps runtime asset grants tied to verified local media', () => {
     expect(databasePluginSource).toContain(
       'get_track_id_for_path(&track_path)',
@@ -207,6 +287,16 @@ describe('stage 2 capability boundary', () => {
       'asset_protocol_scope.allow_file(&cover_path)',
     );
     expect(mediaControlsPluginSource).not.toContain('allow_directory');
+    expect(lyricsPluginSource).toContain("State<'_, DBState>");
+    expect(lyricsPluginSource).toContain('track_id_for_verified_path');
+    expect(lyricsPluginSource).toContain('Uuid::new_v3');
+    expect(lyricsPluginSource).toContain('asset_protocol_scope.is_allowed');
+    expect(lyricsPluginSource).toContain(
+      'add_filter("Lyrics", &["lrc", "txt"])',
+    );
+    expect(lyricsPluginSource).not.toContain('allow_file');
+    expect(lyricsPluginSource).not.toContain('allow_directory');
+    expect(lyricsPluginSource).not.toContain('read_dir');
   });
 
   test('allows core invoke imports only in bridge modules', () => {
@@ -229,9 +319,12 @@ describe('stage 2 capability boundary', () => {
       'src/lib/bridge-config.ts',
       'src/lib/bridge-cover.ts',
       'src/lib/bridge-database.ts',
+      'src/lib/bridge-desktop-lyrics.ts',
+      'src/lib/bridge-lyrics.ts',
       'src/lib/bridge-media-controls.ts',
       'src/lib/bridge-native-audio.ts',
       'src/lib/bridge-settings.ts',
+      'src/lib/bridge-tray.ts',
     ]);
   });
 });

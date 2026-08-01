@@ -43,6 +43,7 @@ type TrackListProps = {
   tracksDensity: Config['track_view_density'];
   reorderable?: boolean;
   onReorder?: (tracks: Track[]) => void;
+  onSelectionChange?: (selectedTrackIDs: Set<string>) => void;
   queueOrigin: QueueOrigin;
   // For View-specific context menus
   extraContextMenu?: Array<{
@@ -75,6 +76,7 @@ export default function TrackList(props: Props) {
     reorderable,
     queueOrigin,
     onReorder,
+    onSelectionChange,
     playlists,
     extraContextMenu,
   } = props;
@@ -94,6 +96,10 @@ export default function TrackList(props: Props) {
   const { t } = useLingui();
 
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    onSelectionChange?.(new Set(selectedTracks));
+  }, [onSelectionChange, selectedTracks]);
 
   const navigate = useNavigate();
   const invalidate = useInvalidate();

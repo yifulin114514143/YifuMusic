@@ -88,6 +88,7 @@ pub struct Config {
     pub sleepblocker: bool,
     pub auto_update_checker: bool,
     pub notifications: bool,
+    pub status_bar_lyrics: bool,
     pub track_view_density: TrackViewDensity,
     pub wayland_compat: bool,
     #[serde(default)]
@@ -99,7 +100,7 @@ pub const SYSTEM_THEME: &str = "__system";
 impl Default for Config {
     fn default() -> Self {
         Config {
-            language: "en".to_owned(),
+            language: "zh-CN".to_owned(),
             theme: SYSTEM_THEME.to_owned(),
             ui_accent_color: None,
             audio_volume: 1.0,
@@ -121,6 +122,7 @@ impl Default for Config {
             sleepblocker: false,
             auto_update_checker: true,
             notifications: false,
+            status_bar_lyrics: false,
             track_view_density: TrackViewDensity::Normal,
             wayland_compat: false,
             menu_bar_visible: false,
@@ -147,6 +149,11 @@ impl Config {
 #[cfg(test)]
 mod tests {
     use super::{Config, PlaybackMode};
+
+    #[test]
+    fn default_config_uses_simplified_chinese() {
+        assert_eq!(Config::default().language, "zh-CN");
+    }
 
     #[test]
     fn legacy_config_maps_to_one_playback_mode() {

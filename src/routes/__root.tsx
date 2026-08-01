@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import SettingsAPI from '../api/SettingsAPI';
 import AppEvents from '../components/AppEvents';
 import AppShell from '../components/AppShell';
+import DesktopLyricsSync from '../components/DesktopLyricsSync';
 import DropzoneImport from '../components/DropzoneImport';
 import { ErrorView, NotFoundView } from '../components/GlobalErrors';
 import GlobalKeyBindings from '../components/GlobalKeyBindings';
@@ -21,6 +22,7 @@ import { logAndNotifyError } from '../lib/utils';
 
 type Search = {
   jump_to_playing_track?: boolean;
+  now_playing?: boolean;
 };
 
 export const Route = createRootRoute({
@@ -33,14 +35,14 @@ export const Route = createRootRoute({
     // fragment of the URL (after the #), which will prevent the default_view
     // plugin to navigate to the default view.
     const jump_to_playing_track = Boolean(search?.jump_to_playing_track);
+    const now_playing = Boolean(search?.now_playing);
 
-    if (jump_to_playing_track === true) {
-      return {
-        jump_to_playing_track,
-      };
-    }
+    if (!jump_to_playing_track && !now_playing) return {};
 
-    return {};
+    return {
+      ...(jump_to_playing_track ? { jump_to_playing_track } : {}),
+      ...(now_playing ? { now_playing } : {}),
+    };
   },
 });
 
@@ -70,6 +72,7 @@ function ViewRoot() {
       <AppEvents />
       <LibraryEvents />
       <PlayerEvents />
+      <DesktopLyricsSync />
       <GlobalKeyBindings />
 
       {/** The actual app */}

@@ -13,6 +13,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             {
                 use tauri::Manager as _; // Suppress warning about unused import.
 
+                if win.label() != "main" {
+                    return;
+                }
+
                 // Weird, should "win" be a reference instead maybe?
                 let window = win.clone();
 

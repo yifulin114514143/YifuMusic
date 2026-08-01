@@ -6,7 +6,7 @@ import {
 import { i18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
 import { afterEach, beforeEach, expect, test, vi } from 'vite-plus/test';
-import { page } from 'vite-plus/test/browser';
+import { page, userEvent } from 'vite-plus/test/browser';
 import { cleanup, render } from 'vitest-browser-react';
 
 import type { Track } from '../generated/typings';
@@ -59,12 +59,14 @@ test('provides a localized, independent queue drag handle', async () => {
   await render(
     <I18nProvider i18n={i18n}>
       <DndContext>
-        <SortableContext
-          items={[TRACK.id]}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={[1]} strategy={verticalListSortingStrategy}>
           <ul>
-            <QueueListItem index={0} queueCursor={0} track={TRACK} />
+            <QueueListItem
+              index={0}
+              queueCursor={0}
+              queueIndex={1}
+              track={TRACK}
+            />
           </ul>
         </SortableContext>
       </DndContext>
@@ -79,4 +81,39 @@ test('provides a localized, independent queue drag handle', async () => {
   await expect.element(handle).toHaveAttribute('title', label);
   await expect.element(handle).toHaveAttribute('aria-describedby');
   expect(item?.getAttribute('aria-describedby')).toBeNull();
+});
+
+test('marks keyboard queue reordering as handled before global player shortcuts', async () => {
+  const onDocumentKeyDown = vi.fn<(event: KeyboardEvent) => void>();
+  document.addEventListener('keydown', onDocumentKeyDown);
+
+  try {
+    await render(
+      <I18nProvider i18n={i18n}>
+        <DndContext>
+          <SortableContext items={[1]} strategy={verticalListSortingStrategy}>
+            <ul>
+              <QueueListItem
+                index={0}
+                queueCursor={0}
+                queueIndex={1}
+                track={TRACK}
+              />
+            </ul>
+          </SortableContext>
+        </DndContext>
+      </I18nProvider>,
+    );
+
+    const handle = page.getByRole('button', {
+      name: `重新排序 ${TRACK.title}`,
+    });
+    handle.element().focus();
+    await userEvent.keyboard('{Space}');
+
+    expect(onDocumentKeyDown).toHaveBeenCalledTimes(1);
+    expect(onDocumentKeyDown.mock.calls[0][0].defaultPrevented).toBe(true);
+  } finally {
+    document.removeEventListener('keydown', onDocumentKeyDown);
+  }
 });

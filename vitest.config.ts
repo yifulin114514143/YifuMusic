@@ -65,6 +65,7 @@ export default defineConfig({
             provider: playwright(),
             headless: true,
             ui: false,
+            fileParallelism: false,
             viewport: {
               width: 900,
               height: 500,

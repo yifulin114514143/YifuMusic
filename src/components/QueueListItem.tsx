@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
-import { useCallback } from 'react';
+import { type KeyboardEvent as ReactKeyboardEvent, useCallback } from 'react';
 
 import ButtonIcon from '../elements/ButtonIcon';
 import type { Track } from '../generated/typings';
@@ -11,6 +11,7 @@ import Cover from './Cover';
 
 type Props = {
   index: number;
+  queueIndex: number;
   track: Track;
   queueCursor: number;
 };
@@ -27,9 +28,10 @@ export default function QueueListItem(props: Props) {
     transform,
     transition,
   } = useSortable({
-    id: track.id,
+    id: props.queueIndex,
     data: {
       type: 'queue-track',
+      queueIndex: props.queueIndex,
     },
   });
 
@@ -41,6 +43,14 @@ export default function QueueListItem(props: Props) {
   const remove = useCallback(() => {
     player.removeFromQueue(props.index);
   }, [props.index]);
+
+  const onDragHandleKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+      listeners?.onKeyDown?.(event);
+      event.preventDefault();
+    },
+    [listeners],
+  );
 
   const play = useCallback(async () => {
     await player.startFromQueue(props.queueCursor + props.index + 1);
@@ -79,6 +89,7 @@ export default function QueueListItem(props: Props) {
           label={t`Reorder ${track.title}`}
           {...attributes}
           {...listeners}
+          onKeyDown={onDragHandleKeyDown}
           xstyle={styles.queueItemDragHandle}
         />
         <ButtonIcon
@@ -171,6 +182,7 @@ const styles = stylex.create({
   queueItemDragHandle: {
     color: 'var(--text-secondary)',
     cursor: 'grab',
+    touchAction: 'none',
   },
   queueItemRemove: {
     color: {

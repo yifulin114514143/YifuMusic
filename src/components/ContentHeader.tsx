@@ -33,21 +33,17 @@ export default function ContentHeader(props: Props) {
 const styles = stylex.create({
   header: {
     minWidth: 0,
-    paddingBlock: '16px',
-    paddingInline: {
-      default: '24px',
-      '@media (max-width: 899px)': '16px',
-    },
+    paddingTop: '4px',
+    paddingBottom: '18px',
+    paddingInline: 0,
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     columnGap: '16px',
     rowGap: '12px',
     flexWrap: 'wrap',
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: 'var(--border-subtle)',
-    backgroundColor: 'var(--surface-canvas)',
+    borderBottomWidth: 0,
+    backgroundColor: 'transparent',
   },
   copy: {
     minWidth: 0,
@@ -58,9 +54,12 @@ const styles = stylex.create({
   title: {
     minWidth: 0,
     margin: 0,
-    color: 'var(--text-primary)',
-    fontSize: '20px',
-    fontWeight: 700,
+    color: 'var(--accent)',
+    fontSize: {
+      default: '28px',
+      '@media (max-width: 699px)': '24px',
+    },
+    fontWeight: 800,
     lineHeight: 1.25,
     overflowWrap: 'anywhere',
   },

@@ -4,7 +4,6 @@ import * as stylex from '@stylexjs/stylex';
 import ButtonIcon from '../elements/ButtonIcon';
 import { usePlayerState } from '../hooks/usePlayer';
 import player from '../lib/player';
-import VolumeControl from './VolumeControl';
 
 export default function PlayerControls() {
   const isPaused = usePlayerState((state) => state.isPaused);
@@ -14,9 +13,10 @@ export default function PlayerControls() {
     <div {...stylex.props(styles.playerControls)}>
       <ButtonIcon
         icon="skipBack"
-        iconSize={16}
+        iconSize={20}
         label={t`Previous`}
         onClick={() => player.previous()}
+        xstyle={styles.controlButton}
       />
       <ButtonIcon
         icon={isPaused ? 'play' : 'pause'}
@@ -27,11 +27,11 @@ export default function PlayerControls() {
       />
       <ButtonIcon
         icon="skipForward"
-        iconSize={16}
+        iconSize={20}
         label={t`Next`}
         onClick={() => player.next()}
+        xstyle={styles.controlButton}
       />
-      <VolumeControl />
     </div>
   );
 }
@@ -41,18 +41,41 @@ const styles = stylex.create({
     display: 'flex',
     alignItems: 'center',
     position: 'relative',
-    rowGap: '8px',
-    columnGap: '8px',
+    rowGap: '2px',
+    columnGap: '2px',
+  },
+  controlButton: {
+    width: '42px',
+    height: '42px',
+    minWidth: '42px',
+    minHeight: '42px',
+    borderRadius: '999px',
+    color: 'var(--text-primary)',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'transparent',
+      ':active': 'transparent',
+    },
+    transform: {
+      ':hover': 'scale(1.1)',
+      ':active': 'scale(0.96)',
+    },
   },
   playPause: {
-    minWidth: '40px',
-    minHeight: '40px',
-    color: 'var(--accent-contrast)',
+    width: '42px',
+    height: '42px',
+    minWidth: '42px',
+    minHeight: '42px',
+    color: 'var(--text-primary)',
     backgroundColor: {
-      default: 'var(--accent)',
-      ':hover': 'var(--accent)',
-      ':active': 'var(--accent)',
+      default: 'transparent',
+      ':hover': 'transparent',
+      ':active': 'transparent',
     },
     borderRadius: '999px',
+    transform: {
+      ':hover': 'scale(1.12)',
+      ':active': 'scale(0.96)',
+    },
   },
 });

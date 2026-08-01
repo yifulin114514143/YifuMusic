@@ -5,32 +5,46 @@ import { Link } from '@tanstack/react-router';
 import type { LinkProps } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 
-import useLibraryStore from '../lib/store';
+import { useAppShell } from './AppShellContext';
 import Icon from './Icon';
-import ProgressBar from './ProgressBar';
-import TrackListStatus from './TrackListStatus';
+import ProfileMenu from './ProfileMenu';
+import Search from './Search';
 
 type NavItemProps = {
   to: LinkProps['to'];
   label: string;
+  isCompact: boolean;
   children: ReactNode;
 };
 
-function NavItem({ to, label, children }: NavItemProps) {
+function NavItem({ to, label, isCompact, children }: NavItemProps) {
   return (
     <NavigationMenu.Item {...stylex.props(styles.navigationItem)}>
       <NavigationMenu.Link
         render={(renderProps) => (
           <Link
             {...renderProps}
-            to={to}
-            title={label}
             aria-label={label}
+            title={label}
+            to={to}
             draggable={false}
-            {...stylex.props(styles.navigationLink)}
+            data-museeks-action
+            {...stylex.props(
+              styles.navigationLink,
+              isCompact && styles.navigationLinkCompact,
+            )}
           >
-            <span {...stylex.props(styles.navigationIcon)}>{children}</span>
-            <span {...stylex.props(styles.navigationLabel)}>{label}</span>
+            <span aria-hidden="true" {...stylex.props(styles.navigationIcon)}>
+              {children}
+            </span>
+            <span
+              {...stylex.props(
+                styles.navigationLabel,
+                isCompact && styles.navigationLabelCompact,
+              )}
+            >
+              {label}
+            </span>
           </Link>
         )}
       />
@@ -38,230 +52,350 @@ function NavItem({ to, label, children }: NavItemProps) {
   );
 }
 
+type UnavailableNavItemProps = {
+  label: string;
+  isCompact: boolean;
+  children: ReactNode;
+};
+
+function UnavailableNavItem({
+  label,
+  isCompact,
+  children,
+}: UnavailableNavItemProps) {
+  return (
+    <NavigationMenu.Item {...stylex.props(styles.navigationItem)}>
+      <button
+        aria-label={label}
+        aria-disabled="true"
+        disabled
+        title={label}
+        type="button"
+        {...stylex.props(
+          styles.navigationLink,
+          styles.navigationLinkUnavailable,
+          isCompact && styles.navigationLinkCompact,
+        )}
+      >
+        <span aria-hidden="true" {...stylex.props(styles.navigationIcon)}>
+          {children}
+        </span>
+        <span
+          {...stylex.props(
+            styles.navigationLabel,
+            isCompact && styles.navigationLabelCompact,
+          )}
+        >
+          {label}
+        </span>
+      </button>
+    </NavigationMenu.Item>
+  );
+}
+
 export default function Navigation() {
   const { t } = useLingui();
-  const platform = window.__MUSEEKS_PLATFORM;
+  const { sidebarCollapsed } = useAppShell();
 
   return (
     <aside
       aria-label={t`YifuMusic sidebar`}
-      {...stylex.props(styles.navigation)}
+      data-collapsed={sidebarCollapsed || undefined}
+      data-reference-layout="moekoe-rail"
+      {...stylex.props(
+        styles.navigation,
+        sidebarCollapsed && styles.navigationCompact,
+      )}
     >
       <div
         {...stylex.props(
-          styles.brand,
-          platform === 'macos' && styles.brandMacos,
+          styles.profile,
+          sidebarCollapsed && styles.profileCompact,
         )}
       >
-        <span {...stylex.props(styles.brandMark)}>
-          <Icon name="musicalNotes" size={20} />
-        </span>
-        <span {...stylex.props(styles.brandName)}>YifuMusic</span>
+        <ProfileMenu compact={sidebarCollapsed} variant="sidebar" />
       </div>
 
-      <NavigationMenu.Root
-        orientation="vertical"
-        aria-label={t`Main navigation`}
-        {...stylex.props(styles.navigationRoot)}
+      <div
+        {...stylex.props(
+          styles.navigationMain,
+          sidebarCollapsed && styles.navigationMainCompact,
+        )}
       >
-        <div {...stylex.props(styles.viewLinksContainer)}>
-          <span {...stylex.props(styles.groupLabel)}>{t`Library`}</span>
-          <NavigationMenu.List {...stylex.props(styles.viewLinks)}>
-            <NavItem to="/library" label={t`Library`}>
-              <Icon name="musicalNotes" size={16} />
+        {sidebarCollapsed ? (
+          <Link
+            aria-label={t`Search`}
+            title={t`Search`}
+            to="/search"
+            draggable={false}
+            data-museeks-action
+            {...stylex.props(styles.compactSearchLink)}
+          >
+            <Icon name="search" size={16} />
+          </Link>
+        ) : (
+          <div {...stylex.props(styles.searchWrapper)}>
+            <Search />
+          </div>
+        )}
+
+        <NavigationMenu.Root
+          aria-label={t`Main navigation`}
+          orientation="vertical"
+          {...stylex.props(styles.navigationRoot)}
+        >
+          <NavigationMenu.List {...stylex.props(styles.navigationList)}>
+            <NavItem to="/" label={t`首页`} isCompact={sidebarCollapsed}>
+              <Icon name="house" size={20} />
             </NavItem>
-            <NavItem to="/artists" label={t`Artists`}>
-              <Icon name="microphone" size={16} />
+            <NavItem
+              to="/discover"
+              label={t`发现`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="compass" size={20} />
             </NavItem>
-            <NavItem to="/playlists" label={t`Playlists`}>
-              <Icon name="playlist" size={16} />
+            <NavItem
+              to="/library"
+              label={t`音乐库`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="musicalNotes" size={20} />
             </NavItem>
           </NavigationMenu.List>
-        </div>
+        </NavigationMenu.Root>
 
-        <div {...stylex.props(styles.systemLinks)}>
-          <span {...stylex.props(styles.groupLabel)}>{t`System`}</span>
-          <NavigationMenu.List {...stylex.props(styles.viewLinks)}>
-            <NavItem to="/settings" label={t`Settings`}>
-              <Icon name="settings" size={16} />
+        <NavigationMenu.Root
+          aria-label={t`Library navigation`}
+          orientation="vertical"
+          {...stylex.props(styles.libraryNavigation)}
+        >
+          <span
+            {...stylex.props(
+              styles.sectionTitle,
+              sidebarCollapsed && styles.sectionTitleCompact,
+            )}
+          >
+            {t`音乐库`}
+          </span>
+          <NavigationMenu.List {...stylex.props(styles.navigationList)}>
+            <NavItem
+              to="/local-music"
+              label={t`本地音乐`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="hardDrive" size={20} />
+            </NavItem>
+            <UnavailableNavItem
+              label={t`我的云盘（服务接入后可用）`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="cloud" size={20} />
+            </UnavailableNavItem>
+            <UnavailableNavItem
+              label={t`听歌识曲（服务接入后可用）`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="microphone" size={20} />
+            </UnavailableNavItem>
+          </NavigationMenu.List>
+        </NavigationMenu.Root>
+
+        <NavigationMenu.Root
+          aria-label={t`Playlist navigation`}
+          orientation="vertical"
+          {...stylex.props(styles.playlistNavigation)}
+        >
+          <span
+            {...stylex.props(
+              styles.sectionTitle,
+              sidebarCollapsed && styles.sectionTitleCompact,
+            )}
+          >
+            {t`我的歌单`}
+          </span>
+          <NavigationMenu.List {...stylex.props(styles.navigationList)}>
+            <NavItem
+              to="/playlists"
+              label={t`我的歌单`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="playlist" size={20} />
             </NavItem>
           </NavigationMenu.List>
-        </div>
-      </NavigationMenu.Root>
+        </NavigationMenu.Root>
 
-      <div {...stylex.props(styles.status)} aria-label={t`Library status`}>
-        <Status />
+        <NavigationMenu.Root
+          aria-label={t`System navigation`}
+          orientation="vertical"
+          {...stylex.props(styles.systemNavigation)}
+        >
+          <NavigationMenu.List {...stylex.props(styles.navigationList)}>
+            <NavItem
+              to="/settings"
+              label={t`Settings`}
+              isCompact={sidebarCollapsed}
+            >
+              <Icon name="settings" size={20} />
+            </NavItem>
+          </NavigationMenu.List>
+        </NavigationMenu.Root>
       </div>
     </aside>
   );
 }
 
-function Status() {
-  const refresh = useLibraryStore((state) => state.refresh);
-  const refreshing = useLibraryStore((state) => state.refreshing);
-  const status = useLibraryStore((state) => state.tracksStatus);
-  const { t } = useLingui();
-
-  const { current, total } = refresh;
-
-  if (refreshing) {
-    const isScanning = total === 0;
-    const progress = total > 0 ? Math.round((current / total) * 100) : 100;
-
-    return (
-      <div {...stylex.props(styles.statusLibraryRefresh)}>
-        <div {...stylex.props(styles.statusLibraryRefreshProgress)}>
-          {isScanning ? (
-            t`scanning tracks...`
-          ) : (
-            <ProgressBar
-              progress={progress}
-              label={total > 0 ? `${current} / ${total}` : ''}
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (status != null) {
-    return <TrackListStatus {...status} />;
-  }
-
-  return null;
-}
-
 const styles = stylex.create({
   navigation: {
-    minHeight: 0,
-    overflow: 'hidden',
+    minWidth: 0,
+    height: 'calc(100dvh - 78px)',
+    boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    paddingBlock: {
-      default: '16px',
-      '@media (max-width: 899px)': '12px',
-    },
-    paddingInline: {
-      default: '12px',
-      '@media (max-width: 899px)': '8px',
-    },
-    backgroundColor: 'var(--surface-raised)',
+    backgroundColor: 'var(--sidebar-bg)',
     borderRightWidth: '1px',
     borderRightStyle: 'solid',
     borderRightColor: 'var(--border-subtle)',
-    alignItems: {
-      default: 'stretch',
-      '@media (max-width: 899px)': 'center',
-    },
+    boxShadow: '2px 0 18px rgba(24, 66, 99, 0.08)',
+    overflowX: 'hidden',
+    overflowY: 'hidden',
+    transition: 'width 200ms ease-out',
   },
-  brand: {
-    minHeight: '40px',
-    marginBottom: {
-      default: '28px',
-      '@media (max-width: 899px)': '20px',
-    },
+  navigationCompact: {
+    alignItems: 'stretch',
+  },
+  profile: {
+    minHeight: '76px',
+    paddingBlock: '15px',
+    paddingInline: '12px',
     display: 'flex',
     alignItems: 'center',
     columnGap: '10px',
-  },
-  brandMacos: {
-    paddingLeft: {
-      default: '64px',
-      '@media (max-width: 899px)': 0,
-    },
-    paddingTop: {
-      '@media (max-width: 899px)': '40px',
-    },
-  },
-  brandMark: {
-    width: '36px',
-    height: '36px',
-    flexShrink: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'var(--accent-contrast)',
-    backgroundColor: 'var(--accent)',
-    borderRadius: 'var(--radius-md)',
-  },
-  brandName: {
     color: 'var(--text-primary)',
-    fontSize: '16px',
-    lineHeight: 1,
-    fontWeight: 700,
-    whiteSpace: 'nowrap',
-    display: {
-      default: 'inline',
-      '@media (max-width: 899px)': 'none',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'var(--border-subtle)',
+    backgroundColor: {
+      default: 'var(--sidebar-bg)',
+      ':hover': 'var(--sidebar-bg)',
     },
   },
-  navigationRoot: {
+  profileCompact: {
+    minHeight: '76px',
+    justifyContent: 'center',
+    paddingInline: 0,
+  },
+  navigationMain: {
+    minWidth: 0,
     minHeight: 0,
     flexGrow: 1,
     display: 'flex',
     flexDirection: 'column',
+    paddingTop: '12px',
+    paddingInline: '10px',
+    paddingBottom: '10px',
+    overflowX: 'hidden',
+    overflowY: 'auto',
   },
-  viewLinksContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: '8px',
-    minHeight: 0,
+  navigationMainCompact: {
+    alignItems: 'center',
+    paddingInline: '10px',
   },
-  viewLinks: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: '4px',
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
+  searchWrapper: {
+    width: '100%',
+    marginBottom: '16px',
   },
-  groupLabel: {
-    paddingInline: '8px',
-    color: 'var(--text-secondary)',
-    fontSize: '11px',
-    fontWeight: 700,
-    lineHeight: 1,
-    display: {
-      default: 'inline',
-      '@media (max-width: 899px)': 'none',
+  compactSearchLink: {
+    width: '42px',
+    height: '38px',
+    flexShrink: 0,
+    marginBottom: '16px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: {
+      default: 'var(--accent)',
+      ':hover': 'var(--accent)',
     },
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'var(--surface-hover)',
+    },
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'var(--border-strong)',
+    borderRadius: '10px',
+    textDecorationLine: 'none',
+  },
+  navigationRoot: {
+    width: '100%',
+    minWidth: 0,
+    flexShrink: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  libraryNavigation: {
+    flexShrink: 0,
+    marginTop: '18px',
+  },
+  playlistNavigation: {
+    minHeight: '68px',
+    flexGrow: 1,
+    flexShrink: 1,
+    marginTop: '18px',
+    overflowY: 'auto',
+  },
+  navigationList: {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: '6px',
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
   },
   navigationItem: {
     minWidth: 0,
   },
   navigationLink: {
-    minHeight: '40px',
-    width: {
-      '@media (max-width: 899px)': '40px',
-    },
-    paddingBlock: '8px',
-    paddingInline: {
-      default: '10px',
-      '@media (max-width: 899px)': 0,
-    },
-    color: 'var(--text-secondary)',
-    textDecoration: 'none',
+    minWidth: 0,
+    minHeight: '38px',
+    paddingBlock: 0,
+    paddingInline: '10px',
     display: 'flex',
     alignItems: 'center',
-    columnGap: '10px',
-    borderRadius: 'var(--radius-sm)',
-    boxShadow: {
-      default: 'inset 3px 0 0 transparent',
-      ':hover': 'inset 3px 0 0 var(--accent)',
-      '[data-status="active"]': 'inset 3px 0 0 var(--accent)',
+    columnGap: '12px',
+    color: {
+      default: 'var(--text-secondary)',
+      ':hover': 'var(--text-primary)',
+      ':is([data-status="active"])': 'var(--accent)',
     },
     backgroundColor: {
+      default: 'transparent',
       ':hover': 'var(--surface-hover)',
-      '[data-status="active"]': 'var(--surface-selected)',
+      ':is([data-status="active"])': 'var(--surface-selected)',
     },
-    fontWeight: {
-      default: 500,
-      '[data-status="active"]': 700,
+    borderRadius: '10px',
+    boxShadow: {
+      default: 'inset 0 0 0 1px transparent',
+      ':is([data-status="active"])': 'inset 0 0 0 1px transparent',
     },
-    justifyContent: {
-      default: 'flex-start',
-      '@media (max-width: 899px)': 'center',
-    },
+    fontSize: '14px',
+    fontWeight: 500,
+    textDecorationLine: 'none',
+    borderStyle: 'none',
+    cursor: 'pointer',
+  },
+  navigationLinkUnavailable: {
+    width: '100%',
+    textAlign: 'left',
+    opacity: 0.54,
+    cursor: 'not-allowed',
+  },
+  navigationLinkCompact: {
+    width: '42px',
+    minWidth: '42px',
+    padding: 0,
+    justifyContent: 'center',
   },
   navigationIcon: {
     width: '20px',
@@ -270,44 +404,36 @@ const styles = stylex.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    color: 'var(--accent)',
   },
   navigationLabel: {
     minWidth: 0,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    display: {
-      default: 'inline',
-      '@media (max-width: 899px)': 'none',
-    },
   },
-  systemLinks: {
-    marginTop: 'auto',
-    paddingTop: {
-      default: '24px',
-      '@media (max-width: 899px)': '16px',
-    },
+  navigationLabelCompact: {
+    display: 'none',
   },
-  status: {
-    marginTop: '16px',
+  systemNavigation: {
+    flexShrink: 0,
+    paddingTop: '14px',
+    marginTop: '18px',
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: 'var(--border-subtle)',
+  },
+  sectionTitle: {
     paddingInline: '8px',
+    paddingBottom: '6px',
     color: 'var(--text-secondary)',
-    fontSize: '11px',
-    lineHeight: 1.4,
-    display: {
-      default: 'flex',
-      '@media (max-width: 899px)': 'none',
-    },
-    justifyContent: 'flex-start',
+    fontSize: '12px',
+    fontWeight: 700,
   },
-  statusLibraryRefresh: {
-    display: 'flex',
-    flexGrow: 1,
-    minWidth: 0,
-    alignItems: 'center',
-  },
-  statusLibraryRefreshProgress: {
-    flexGrow: 1,
-    minWidth: 0,
+  sectionTitleCompact: {
+    height: 0,
+    padding: 0,
+    overflow: 'hidden',
+    visibility: 'hidden',
   },
 });

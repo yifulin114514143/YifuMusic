@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import type React from 'react';
+import { useCallback } from 'react';
 
 import ButtonIcon from '../elements/ButtonIcon';
 import type { Track } from '../generated/typings';
@@ -79,6 +80,14 @@ export default function TrackRow(props: Props) {
   const isDropAbove = isOver && overIndex < activeIndex;
   const isDropBelow = isOver && overIndex > activeIndex;
 
+  const onDragKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLLIElement>) => {
+      listeners?.onKeyDown?.(event);
+      event.preventDefault();
+    },
+    [listeners],
+  );
+
   return (
     // oxlint-disable-next-line jsx_a11y/click-events-have-key-events - given by ...listeners
     <li
@@ -92,6 +101,7 @@ export default function TrackRow(props: Props) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onKeyDown={onDragKeyDown}
       // accessibility
       aria-disabled="false" // required
       aria-selected={selected}
@@ -180,10 +190,8 @@ const trackStyles = stylex.create({
     display: 'flex',
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
-    borderTopColor: 'transparent',
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: 'transparent',
+    borderTopColor: 'var(--border-subtle)',
+    borderBottomWidth: 0,
     backgroundColor: 'var(--tracks-bg-even)',
     alignItems: 'center',
     maxWidth: '100%',
@@ -194,6 +202,7 @@ const trackStyles = stylex.create({
   trackSelected: {
     backgroundColor: 'var(--active-item-bg)',
     color: 'var(--active-item-color)',
+    boxShadow: 'inset 3px 0 0 var(--accent)',
   },
   selectedWithSelectedAbove: {
     borderTopColor: 'rgba(255 255 255 / 0.2)',
@@ -230,8 +239,8 @@ const cellStyles = stylex.create({
     borderLeftWidth: '1px',
     borderLeftStyle: 'solid',
     borderLeftColor: 'transparent',
-    paddingRight: '4px',
-    paddingLeft: '4px',
+    paddingRight: '8px',
+    paddingLeft: '8px',
     cursor: 'default',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -239,7 +248,7 @@ const cellStyles = stylex.create({
     lineHeight: '24px',
   },
   trackPlaying: {
-    width: '32px',
+    width: '40px',
     flexShrink: 0,
   },
   title: {
@@ -268,8 +277,8 @@ const cellStyles = stylex.create({
     whiteSpace: 'nowrap',
   },
   duration: {
-    width: '7%',
-    minWidth: '70px',
+    width: '95px',
+    minWidth: '95px',
     flexShrink: 0,
   },
   artist: {

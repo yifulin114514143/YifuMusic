@@ -14,7 +14,7 @@ import toastManager from '../lib/toast-manager';
 import { logAndNotifyError } from '../lib/utils';
 import LibraryAPI from './LibraryAPI';
 
-export const DEFAULT_MAIN_COLOR = '#18b7bf';
+export const DEFAULT_MAIN_COLOR = '#FF69B4';
 
 const HEX_COLOR_INPUT_PATTERN = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i;
 

@@ -1,0 +1,20 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop-lyrics-capability",
+  "description": "Capability for the dedicated desktop lyrics window",
+  "windows": ["desktop-lyrics"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "desktop-lyrics:allow-close",
+    "desktop-lyrics:allow-start-dragging",
+    "desktop-lyrics:allow-get-state",
+    "desktop-lyrics:allow-control",
+    "desktop-lyrics:allow-set-mouse-passthrough",
+    "desktop-lyrics:allow-get-window-geometry",
+    "desktop-lyrics:allow-update-window-geometry",
+    "desktop-lyrics:allow-set-always-on-top",
+    "desktop-lyrics:allow-set-resizable"
+  ],
+  "platforms": ["linux", "macOS", "windows"]
+}

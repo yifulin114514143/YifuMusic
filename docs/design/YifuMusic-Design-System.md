@@ -1,91 +1,61 @@
-# YifuMusic Design System
+# YifuMusic MoeKoeMusic 复刻设计系统
 
-## Design intent
+## 设计目标
 
-YifuMusic is a desktop music tool for frequent local-library browsing, queue
-management, and playback control. The interface prioritizes the currently
-playing track, dense lists, predictable keyboard operation, and readable
-long-lived desktop layouts.
+YifuMusic 当前以授权参考 `/Users/mico/AI 事物/MoeKoeMusic-授权参考` 的桌面客户端为复刻基准。验收重点是页面结构、区域比例、导航层级、工具栏位置、内容密度、控制顺序、面板展开方式和交互路径，而不是独立视觉设计。
 
-It is not a marketing landing page, a full-screen poster, or a card gallery.
-The design does not use large purple-blue gradients, warm beige or coffee
-themes, decorative light orbs, or glass effects that reduce contrast.
+实现继续使用 React、TypeScript、StyleX、TanStack Router、Tauri 与 Rust。可以迁移参考项目的结构和样式逻辑，但不可引入 Vue 或 Electron 运行时。
 
-## Semantic tokens
+## 布局基线
 
-Both installed themes define the same semantic token set. Components use these
-tokens instead of embedding product colors:
+顶部导航模式是默认桌面布局；侧栏模式是可切换的替代布局：
 
-| Purpose                               | Token                                                  |
-| ------------------------------------- | ------------------------------------------------------ |
-| Application canvas                    | `--surface-canvas`                                     |
-| Raised navigation and player surfaces | `--surface-raised`                                     |
-| Recessed list and queue surfaces      | `--surface-sunken`                                     |
-| Hover and selected surfaces           | `--surface-hover`, `--surface-selected`                |
-| Primary and secondary text            | `--text-primary`, `--text-secondary`                   |
-| Borders                               | `--border-subtle`, `--border-strong`                   |
-| Functional emphasis                   | `--accent`, `--accent-contrast`, `--accent-subtle`     |
-| Status colors                         | `--success-color`, `--warning-color`, `--danger-color` |
-| Keyboard focus                        | `--focus-color`                                        |
+| 区域       | 参考尺寸与行为                                             | YifuMusic 复刻要求                                               |
+| ---------- | ---------------------------------------------------------- | ---------------------------------------------------------------- |
+| 顶部导航   | 默认；后退、前进、刷新、首页、发现、音乐库、搜索和账号入口 | 内容与工具栏对齐 `min(1200px, 100%)`，保持拖拽区与可交互控件分离 |
+| 侧栏导航   | 可切换；展开 226px，收起约 64px                            | 账号区、导航组、歌单入口和折叠状态随布局同步                     |
+| 中央内容   | 顶栏和底栏之间滚动；最大内容宽度约 1200px                  | 首页、发现、曲库、歌单、搜索、设置均复刻相同阅读顺序             |
+| 底部播放器 | 固定；曲目信息、进度、上一首/播放/下一首、模式、队列和音量 | 应用内全屏歌词、独立桌面歌词、队列和视频切换不打断播放状态       |
+| 队列面板   | 独立可开关的播放列表，显示当前曲目、删除和清空             | 本地、在线和云盘来源共同进入统一视觉队列                         |
 
-Dark mode uses neutral charcoal and restrained ink-gray surfaces with cyan
-functional emphasis. Light mode uses fog white and cool gray surfaces with the
-same emphasis semantics. Coral is reserved for warning and destructive states.
+## 视觉令牌
 
-## Spacing and dimensions
+授权参考的 `HomeLayout.vue` 定义了浅色的 `#FF69B4`、`#ea33e4`、`#FFB6C1`、`#FFF0F5`、`#FFE6F0` 与 `#FFD9E6`。其 `dark.scss` 定义了深色画布 `#121212`、抬升表面 `#1a1a1a`、卡片 `#1d1d1d`、输入/常规悬浮 `#2a2a2a`、加强悬浮 `#363636`、边框 `#333`、主文本 `#e1e1e1`、次级文本 `#999` 与弱文本 `#777`。
 
-The spacing scale advances in 4px increments: `4`, `8`, `12`, `16`, `20`,
-`24`, `32`, and `40` pixels. Stable desktop dimensions are:
+YifuMusic 继续以语义令牌承载主题切换，令牌值以这些参考层级为准，不再使用青色或蓝灰色表面。
 
-| Item                    | Dimension            |
-| ----------------------- | -------------------- |
-| Wide navigation rail    | 224px                |
-| Compact navigation rail | 64px                 |
-| Wide queue panel        | 320px                |
-| Bottom player           | 84px                 |
-| Icon button hit target  | at least 32px square |
-| Play/pause hit target   | at least 40px square |
-| Default list row        | 32px minimum         |
+| 层级                 | 深色主题                          | 浅色主题                          |
+| -------------------- | --------------------------------- | --------------------------------- |
+| 应用画布             | `#121212`                         | `#FFF0F5`                         |
+| 导航与抬升表面       | `#1a1a1a`                         | `#ffffff`                         |
+| 卡片、队列与凹陷表面 | `#1d1d1d`                         | `#FFE6F0`                         |
+| 输入与常规悬浮       | `#2a2a2a`                         | `#FFE9F2`                         |
+| 主/次/弱文本         | `#e1e1e1` / `#999999` / `#777777` | `#333333` / `#7C6571` / `#7C6571` |
+| 识别粉色             | `#FF69B4`                         | `#FF69B4`（画布与选中态）         |
 
-Numeric duration and progress values use tabular figures. Title, artist, album,
-and queue text truncates instead of changing layout dimensions; the complete
-value remains available through the native tooltip and accessible name.
+`--main-color` 在深浅主题下均以参考默认的 `#FF69B4` 呈现，填充强调表面使用白色前景；浅色主题的键盘焦点环使用参考中的更深粉色 `#ea33e4`，以保证其在浅粉画布上清晰可见。其他可选主题色仅替换语义强调色，选中、边框和弱强调色通过 `color-mix()` 随之更新，不保留蓝色专属 token。
 
-## Typography and interaction
+圆角采用参考界面相近的 `6px` 小圆角和 `8px` 中圆角；面板与标题栏阴影采用参考中较克制的 `0 4px–8px` 与 `0 2px` 层级。全局字体栈与授权参考保持同一套系统字体顺序，代码和路径文本通过 `--font-mono` 使用参考中的 `Consolas, Monaco, monospace` 回退栈。`body` 背景和基础文本直接使用语义画布与主文本令牌，避免主题切换时出现白色闪屏。
 
-System UI fonts are used for fast, legible Chinese and Latin rendering. Text
-uses normal tracking and compact desktop line heights. Interactive states are
-always represented by more than color: selected navigation items have an inset
-indicator and weight change; disabled controls lower contrast and communicate
-their unavailable state in their label.
+| 语义            | 令牌                                          |
+| --------------- | --------------------------------------------- |
+| 应用画布        | `--surface-canvas`                            |
+| 导航/播放器表面 | `--surface-raised`                            |
+| 列表/队列表面   | `--surface-sunken`                            |
+| 悬浮与选中态    | `--surface-hover`、`--surface-selected`       |
+| 文本            | `--text-primary`、`--text-secondary`          |
+| 强调            | `--main-color`、`--accent`、`--accent-subtle` |
+| 焦点            | `--focus-color`                               |
+| 填充控件前景    | `--accent-contrast`、`--form-control-color`   |
+| 代码与路径文本  | `--font-mono`                                 |
 
-`hover`, `active`, `selected`, `disabled`, and `focus-visible` are defined by
-semantic tokens. Focus is always visible, uses the shared focus ring, and does
-not depend on hover. Pure icon controls use localized `aria-label` and native
-tooltip (`title`) text; the Chinese locale exposes Chinese labels and tooltips.
+## 交互与可访问性
 
-## Motion and accessibility
+- 侧栏折叠、前进后退、刷新、搜索、账号菜单、队列、全屏播放器、歌词、MV、设置与插件入口均采用可键盘操作的原生控件。
+- 默认 `zh-CN` 必须提供自然简体中文的菜单、按钮、标题、空状态、错误、通知、tooltip 和 `aria-label`；其它语言可切换但不得破坏中文默认体验。
+- 可见焦点、禁用态、当前路由、当前播放曲目和歌词当前行必须不只依赖颜色表达。
+- 常规动效维持短时、可预测；`prefers-reduced-motion: reduce` 下移除非必要位移动画。
 
-Routine transitions use 120ms to 180ms and never move layout unexpectedly.
-`prefers-reduced-motion: reduce` removes nonessential transitions and animation.
-Keyboard order follows the visual reading order. Temporary queue panels accept
-Escape, receive focus when opened by keyboard or pointer, and return focus to
-their trigger after closing. Text, icons, and focus rings retain readable
-contrast in both themes.
+## 资产与归属
 
-## Icons and visual assets
-
-Stage 4 reuses the repository's own SVG icon set with its existing 16px, 20px,
-and 24px size steps. The `Ellipsis`, `GripVertical`, and `Trash2` additions use
-`lucide-react` 1.27.0 with a fixed 2px stroke. The package is ISC licensed;
-`Ellipsis` and `Trash2` are listed in its bundled license as Feather-derived
-icons carrying the Feather MIT notice. New UI does not copy icons, visual
-parameters, screenshots, text, or brand assets from MoeKoeMusic or other music
-clients.
-
-No character illustration is added in Stage 4. If the user later provides a
-source with explicit redistribution permission, it may appear only in a small
-empty state, a dismissible edge background in a now-playing view, or a theme
-preview. It must occupy no more than 20% of visible central content, never
-cover lists, progress, queue, search, or primary actions, and must be hidden or
-static on narrow windows and with reduced motion.
+用户已确认作者授权，因此在授权范围内可参考、翻译和迁移 MoeKoeMusic 的组件、样式结构和功能流程。YifuMusic 仍须保留既有 Museeks 的 `LICENSE` 与 `NOTICE.md`；对尚未确认的资产路径、服务契约或运行时行为不得自行猜测。
