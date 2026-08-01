@@ -126,16 +126,29 @@ jobs:
           flatpak install -y flathub org.gnome.Platform//48 org.gnome.Sdk//48
           flatpak install flathub -y org.flatpak.Builder
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build application (signed)
+        if: secrets.APPLE_CERTIFICATE != ''
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE != '' }}
+          ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        with:
+          tauriScript: vp run tauri
+          includeUpdaterJson: false
+          # compile a universal binary for intel + apple sillicon
+          args: ${{ matrix.platform == 'macos-14' && '--target universal-apple-darwin' || '' }}
+
+      - name: Build application (unsigned)
+        if: secrets.APPLE_CERTIFICATE == ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: tauri-apps/tauri-action@v0
         with:
           tauriScript: vp run tauri
           includeUpdaterJson: false
