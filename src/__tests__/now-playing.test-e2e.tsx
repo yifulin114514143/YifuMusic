@@ -102,6 +102,8 @@ test('opens desktop lyrics without replacing the player audio element', async ()
 });
 
 test('切换 macOS 状态栏歌词后立即重新同步托盘状态', async () => {
+  if (window.__MUSEEKS_PLATFORM !== 'macos') return;
+
   await setupScannedLibrary();
   const player = (await import('../lib/player')).default;
   player.stop();
