@@ -77,6 +77,9 @@ jobs:
 
     needs: qa
 
+    env:
+      HAS_APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE != '' }}
+
     permissions:
       contents: write
 
@@ -127,7 +130,7 @@ jobs:
           flatpak install flathub -y org.flatpak.Builder
 
       - name: Build application (signed)
-        if: secrets.APPLE_CERTIFICATE != ''
+        if: env.HAS_APPLE_CERTIFICATE == 'true'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -145,7 +148,7 @@ jobs:
           args: ${{ matrix.platform == 'macos-14' && '--target universal-apple-darwin' || '' }}
 
       - name: Build application (unsigned)
-        if: secrets.APPLE_CERTIFICATE == ''
+        if: env.HAS_APPLE_CERTIFICATE != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: tauri-apps/tauri-action@v0
