@@ -258,7 +258,8 @@ const styles = stylex.create({
     borderRightWidth: '1px',
     borderRightStyle: 'solid',
     borderRightColor: 'var(--border-subtle)',
-    boxShadow: '2px 0 18px rgba(24, 66, 99, 0.08)',
+    boxShadow:
+      '2px 0 18px rgba(24, 20, 54, 0.12), inset -1px 0 0 var(--glass-highlight)',
     overflowX: 'hidden',
     overflowY: 'hidden',
     transition: 'width 200ms ease-out',

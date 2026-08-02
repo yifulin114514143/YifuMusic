@@ -95,7 +95,7 @@ p {
 [data-liquid-glass="disabled"] [data-glass-surface] {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background-color: var(--surface-raised) !important;
+  background-color: var(--glass-surface-solid) !important;
   box-shadow: none !important;
 }
 
@@ -112,6 +112,14 @@ p {
 [data-dynamic-effects="disabled"] [data-route-transition="enter"],
 [data-dynamic-effects="disabled"] [data-playing-indicator-animation] {
   animation: none !important;
+}
+
+[data-dynamic-effects="disabled"] *:hover {
+  transform: none !important;
+}
+
+[data-dynamic-effects="disabled"] [data-dynamic-effect="neon"] {
+  box-shadow: none !important;
 }
 
 /* The side-toolbar search is intentionally an icon until it is hovered or

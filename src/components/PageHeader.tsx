@@ -195,7 +195,7 @@ const styles = stylex.create({
     borderBottomStyle: 'solid',
     borderBottomColor: 'var(--border-subtle)',
     backgroundColor: 'var(--header-bg)',
-    boxShadow: 'var(--header-shadow)',
+    boxShadow: 'var(--header-shadow), inset 0 1px 0 var(--glass-highlight)',
     backdropFilter: 'var(--glass-backdrop-filter-soft)',
   },
   headerTop: {

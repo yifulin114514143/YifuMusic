@@ -213,7 +213,8 @@ const styles = stylex.create({
     borderColor: 'var(--border-subtle)',
     borderRadius: '10px',
     backgroundColor: 'var(--glass-surface)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+    boxShadow:
+      '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 var(--glass-highlight)',
     backdropFilter: 'var(--glass-backdrop-filter-strong)',
     position: 'fixed',
     top: 'auto',

@@ -120,7 +120,11 @@ export default function ProfileMenu({ compact = false, variant }: Props) {
           compact && styles.triggerCompact,
         )}
       >
-        <span aria-hidden="true" {...stylex.props(styles.mark)}>
+        <span
+          aria-hidden="true"
+          data-dynamic-effect="neon"
+          {...stylex.props(styles.mark)}
+        >
           Y
         </span>
         {variant === 'sidebar' && !compact && (

@@ -287,7 +287,7 @@ const styles = stylex.create({
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
     borderTopColor: 'var(--border-subtle)',
-    boxShadow: 'var(--shadow-panel)',
+    boxShadow: 'var(--shadow-panel), inset 0 1px 0 var(--glass-highlight)',
     backdropFilter: 'var(--glass-backdrop-filter-strong)',
     zIndex: 98,
   },

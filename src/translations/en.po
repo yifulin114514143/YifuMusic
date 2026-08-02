@@ -238,7 +238,7 @@ msgid "本地音乐"
 msgstr "本地音乐"
 
 #: src/components/Navigation.tsx:191
-#: src/components/ProfileMenu.tsx:150
+#: src/components/ProfileMenu.tsx:154
 msgid "我的云盘（服务接入后可用）"
 msgstr "我的云盘（服务接入后可用）"
 
@@ -263,9 +263,9 @@ msgstr "System navigation"
 
 #: src/components/Navigation.tsx:237
 #: src/components/PageHeader.tsx:89
-#: src/components/ProfileMenu.tsx:154
-#: src/components/ProfileMenu.tsx:157
-#: src/components/ProfileMenu.tsx:164
+#: src/components/ProfileMenu.tsx:158
+#: src/components/ProfileMenu.tsx:161
+#: src/components/ProfileMenu.tsx:168
 #: src/routes/settings.tsx:109
 msgid "Settings"
 msgstr "Settings"
@@ -605,40 +605,40 @@ msgstr "Open now playing"
 msgid "打开资料与服务菜单"
 msgstr "打开资料与服务菜单"
 
-#: src/components/ProfileMenu.tsx:139
+#: src/components/ProfileMenu.tsx:143
 msgid "资料与服务菜单"
 msgstr "资料与服务菜单"
 
-#: src/components/ProfileMenu.tsx:148
+#: src/components/ProfileMenu.tsx:152
 msgid "登录（服务接入后可用）"
 msgstr "登录（服务接入后可用）"
 
-#: src/components/ProfileMenu.tsx:149
+#: src/components/ProfileMenu.tsx:153
 msgid "VIP（服务接入后可用）"
 msgstr "VIP（服务接入后可用）"
 
-#: src/components/ProfileMenu.tsx:151
+#: src/components/ProfileMenu.tsx:155
 msgid "在线收藏（服务接入后可用）"
 msgstr "在线收藏（服务接入后可用）"
 
-#: src/components/ProfileMenu.tsx:152
+#: src/components/ProfileMenu.tsx:156
 msgid "检查更新（服务接入后可用）"
 msgstr "检查更新（服务接入后可用）"
 
-#: src/components/ProfileMenu.tsx:167
-#: src/components/ProfileMenu.tsx:169
-#: src/components/ProfileMenu.tsx:174
-#: src/components/ProfileMenu.tsx:197
+#: src/components/ProfileMenu.tsx:171
+#: src/components/ProfileMenu.tsx:173
+#: src/components/ProfileMenu.tsx:178
+#: src/components/ProfileMenu.tsx:201
 msgid "免责声明"
 msgstr "免责声明"
 
-#: src/components/ProfileMenu.tsx:182
-#: src/components/ProfileMenu.tsx:201
-#: src/components/ProfileMenu.tsx:203
+#: src/components/ProfileMenu.tsx:186
+#: src/components/ProfileMenu.tsx:205
+#: src/components/ProfileMenu.tsx:207
 msgid "关闭免责声明"
 msgstr "关闭免责声明"
 
-#: src/components/ProfileMenu.tsx:231
+#: src/components/ProfileMenu.tsx:235
 msgid "我知道了"
 msgstr "我知道了"
 
