@@ -1,7 +1,11 @@
 import { expect, test, vi } from 'vite-plus/test';
 import { page } from 'vite-plus/test/browser';
 
-import { beforeEachSetup } from './e2e-helpers';
+import {
+  beforeEachSetup,
+  getMainNavigation,
+  getSystemNavigation,
+} from './e2e-helpers';
 
 vi.mock('@tauri-apps/api/app', () => ({
   getTauriVersion: vi.fn<() => Promise<string>>().mockResolvedValue('2.11.2'),
@@ -131,6 +135,83 @@ test('界面设置保留桌面歌词真实入口，并清楚标记未接入服�
   });
   await expect.element(unavailable).toBeDisabled();
   await expect.element(unavailable).toHaveAttribute('title', '服务接入后可用');
+});
+
+test('视觉开关即时控制玻璃、动效与发现页角色图，并持久化配置', async () => {
+  openSettings('ui');
+
+  const glass = page.getByRole('switch', { name: '液态玻璃效果' });
+  const dynamic = page.getByRole('switch', { name: '动态效果' });
+  const character = page.getByRole('switch', { name: '发现页角色图' });
+  await expect.element(glass).toHaveAttribute('aria-checked', 'true');
+  await expect.element(dynamic).toHaveAttribute('aria-checked', 'true');
+  await expect.element(character).toHaveAttribute('aria-checked', 'true');
+
+  const shell = page
+    .getByTestId('app-shell-workspace')
+    .element() as HTMLElement;
+  const workspaceColumns = getComputedStyle(shell).gridTemplateColumns;
+  const glassSurface = document.querySelector<HTMLElement>(
+    '[data-glass-surface="card"]',
+  );
+  if (glassSurface === null) {
+    throw new Error('未找到设置玻璃表面');
+  }
+  expect(getComputedStyle(glassSurface).backdropFilter).not.toBe('none');
+
+  await glass.click();
+  await expect.element(glass).toHaveAttribute('aria-checked', 'false');
+  expect(getComputedStyle(glassSurface).backdropFilter).toBe('none');
+  expect(getComputedStyle(shell).gridTemplateColumns).toBe(workspaceColumns);
+
+  await dynamic.click();
+  await expect.element(dynamic).toHaveAttribute('aria-checked', 'false');
+  const routeTransition = document.querySelector<HTMLElement>(
+    '[data-route-transition="enter"]',
+  );
+  if (routeTransition === null) {
+    throw new Error('未找到页面过渡元素');
+  }
+  expect(getComputedStyle(routeTransition).animationName).toBe('none');
+  expect(getComputedStyle(glassSurface).transitionDuration).toBe('0s');
+
+  const configBridge = (await import('../lib/bridge-config')).default;
+  expect(await configBridge.getAll()).toMatchObject({
+    liquid_glass: false,
+    dynamic_effects: false,
+  });
+
+  await character.click();
+  await expect.element(character).toHaveAttribute('aria-checked', 'false');
+  await getMainNavigation().getByRole('link', { name: '发现' }).click();
+  await expect
+    .element(page.getByTestId('discover-nangong-yu'))
+    .not.toBeInTheDocument();
+
+  await getSystemNavigation()
+    .getByRole('link', { name: '设置', exact: true })
+    .click();
+  await page
+    .getByRole('navigation', { name: '设置分类' })
+    .getByRole('link', { name: '界面' })
+    .click();
+  await expect
+    .element(page.getByRole('switch', { name: '液态玻璃效果' }))
+    .toHaveAttribute('aria-checked', 'false');
+  await expect
+    .element(page.getByRole('switch', { name: '动态效果' }))
+    .toHaveAttribute('aria-checked', 'false');
+  const restoredCharacter = page.getByRole('switch', {
+    name: '发现页角色图',
+  });
+  await restoredCharacter.click();
+  await expect
+    .element(restoredCharacter)
+    .toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('switch', { name: '液态玻璃效果' }).click();
+  await page.getByRole('switch', { name: '动态效果' }).click();
+  await getMainNavigation().getByRole('link', { name: '发现' }).click();
+  await expect.element(page.getByTestId('discover-nangong-yu')).toBeVisible();
 });
 
 test('设置布局在 1440、1024 与 700px 保持可读且分类可达', async () => {

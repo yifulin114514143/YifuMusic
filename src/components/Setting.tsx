@@ -9,6 +9,7 @@ type Props = {
 export function Section(props: Props) {
   return (
     <section
+      data-glass-surface="card"
       data-reference-layout="moekoe-setting-card"
       data-testid="setting-card"
       {...stylex.props(styles.settingSection)}
@@ -193,10 +194,13 @@ const styles = stylex.create({
       ':focus-within': 'var(--accent-border)',
     },
     borderRadius: '12px',
-    backgroundColor: 'var(--surface-raised)',
+    backgroundColor: 'var(--glass-surface)',
+    backdropFilter: 'var(--glass-backdrop-filter-soft)',
     boxShadow: {
-      default: '0 8px 22px rgba(30, 55, 78, 0.04)',
-      ':hover': '0 12px 24px rgba(30, 55, 78, 0.1)',
+      default:
+        '0 8px 22px rgba(30, 22, 66, 0.08), inset 0 1px 0 var(--glass-highlight)',
+      ':hover':
+        '0 12px 24px rgba(30, 22, 66, 0.14), inset 0 1px 0 var(--glass-highlight)',
       ':focus-within': '0 0 0 3px var(--accent-subtle)',
     },
     transition: 'transform 160ms ease, box-shadow 160ms ease',

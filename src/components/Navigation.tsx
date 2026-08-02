@@ -101,6 +101,7 @@ export default function Navigation() {
     <aside
       aria-label={t`YifuMusic sidebar`}
       data-collapsed={sidebarCollapsed || undefined}
+      data-glass-surface="navigation"
       data-reference-layout="moekoe-rail"
       {...stylex.props(
         styles.navigation,
@@ -252,11 +253,13 @@ const styles = stylex.create({
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'var(--sidebar-bg)',
+    backgroundColor: 'var(--glass-surface)',
+    backdropFilter: 'var(--glass-backdrop-filter-soft)',
     borderRightWidth: '1px',
     borderRightStyle: 'solid',
     borderRightColor: 'var(--border-subtle)',
-    boxShadow: '2px 0 18px rgba(24, 66, 99, 0.08)',
+    boxShadow:
+      '2px 0 18px rgba(24, 20, 54, 0.12), inset -1px 0 0 var(--glass-highlight)',
     overflowX: 'hidden',
     overflowY: 'hidden',
     transition: 'width 200ms ease-out',
@@ -276,8 +279,8 @@ const styles = stylex.create({
     borderBottomStyle: 'solid',
     borderBottomColor: 'var(--border-subtle)',
     backgroundColor: {
-      default: 'var(--sidebar-bg)',
-      ':hover': 'var(--sidebar-bg)',
+      default: 'transparent',
+      ':hover': 'transparent',
     },
   },
   profileCompact: {

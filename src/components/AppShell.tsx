@@ -20,7 +20,8 @@ type Props = {
 
 export default function AppShell({ children }: Props) {
   const { t } = useLingui();
-  const language = useSuspenseQuery(configQuery).data.language;
+  const config = useSuspenseQuery(configQuery).data;
+  const language = config.language;
   const location = useLocation();
   const navigate = useNavigate();
   const search = useSearch({ from: '__root__' });
@@ -200,6 +201,8 @@ export default function AppShell({ children }: Props) {
       <div
         data-reference-layout="moekoe"
         data-navigation-mode={navigationMode}
+        data-liquid-glass={config.liquid_glass ? 'enabled' : 'disabled'}
+        data-dynamic-effects={config.dynamic_effects ? 'enabled' : 'disabled'}
         lang={language}
         {...stylex.props(styles.shell)}
       >

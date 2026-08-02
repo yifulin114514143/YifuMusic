@@ -94,6 +94,7 @@ export default function PageHeader() {
   return (
     <header
       aria-label={page.title}
+      data-glass-surface="header"
       data-reference-layout="moekoe-titlebar"
       data-navigation-mode={navigationMode}
       data-sidebar-collapsed={sidebarCollapsed || undefined}
@@ -194,7 +195,8 @@ const styles = stylex.create({
     borderBottomStyle: 'solid',
     borderBottomColor: 'var(--border-subtle)',
     backgroundColor: 'var(--header-bg)',
-    boxShadow: 'var(--header-shadow)',
+    boxShadow: 'var(--header-shadow), inset 0 1px 0 var(--glass-highlight)',
+    backdropFilter: 'var(--glass-backdrop-filter-soft)',
   },
   headerTop: {
     left: 0,

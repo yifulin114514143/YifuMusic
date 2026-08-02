@@ -19,7 +19,10 @@ export default function TrackPlayingIndicator() {
       }
 
       return (
-        <div {...stylex.props(styles.animation)}>
+        <div
+          data-playing-indicator-animation
+          {...stylex.props(styles.animation)}
+        >
           <div {...stylex.props(styles.bar)} />
           <div {...stylex.props(styles.bar, styles.barSecond)} />
           <div {...stylex.props(styles.bar, styles.barThird)} />

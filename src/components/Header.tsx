@@ -109,6 +109,7 @@ export default function Header() {
   return (
     <header
       aria-label={t`Player`}
+      data-glass-surface="player"
       data-reference-layout="moekoe-player-dock"
       {...stylex.props(styles.header)}
     >
@@ -282,12 +283,12 @@ const styles = stylex.create({
     right: 0,
     bottom: 0,
     width: '100%',
-    backgroundColor: 'var(--footer-bg)',
+    backgroundColor: 'var(--glass-surface)',
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
     borderTopColor: 'var(--border-subtle)',
-    boxShadow: 'var(--shadow-panel)',
-    backdropFilter: 'blur(10px)',
+    boxShadow: 'var(--shadow-panel), inset 0 1px 0 var(--glass-highlight)',
+    backdropFilter: 'var(--glass-backdrop-filter-strong)',
     zIndex: 98,
   },
   playerBar: {

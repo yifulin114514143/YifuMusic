@@ -1,15 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import type React from 'react';
 
-import arona from '../assets/moekoe/arona.png';
+import nangongYuCinema from '../assets/moekoe/nangong-yu-cinema.webp';
 import BackToTop from '../components/BackToTop';
 import Cover from '../components/Cover';
 import Icon from '../components/Icon';
 import type { Playlist, Track } from '../generated/typings';
 import player from '../lib/player';
-import { allPlaylistsQuery, allTracksQuery } from '../lib/queries';
+import { allPlaylistsQuery, allTracksQuery, configQuery } from '../lib/queries';
 import type { QueueOrigin } from '../types/museeks';
 
 const QUEUE_ORIGIN: QueueOrigin = { type: 'library' };
@@ -141,6 +141,8 @@ function LocalContentState({
 function ViewDiscover() {
   const { view } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  const discoverCharacterVisible =
+    useSuspenseQuery(configQuery).data.discover_character_visible;
   const {
     data: tracks = [],
     isError: tracksError,
@@ -212,14 +214,16 @@ function ViewDiscover() {
         </header>
 
         <div {...stylex.props(styles.switchStage)}>
-          <img
-            alt=""
-            aria-hidden="true"
-            data-testid="discover-arona"
-            draggable={false}
-            src={arona}
-            {...stylex.props(styles.floatingArona)}
-          />
+          {discoverCharacterVisible && (
+            <img
+              alt=""
+              aria-hidden="true"
+              data-testid="discover-nangong-yu"
+              draggable={false}
+              src={nangongYuCinema}
+              {...stylex.props(styles.floatingNangongYu)}
+            />
+          )}
           <div
             aria-label="发现分类"
             aria-orientation="horizontal"
@@ -416,7 +420,7 @@ const styles = stylex.create({
     paddingTop: '40px',
     marginBottom: '22px',
   },
-  floatingArona: {
+  floatingNangongYu: {
     width: 'clamp(112px, 20vw, 180px)',
     height: 'auto',
     position: 'absolute',
