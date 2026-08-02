@@ -37,17 +37,58 @@ msgid "The playlist \"{name}\" was created"
 msgstr "The playlist \"{name}\" was created"
 
 #. placeholder {0}: newRelease.tag_name
-#: src/api/SettingsAPI.ts:168
+#: src/api/SettingsAPI.ts:220
 msgid "YifuMusic {0} is available."
 msgstr "YifuMusic {0} is available."
 
-#: src/api/SettingsAPI.ts:170
+#: src/api/SettingsAPI.ts:222
 msgid "YifuMusic {currentVersion} is the latest version available."
 msgstr "YifuMusic {currentVersion} is the latest version available."
+
+#: src/components/AppShell.tsx:221
+msgid "Main content"
+msgstr "Main content"
+
+#: src/components/ButtonPlaybackMode.tsx:22
+#: src/components/ButtonPlaybackMode.tsx:42
+msgid "Playback mode: Sequential"
+msgstr "Playback mode: Sequential"
+
+#: src/components/ButtonPlaybackMode.tsx:27
+msgid "Playback mode: Repeat all"
+msgstr "Playback mode: Repeat all"
+
+#: src/components/ButtonPlaybackMode.tsx:32
+msgid "Playback mode: Repeat one"
+msgstr "Playback mode: Repeat one"
+
+#: src/components/ButtonPlaybackMode.tsx:37
+msgid "播放模式：随机播放"
+msgstr "播放模式：随机播放"
+
+#: src/components/ButtonPlaybackMode.tsx:85
+msgid "播放模式选项"
+msgstr "播放模式选项"
+
+#: src/components/ButtonShuffle.tsx:15
+msgid "Shuffle"
+msgstr "Shuffle"
 
 #: src/components/Cover.tsx:34
 msgid "Album cover"
 msgstr "Album cover"
+
+#: src/components/DesktopLyricsButton.tsx:43
+msgid "无法打开桌面歌词"
+msgstr "无法打开桌面歌词"
+
+#: src/components/DesktopLyricsButton.tsx:52
+msgid "打开桌面歌词"
+msgstr "打开桌面歌词"
+
+#: src/components/DesktopLyricsButton.tsx:56
+msgid "桌面歌词"
+msgstr "桌面歌词"
 
 #: src/components/DropzoneImport.tsx:49
 msgid "{skippedItemsCount, plural, one {# invalid item ignored} other {# invalid items ignored}}"
@@ -87,563 +128,1212 @@ msgstr "Try <0>reloading the app</0>,"
 msgid "or if it happens again, please <0>report an issue</0>."
 msgstr "or if it happens again, please <0>report an issue</0>."
 
-#: src/components/Header.tsx:24
-msgid "Header"
-msgstr "Header"
+#. placeholder {0}: trackPlaying.title
+#. placeholder {1}: playlist.name
+#: src/components/Header.tsx:96
+msgid "已将“{0}”加入“{1}”"
+msgstr "已将“{0}”加入“{1}”"
 
-#: src/components/Header.tsx:53
-msgid "Queue"
-msgstr "Queue"
+#: src/components/Header.tsx:111
+msgid "Player"
+msgstr "Player"
 
-#: src/components/Navigation.tsx:48
+#: src/components/Header.tsx:128
+#: src/components/NowPlayingOverlay.tsx:956
+msgid "No track selected"
+msgstr "No track selected"
+
+#: src/components/Header.tsx:143
+msgid "播放速度：{playbackRate} 倍"
+msgstr "播放速度：{playbackRate} 倍"
+
+#: src/components/Header.tsx:145
+msgid "播放速度"
+msgstr "播放速度"
+
+#: src/components/Header.tsx:156
+msgid "播放速度选项"
+msgstr "播放速度选项"
+
+#: src/components/Header.tsx:182
+msgid "收藏歌曲（暂未实现）"
+msgstr "收藏歌曲（暂未实现）"
+
+#: src/components/Header.tsx:184
+msgid "收藏歌曲"
+msgstr "收藏歌曲"
+
+#: src/components/Header.tsx:188
+msgid "收藏功能暂未实现"
+msgstr "收藏功能暂未实现"
+
+#: src/components/Header.tsx:202
+#: src/components/Header.tsx:204
+msgid "加入歌单"
+msgstr "加入歌单"
+
+#: src/components/Header.tsx:213
+msgid "选择歌单"
+msgstr "选择歌单"
+
+#: src/components/Header.tsx:220
+msgid "还没有可加入的歌单"
+msgstr "还没有可加入的歌单"
+
+#: src/components/Header.tsx:242
+msgid "分享歌曲（暂未实现）"
+msgstr "分享歌曲（暂未实现）"
+
+#: src/components/Header.tsx:244
+msgid "分享歌曲"
+msgstr "分享歌曲"
+
+#: src/components/Header.tsx:248
+msgid "分享功能暂未实现"
+msgstr "分享功能暂未实现"
+
+#. placeholder {0}: queue.length
+#: src/components/Header.tsx:262
+msgid "{0, plural, one {Queue, # track} other {Queue, # tracks}}"
+msgstr "{0, plural, one {Queue, # track} other {Queue, # tracks}}"
+
+#: src/components/Navigation.tsx:102
+msgid "YifuMusic sidebar"
+msgstr "YifuMusic sidebar"
+
+#: src/components/Navigation.tsx:127
+#: src/components/Navigation.tsx:128
+#: src/components/PageHeader.tsx:85
+msgid "Search"
+msgstr "Search"
+
+#: src/components/Navigation.tsx:143
 msgid "Main navigation"
 msgstr "Main navigation"
 
-#: src/components/Navigation.tsx:51
-#: src/routes/settings.tsx:33
-msgid "Library"
-msgstr "Library"
+#: src/components/Navigation.tsx:148
+#: src/components/PageHeader.tsx:69
+#: src/components/PageHeader.tsx:159
+msgid "首页"
+msgstr "首页"
 
-#: src/components/Navigation.tsx:54
-#: src/routes/artists.tsx:64
-#: src/routes/settings.ui.tsx:148
-msgid "Artists"
-msgstr "Artists"
+#: src/components/Navigation.tsx:153
+#: src/components/PageHeader.tsx:71
+#: src/components/PageHeader.tsx:160
+msgid "发现"
+msgstr "发现"
 
-#: src/components/Navigation.tsx:57
-#: src/routes/playlists.tsx:165
-#: src/routes/settings.ui.tsx:151
-msgid "Playlists"
-msgstr "Playlists"
+#: src/components/Navigation.tsx:160
+#: src/components/Navigation.tsx:179
+#: src/components/PageHeader.tsx:161
+msgid "音乐库"
+msgstr "音乐库"
 
-#: src/components/Navigation.tsx:60
+#: src/components/Navigation.tsx:169
+msgid "Library navigation"
+msgstr "Library navigation"
+
+#: src/components/Navigation.tsx:184
+msgid "本地音乐"
+msgstr "本地音乐"
+
+#: src/components/Navigation.tsx:190
+#: src/components/ProfileMenu.tsx:150
+msgid "我的云盘（服务接入后可用）"
+msgstr "我的云盘（服务接入后可用）"
+
+#: src/components/Navigation.tsx:196
+#: src/components/PageHeader.tsx:151
+#: src/components/PageHeader.tsx:175
+msgid "听歌识曲（服务接入后可用）"
+msgstr "听歌识曲（服务接入后可用）"
+
+#: src/components/Navigation.tsx:205
+msgid "Playlist navigation"
+msgstr "Playlist navigation"
+
+#: src/components/Navigation.tsx:215
+#: src/components/Navigation.tsx:220
+msgid "我的歌单"
+msgstr "我的歌单"
+
+#: src/components/Navigation.tsx:229
+msgid "System navigation"
+msgstr "System navigation"
+
+#: src/components/Navigation.tsx:236
+#: src/components/PageHeader.tsx:89
+#: src/components/ProfileMenu.tsx:154
+#: src/components/ProfileMenu.tsx:157
+#: src/components/ProfileMenu.tsx:164
+#: src/routes/settings.tsx:104
 msgid "Settings"
 msgstr "Settings"
 
-#: src/components/Navigation.tsx:66
-msgid "Library status"
-msgstr "Library status"
+#: src/components/NowPlayingOverlay.tsx:180
+#: src/components/NowPlayingOverlay.tsx:194
+#: src/components/NowPlayingOverlay.tsx:200
+msgid "歌词显示设置"
+msgstr "歌词显示设置"
 
-#: src/components/Navigation.tsx:90
-msgid "scanning tracks..."
-msgstr "scanning tracks..."
+#: src/components/NowPlayingOverlay.tsx:204
+msgid "背景"
+msgstr "背景"
 
-#: src/components/PlayerControls.tsx:18
+#: src/components/NowPlayingOverlay.tsx:206
+msgid "歌词背景"
+msgstr "歌词背景"
+
+#: src/components/NowPlayingOverlay.tsx:214
+#: src/components/NowPlayingOverlay.tsx:216
+msgid "背景：开启"
+msgstr "背景：开启"
+
+#: src/components/NowPlayingOverlay.tsx:225
+msgid "开启"
+msgstr "开启"
+
+#: src/components/NowPlayingOverlay.tsx:228
+#: src/components/NowPlayingOverlay.tsx:230
+msgid "背景：封面"
+msgstr "背景：封面"
+
+#: src/components/NowPlayingOverlay.tsx:239
+msgid "封面"
+msgstr "封面"
+
+#: src/components/NowPlayingOverlay.tsx:242
+#: src/components/NowPlayingOverlay.tsx:244
+msgid "背景：关闭"
+msgstr "背景：关闭"
+
+#: src/components/NowPlayingOverlay.tsx:253
+msgid "关闭"
+msgstr "关闭"
+
+#: src/components/NowPlayingOverlay.tsx:260
+msgid "字体大小"
+msgstr "字体大小"
+
+#: src/components/NowPlayingOverlay.tsx:263
+msgid "歌词字体大小"
+msgstr "歌词字体大小"
+
+#: src/components/NowPlayingOverlay.tsx:271
+#: src/components/NowPlayingOverlay.tsx:273
+msgid "字体大小：小"
+msgstr "字体大小：小"
+
+#: src/components/NowPlayingOverlay.tsx:282
+msgid "小"
+msgstr "小"
+
+#: src/components/NowPlayingOverlay.tsx:285
+#: src/components/NowPlayingOverlay.tsx:287
+msgid "字体大小：中"
+msgstr "字体大小：中"
+
+#: src/components/NowPlayingOverlay.tsx:296
+msgid "中"
+msgstr "中"
+
+#: src/components/NowPlayingOverlay.tsx:299
+#: src/components/NowPlayingOverlay.tsx:301
+msgid "字体大小：大"
+msgstr "字体大小：大"
+
+#: src/components/NowPlayingOverlay.tsx:310
+msgid "大"
+msgstr "大"
+
+#: src/components/NowPlayingOverlay.tsx:317
+msgid "显示方式"
+msgstr "显示方式"
+
+#: src/components/NowPlayingOverlay.tsx:320
+msgid "歌词显示方式"
+msgstr "歌词显示方式"
+
+#: src/components/NowPlayingOverlay.tsx:328
+#: src/components/NowPlayingOverlay.tsx:330
+msgid "显示方式：滚动"
+msgstr "显示方式：滚动"
+
+#: src/components/NowPlayingOverlay.tsx:339
+msgid "滚动"
+msgstr "滚动"
+
+#: src/components/NowPlayingOverlay.tsx:344
+#: src/components/NowPlayingOverlay.tsx:351
+msgid "显示方式：单行"
+msgstr "显示方式：单行"
+
+#: src/components/NowPlayingOverlay.tsx:345
+#: src/components/NowPlayingOverlay.tsx:352
+msgid "纯文本歌词无法定位当前行，单行模式不可用"
+msgstr "纯文本歌词无法定位当前行，单行模式不可用"
+
+#: src/components/NowPlayingOverlay.tsx:362
+msgid "单行"
+msgstr "单行"
+
+#: src/components/NowPlayingOverlay.tsx:369
+msgid "对齐方式"
+msgstr "对齐方式"
+
+#: src/components/NowPlayingOverlay.tsx:372
+msgid "歌词对齐方式"
+msgstr "歌词对齐方式"
+
+#: src/components/NowPlayingOverlay.tsx:380
+#: src/components/NowPlayingOverlay.tsx:382
+msgid "对齐方式：居左"
+msgstr "对齐方式：居左"
+
+#: src/components/NowPlayingOverlay.tsx:391
+msgid "居左"
+msgstr "居左"
+
+#: src/components/NowPlayingOverlay.tsx:394
+#: src/components/NowPlayingOverlay.tsx:396
+msgid "对齐方式：居中"
+msgstr "对齐方式：居中"
+
+#: src/components/NowPlayingOverlay.tsx:405
+msgid "居中"
+msgstr "居中"
+
+#: src/components/NowPlayingOverlay.tsx:412
+msgid "高亮方式"
+msgstr "高亮方式"
+
+#: src/components/NowPlayingOverlay.tsx:415
+msgid "歌词高亮方式"
+msgstr "歌词高亮方式"
+
+#: src/components/NowPlayingOverlay.tsx:423
+msgid "高亮方式：逐行"
+msgstr "高亮方式：逐行"
+
+#: src/components/NowPlayingOverlay.tsx:426
+#: src/components/NowPlayingOverlay.tsx:436
+#: src/components/NowPlayingOverlay.tsx:439
+msgid "当前本地歌词只提供逐行时间，逐字高亮不可用"
+msgstr "当前本地歌词只提供逐行时间，逐字高亮不可用"
+
+#: src/components/NowPlayingOverlay.tsx:433
+msgid "逐行"
+msgstr "逐行"
+
+#: src/components/NowPlayingOverlay.tsx:443
+msgid "逐字"
+msgstr "逐字"
+
+#: src/components/NowPlayingOverlay.tsx:474
+#: src/components/NowPlayingOverlay.tsx:1182
+#: src/components/NowPlayingOverlay.tsx:1192
+#: src/components/QueuePanel.tsx:119
+#: src/components/QueuePanel.tsx:128
+msgid "Queue"
+msgstr "Queue"
+
+#. placeholder {0}: artistTracks.length
+#. placeholder {0}: compilationTracks.length
+#. placeholder {0}: props.count
+#: src/components/NowPlayingOverlay.tsx:476
+#: src/components/QueuePanel.tsx:130
+#: src/components/TrackListGrouped.tsx:116
+#: src/components/TrackListStatus.tsx:11
+#: src/routes/artists.$artistID.tsx:76
+#: src/routes/artists.presets.compilations.tsx:67
+msgid "{0, plural, one {# track} other {# tracks}}"
+msgstr "{0, plural, one {# track} other {# tracks}}"
+
+#: src/components/NowPlayingOverlay.tsx:486
+#: src/components/NowPlayingOverlay.tsx:1057
+#: src/components/QueuePanel.tsx:111
+msgid "Close queue"
+msgstr "Close queue"
+
+#: src/components/NowPlayingOverlay.tsx:492
+#: src/components/NowPlayingOverlay.tsx:910
+#: src/components/QueuePanel.tsx:147
+#: src/components/QueuePanel.tsx:157
+msgid "Now playing"
+msgstr "Now playing"
+
+#: src/components/NowPlayingOverlay.tsx:501
+#: src/components/QueuePanel.tsx:160
+msgid "Paused"
+msgstr "Paused"
+
+#: src/components/NowPlayingOverlay.tsx:501
+#: src/components/QueuePanel.tsx:160
+msgid "Playing"
+msgstr "Playing"
+
+#: src/components/NowPlayingOverlay.tsx:889
+msgid "Loading lyrics..."
+msgstr "Loading lyrics..."
+
+#: src/components/NowPlayingOverlay.tsx:891
+msgid "Lyrics could not be read"
+msgstr "Lyrics could not be read"
+
+#: src/components/NowPlayingOverlay.tsx:894
+msgid "Lyrics could not be parsed"
+msgstr "Lyrics could not be parsed"
+
+#: src/components/NowPlayingOverlay.tsx:895
+msgid "No lyrics available"
+msgstr "No lyrics available"
+
+#: src/components/NowPlayingOverlay.tsx:938
+msgid "Close now playing"
+msgstr "Close now playing"
+
+#: src/components/NowPlayingOverlay.tsx:951
+#: src/components/PageHeader.tsx:87
+msgid "Track details"
+msgstr "Track details"
+
+#: src/components/NowPlayingOverlay.tsx:1034
+msgid "Media error"
+msgstr "Media error"
+
+#: src/components/NowPlayingOverlay.tsx:1057
+msgid "Open queue"
+msgstr "Open queue"
+
+#: src/components/NowPlayingOverlay.tsx:1066
+#: src/components/NowPlayingOverlay.tsx:1103
+msgid "Lyrics"
+msgstr "Lyrics"
+
+#: src/components/NowPlayingOverlay.tsx:1073
+msgid "Return to current lyric"
+msgstr "Return to current lyric"
+
+#: src/components/NowPlayingOverlay.tsx:1096
+msgid "Choose lyrics file"
+msgstr "Choose lyrics file"
+
+#: src/components/NowPlayingOverlay.tsx:1169
+msgid "等待歌词开始"
+msgstr "等待歌词开始"
+
+#: src/components/PageHeader.tsx:73
+#: src/routes/settings.library.tsx:47
+#: src/routes/settings.tsx:59
+msgid "Library"
+msgstr "Library"
+
+#: src/components/PageHeader.tsx:75
+#: src/routes/artists.presets.compilations.tsx:61
+#: src/routes/artists.tsx:227
+msgid "Compilations"
+msgstr "Compilations"
+
+#: src/components/PageHeader.tsx:77
+#: src/components/PageHeader.tsx:79
+#: src/routes/artists.tsx:212
+#: src/routes/settings.ui.tsx:211
+msgid "Artists"
+msgstr "Artists"
+
+#: src/components/PageHeader.tsx:81
+#: src/components/PageHeader.tsx:83
+#: src/routes/settings.ui.tsx:214
+msgid "Playlists"
+msgstr "Playlists"
+
+#: src/components/PageHeader.tsx:122
+msgid "Expand sidebar"
+msgstr "Expand sidebar"
+
+#: src/components/PageHeader.tsx:122
+msgid "Collapse sidebar"
+msgstr "Collapse sidebar"
+
+#: src/components/PageHeader.tsx:129
+#: src/routes/artists.$artistID.tsx:87
+#: src/routes/artists.presets.compilations.tsx:79
+#: src/routes/tracks.$trackID.tsx:175
+msgid "Back"
+msgstr "Back"
+
+#: src/components/PageHeader.tsx:136
+msgid "Forward"
+msgstr "Forward"
+
+#: src/components/PageHeader.tsx:143
+msgid "Refresh page"
+msgstr "Refresh page"
+
+#: src/components/PageHeader.tsx:158
+msgid "顶部导航"
+msgstr "顶部导航"
+
+#: src/components/PlayerControls.tsx:17
 msgid "Previous"
 msgstr "Previous"
 
 #: src/components/PlayerControls.tsx:24
+#: src/components/PlayingIndicator.tsx:13
+#: src/routes/tracks.$trackID.tsx:179
 msgid "Play"
 msgstr "Play"
 
 #: src/components/PlayerControls.tsx:24
+#: src/components/PlayingIndicator.tsx:13
 msgid "Pause"
 msgstr "Pause"
 
-#: src/components/PlayerControls.tsx:30
+#: src/components/PlayerControls.tsx:31
 msgid "Next"
 msgstr "Next"
 
-#: src/components/QueueEmpty.tsx:7
+#: src/components/PlayingBar.tsx:22
+#: src/components/PlayingBar.tsx:24
+#: src/components/PlayingBarInfo.tsx:33
+#: src/components/PlayingBarInfo.tsx:34
+msgid "Open now playing"
+msgstr "Open now playing"
+
+#: src/components/ProfileMenu.tsx:112
+#: src/components/ProfileMenu.tsx:114
+msgid "打开资料与服务菜单"
+msgstr "打开资料与服务菜单"
+
+#: src/components/ProfileMenu.tsx:139
+msgid "资料与服务菜单"
+msgstr "资料与服务菜单"
+
+#: src/components/ProfileMenu.tsx:148
+msgid "登录（服务接入后可用）"
+msgstr "登录（服务接入后可用）"
+
+#: src/components/ProfileMenu.tsx:149
+msgid "VIP（服务接入后可用）"
+msgstr "VIP（服务接入后可用）"
+
+#: src/components/ProfileMenu.tsx:151
+msgid "在线收藏（服务接入后可用）"
+msgstr "在线收藏（服务接入后可用）"
+
+#: src/components/ProfileMenu.tsx:152
+msgid "检查更新（服务接入后可用）"
+msgstr "检查更新（服务接入后可用）"
+
+#: src/components/ProfileMenu.tsx:167
+#: src/components/ProfileMenu.tsx:169
+#: src/components/ProfileMenu.tsx:174
+#: src/components/ProfileMenu.tsx:197
+msgid "免责声明"
+msgstr "免责声明"
+
+#: src/components/ProfileMenu.tsx:182
+#: src/components/ProfileMenu.tsx:201
+#: src/components/ProfileMenu.tsx:203
+msgid "关闭免责声明"
+msgstr "关闭免责声明"
+
+#: src/components/ProfileMenu.tsx:231
+msgid "我知道了"
+msgstr "我知道了"
+
+#: src/components/QueueEmpty.tsx:8
 msgid "Queue is empty"
 msgstr "Queue is empty"
 
-#: src/components/QueueList.tsx:79
-msgid "clear queue"
-msgstr "clear queue"
+#: src/components/QueueEmpty.tsx:11
+msgid "Play a track from your library to get started"
+msgstr "Play a track from your library to get started"
 
-#: src/components/QueueList.tsx:105
+#: src/components/QueueList.tsx:111
+msgid "This will remove all upcoming tracks. The current track will stay."
+msgstr "This will remove all upcoming tracks. The current track will stay."
+
+#: src/components/QueueList.tsx:113
+msgid "Clear queue?"
+msgstr "Clear queue?"
+
+#: src/components/QueueList.tsx:115
+#: src/components/TrackList.tsx:403
+#: src/routes/playlists.$playlistID.tsx:93
+#: src/routes/playlists.$playlistID.tsx:133
+#: src/routes/playlists.$playlistID.tsx:150
+#: src/routes/playlists.$playlistID.tsx:411
+#: src/routes/settings.library.tsx:111
+#: src/routes/settings.library.tsx:166
+#: src/routes/tracks.$trackID.tsx:499
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/components/QueueList.tsx:116
+#: src/routes/playlists.$playlistID.tsx:134
+msgid "Clear"
+msgstr "Clear"
+
+#: src/components/QueueList.tsx:139
+msgid "Upcoming tracks"
+msgstr "Upcoming tracks"
+
+#: src/components/QueueList.tsx:169
 msgid "see more"
 msgstr "see more"
 
-#: src/components/Search.tsx:42
+#: src/components/QueueList.tsx:174
+msgid "Queue actions"
+msgstr "Queue actions"
+
+#: src/components/QueueList.tsx:180
+msgid "Clear queue"
+msgstr "Clear queue"
+
+#. placeholder {0}: track.title
+#: src/components/QueueListItem.tsx:89
+msgid "Reorder {0}"
+msgstr "Reorder {0}"
+
+#. placeholder {0}: track.title
+#: src/components/QueueListItem.tsx:98
+msgid "Play {0}"
+msgstr "Play {0}"
+
+#: src/components/QueueListItem.tsx:110
+msgid "Remove from queue"
+msgstr "Remove from queue"
+
+#. placeholder {0}: track.title
+#: src/components/QueueListItem.tsx:111
+msgid "Remove {0} from queue"
+msgstr "Remove {0} from queue"
+
+#: src/components/QueuePanel.tsx:140
+msgid "Collapse queue"
+msgstr "Collapse queue"
+
+#: src/components/Search.tsx:158
 msgid "search..."
 msgstr "search..."
 
-#: src/components/Search.tsx:49
+#: src/components/Search.tsx:167
 msgid "Search library"
 msgstr "Search library"
 
-#: src/components/Search.tsx:61
+#: src/components/Search.tsx:184
+#: src/components/Search.tsx:185
+#: src/components/TrackListStates.tsx:75
+#: src/routes/artists.tsx:192
+#: src/routes/artists.tsx:254
 msgid "Clear search"
 msgstr "Clear search"
 
 #: src/components/SideNavLink.tsx:62
+#: src/routes/playlists.$playlistID.tsx:313
 msgid "Rename"
 msgstr "Rename"
 
-#: src/components/TrackList.tsx:243
+#: src/components/TrackList.tsx:254
 msgid "Create new playlist..."
 msgstr "Create new playlist..."
 
-#: src/components/TrackList.tsx:246
-#: src/routes/playlists.tsx:63
+#: src/components/TrackList.tsx:257
+#: src/routes/playlists.tsx:49
 msgid "New playlist"
 msgstr "New playlist"
 
-#: src/components/TrackList.tsx:259
+#: src/components/TrackList.tsx:270
 msgid "No playlists"
 msgstr "No playlists"
 
-#. placeholder {0}: selectedTracks.size
+#. placeholder {0}: selectedTrackIDs.size
 #. placeholder {1}: playlist.name
-#: src/components/TrackList.tsx:273
+#: src/components/TrackList.tsx:284
 msgid "{0} track(s) were added to \"{1}\""
 msgstr "{0} track(s) were added to \"{1}\""
 
-#: src/components/TrackList.tsx:291
+#: src/components/TrackList.tsx:302
 msgid "{selectedCount, plural, one {# track selected} other {# tracks selected}}"
 msgstr "{selectedCount, plural, one {# track selected} other {# tracks selected}}"
 
-#: src/components/TrackList.tsx:303
+#: src/components/TrackList.tsx:314
+#: src/routes/tracks.$trackID.tsx:185
 msgid "Add to queue"
 msgstr "Add to queue"
 
-#: src/components/TrackList.tsx:311
+#: src/components/TrackList.tsx:322
 msgid "Play next"
 msgstr "Play next"
 
-#: src/components/TrackList.tsx:323
+#: src/components/TrackList.tsx:334
+#: src/routes/tracks.$trackID.tsx:203
+#: src/routes/tracks.$trackID.tsx:207
 msgid "Add to playlist"
 msgstr "Add to playlist"
 
-#: src/components/TrackList.tsx:333
+#: src/components/TrackList.tsx:344
 msgid "Search for \"{item}\""
 msgstr "Search for \"{item}\""
 
-#: src/components/TrackList.tsx:346
+#: src/components/TrackList.tsx:357
 msgid "Copy \"{item}\""
 msgstr "Copy \"{item}\""
 
-#: src/components/TrackList.tsx:369
+#: src/components/TrackList.tsx:380
 msgid "Edit track"
 msgstr "Edit track"
 
-#: src/components/TrackList.tsx:379
+#: src/components/TrackList.tsx:390
+#: src/routes/tracks.$trackID.tsx:217
 msgid "Show in file manager"
 msgstr "Show in file manager"
 
-#: src/components/TrackList.tsx:385
+#: src/components/TrackList.tsx:396
 msgid "Remove from library"
 msgstr "Remove from library"
 
-#. placeholder {0}: selectedTracks.size
-#: src/components/TrackList.tsx:388
+#. placeholder {0}: selectedTrackIDs.size
+#: src/components/TrackList.tsx:399
 msgid "Are you sure you want to remove {0} track(s) from your library?"
 msgstr "Are you sure you want to remove {0} track(s) from your library?"
 
-#: src/components/TrackList.tsx:390
+#: src/components/TrackList.tsx:401
 msgid "Remove tracks"
 msgstr "Remove tracks"
 
-#: src/components/TrackList.tsx:392
-#: src/routes/settings.library.tsx:100
-#: src/routes/settings.library.tsx:145
-#: src/routes/tracks.$trackID.tsx:257
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/components/TrackList.tsx:393
-#: src/routes/settings.library.tsx:64
+#: src/components/TrackList.tsx:404
+#: src/routes/playlists.$playlistID.tsx:94
+#: src/routes/settings.library.tsx:75
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/TrackListDefault.tsx:124
+#: src/components/TrackListDefault.tsx:125
 #: src/components/TrackListGrouped.tsx:58
 msgid "Track list"
 msgstr "Track list"
-
-#. placeholder {0}: props.count
-#. placeholder {0}: tracks.length
-#: src/components/TrackListGrouped.tsx:115
-#: src/components/TrackListStatus.tsx:11
-msgid "{0, plural, one {# track} other {# tracks}}"
-msgstr "{0, plural, one {# track} other {# tracks}}"
 
 #: src/components/TrackListHeader.tsx:17
 msgid "Track list sorting options"
 msgstr "Track list sorting options"
 
 #: src/components/TrackListHeader.tsx:26
-#: src/routes/tracks.$trackID.tsx:88
+#: src/routes/tracks.$trackID.tsx:338
 msgid "Title"
 msgstr "Title"
 
 #: src/components/TrackListHeader.tsx:31
-#: src/routes/tracks.$trackID.tsx:241
-msgid "Duration"
-msgstr "Duration"
-
-#: src/components/TrackListHeader.tsx:36
 msgid "Artist"
 msgstr "Artist"
 
-#: src/components/TrackListHeader.tsx:41
-#: src/routes/tracks.$trackID.tsx:99
+#: src/components/TrackListHeader.tsx:36
+#: src/routes/tracks.$trackID.tsx:347
 msgid "Album"
 msgstr "Album"
 
+#: src/components/TrackListHeader.tsx:41
+#: src/routes/tracks.$trackID.tsx:484
+msgid "Duration"
+msgstr "Duration"
+
 #: src/components/TrackListHeader.tsx:46
-#: src/routes/tracks.$trackID.tsx:139
+#: src/routes/tracks.$trackID.tsx:385
 msgid "Genre"
 msgstr "Genre"
 
-#: src/components/TrackListStates.tsx:25
+#: src/components/TrackListHeader.tsx:51
+#: src/components/TrackRow.tsx:173
+msgid "More actions"
+msgstr "More actions"
+
+#: src/components/TrackListStates.tsx:26
 msgid "Loading library..."
 msgstr "Loading library..."
 
-#: src/components/TrackListStates.tsx:36
+#: src/components/TrackListStates.tsx:37
 msgid "Your library is being scanned"
 msgstr "Your library is being scanned"
 
-#: src/components/TrackListStates.tsx:39
+#: src/components/TrackListStates.tsx:40
 msgid "hold on..."
 msgstr "hold on..."
 
-#: src/components/TrackListStates.tsx:50
-msgid "There is no music in your library"
-msgstr "There is no music in your library"
+#: src/components/TrackListStates.tsx:51
+msgid "Your library is empty"
+msgstr "Your library is empty"
 
-#: src/components/TrackListStates.tsx:53
-msgid "you can <0>add your music here</0>"
-msgstr "you can <0>add your music here</0>"
+#: src/components/TrackListStates.tsx:54
+msgid "Choose a local music folder in <0>library settings</0> to scan it."
+msgstr "Choose a local music folder in <0>library settings</0> to scan it."
 
-#: src/components/TrackListStates.tsx:69
-#: src/routes/playlists.$playlistID.tsx:104
-msgid "Your search returned no results"
-msgstr "Your search returned no results"
+#: src/components/TrackListStates.tsx:71
+msgid "No results for \"{search}\""
+msgstr "No results for \"{search}\""
 
-#: src/components/VolumeControl.tsx:47
-#: src/components/VolumeControl.tsx:74
+#: src/components/TrackProgress.tsx:116
+msgid "Playback progress"
+msgstr "Playback progress"
+
+#. placeholder {0}: track.title
+#: src/components/TrackRow.tsx:174
+msgid "More actions for {0}"
+msgstr "More actions for {0}"
+
+#: src/components/VolumeControl.tsx:44
+#: src/components/VolumeControl.tsx:96
 msgid "Volume"
 msgstr "Volume"
 
-#: src/routes/__root.tsx:82
-msgid "Application main content"
-msgstr "Application main content"
+#: src/components/VolumeControl.tsx:53
+msgid "取消静音"
+msgstr "取消静音"
 
-#: src/routes/artists.tsx:70
-msgid "Compilations"
-msgstr "Compilations"
+#: src/components/VolumeControl.tsx:53
+msgid "静音"
+msgstr "静音"
 
-#: src/routes/playlists.$playlistID.tsx:72
+#. placeholder {0}: albums.length
+#: src/routes/artists.$artistID.tsx:74
+#: src/routes/artists.presets.compilations.tsx:65
+msgid "{0, plural, one {# album} other {# albums}}"
+msgstr "{0, plural, one {# album} other {# albums}}"
+
+#: src/routes/artists.$artistID.tsx:93
+#: src/routes/artists.presets.compilations.tsx:85
+#: src/routes/playlists.$playlistID.tsx:285
+#: src/routes/playlists.$playlistID.tsx:286
+#: src/routes/playlists.$playlistID.tsx:292
+msgid "Play all"
+msgstr "Play all"
+
+#: src/routes/artists.$artistID.tsx:101
+#: src/routes/artists.presets.compilations.tsx:92
+#: src/routes/playlists.$playlistID.tsx:296
+msgid "Add all to queue"
+msgstr "Add all to queue"
+
+#: src/routes/artists.presets.compilations.tsx:62
+msgid "Local compilation collection"
+msgstr "Local compilation collection"
+
+#: src/routes/artists.tsx:188
+#: src/routes/artists.tsx:250
+msgid "No artists found for \"{search}\""
+msgstr "No artists found for \"{search}\""
+
+#: src/routes/artists.tsx:214
+msgid "Artist count"
+msgstr "Artist count"
+
+#. placeholder {0}: artistNames.length
+#: src/routes/artists.tsx:215
+msgid "{0, plural, one {# artist} other {# artists}}"
+msgstr "{0, plural, one {# artist} other {# artists}}"
+
+#: src/routes/playlists.$playlistID.tsx:86
 msgid "Remove from playlist"
 msgstr "Remove from playlist"
 
-#: src/routes/playlists.$playlistID.tsx:88
-#: src/routes/playlists.$playlistID.tsx:115
-msgid "Empty playlist"
-msgstr "Empty playlist"
+#. placeholder {0}: playlist.name
+#: src/routes/playlists.$playlistID.tsx:89
+msgid "This will remove the selected tracks from \"{0}\"."
+msgstr "This will remove the selected tracks from \"{0}\"."
 
 #: src/routes/playlists.$playlistID.tsx:91
-#: src/routes/playlists.$playlistID.tsx:118
-msgid "You can add tracks from the <0>library view</0>"
-msgstr "You can add tracks from the <0>library view</0>"
+msgid "Remove tracks from playlist?"
+msgstr "Remove tracks from playlist?"
 
-#: src/routes/playlists.tsx:93
+#. placeholder {0}: playlist.name
+#: src/routes/playlists.$playlistID.tsx:129
+msgid "This will remove all tracks from \"{0}\"."
+msgstr "This will remove all tracks from \"{0}\"."
+
+#: src/routes/playlists.$playlistID.tsx:131
+msgid "Clear playlist?"
+msgstr "Clear playlist?"
+
+#. placeholder {0}: playlist.name
+#: src/routes/playlists.$playlistID.tsx:146
+msgid "This will permanently delete \"{0}\"."
+msgstr "This will permanently delete \"{0}\"."
+
+#: src/routes/playlists.$playlistID.tsx:148
+msgid "Delete playlist?"
+msgstr "Delete playlist?"
+
+#: src/routes/playlists.$playlistID.tsx:151
 msgid "Delete"
 msgstr "Delete"
 
-#: src/routes/playlists.tsx:102
-msgid "Duplicate"
-msgstr "Duplicate"
+#: src/routes/playlists.$playlistID.tsx:178
+#: src/routes/playlists.$playlistID.tsx:200
+msgid "Empty playlist"
+msgstr "Empty playlist"
 
-#: src/routes/playlists.tsx:110
+#: src/routes/playlists.$playlistID.tsx:181
+#: src/routes/playlists.$playlistID.tsx:203
+msgid "You can add tracks from the <0>library view</0>"
+msgstr "You can add tracks from the <0>library view</0>"
+
+#: src/routes/playlists.$playlistID.tsx:192
+msgid "Your search returned no results"
+msgstr "Your search returned no results"
+
+#: src/routes/playlists.$playlistID.tsx:319
+msgid "Add tracks"
+msgstr "Add tracks"
+
+#: src/routes/playlists.$playlistID.tsx:330
+msgid "Clear playlist"
+msgstr "Clear playlist"
+
+#: src/routes/playlists.$playlistID.tsx:339
+msgid "Import from folders"
+msgstr "Import from folders"
+
+#: src/routes/playlists.$playlistID.tsx:345
 msgid "Export"
 msgstr "Export"
 
-#: src/routes/playlists.tsx:140
-msgid "You haven't created any playlist yet"
-msgstr "You haven't created any playlist yet"
+#: src/routes/playlists.$playlistID.tsx:350
+msgid "Delete playlist"
+msgstr "Delete playlist"
 
-#: src/routes/playlists.tsx:144
-msgid "create one now"
-msgstr "create one now"
+#: src/routes/playlists.$playlistID.tsx:392
+msgid "Playlist name"
+msgstr "Playlist name"
 
-#: src/routes/playlists.tsx:153
-msgid "No playlist selected"
-msgstr "No playlist selected"
-
-#: src/routes/playlists.tsx:170
-msgid "New Playlist"
-msgstr "New Playlist"
+#: src/routes/playlists.$playlistID.tsx:401
+#: src/routes/tracks.$trackID.tsx:501
+msgid "Save"
+msgstr "Save"
 
 #: src/routes/settings.about.tsx:33
 msgid "About YifuMusic"
 msgstr "About YifuMusic"
 
-#: src/routes/settings.about.tsx:42
+#: src/routes/settings.about.tsx:50
 msgid "project repository"
 msgstr "project repository"
 
-#: src/routes/settings.about.tsx:48
+#: src/routes/settings.about.tsx:56
 msgid "release notes"
 msgstr "release notes"
 
-#: src/routes/settings.about.tsx:51
+#: src/routes/settings.about.tsx:59
 msgid "Automatically check for updates"
 msgstr "Automatically check for updates"
 
-#: src/routes/settings.about.tsx:63
+#: src/routes/settings.about.tsx:60
+msgid "Check for an available YifuMusic release when the app starts"
+msgstr "Check for an available YifuMusic release when the app starts"
+
+#: src/routes/settings.about.tsx:72
 msgid "Check for update"
 msgstr "Check for update"
 
-#: src/routes/settings.about.tsx:69
+#: src/routes/settings.about.tsx:80
+msgid "Licenses and notices"
+msgstr "Licenses and notices"
+
+#: src/routes/settings.about.tsx:84
+msgid "YifuMusic is a modification of Museeks and is distributed under the MIT License."
+msgstr "YifuMusic is a modification of Museeks and is distributed under the MIT License."
+
+#: src/routes/settings.about.tsx:90
+msgid "The root LICENSE and NOTICE.md retain the upstream license and acknowledgement."
+msgstr "The root LICENSE and NOTICE.md retain the upstream license and acknowledgement."
+
+#: src/routes/settings.about.tsx:100
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/settings.about.tsx:72
+#: src/routes/settings.about.tsx:104
 msgid "YifuMusic is maintained by <0>project contributors</0>"
 msgstr "YifuMusic is maintained by <0>project contributors</0>"
 
-#: src/routes/settings.about.tsx:86
+#: src/routes/settings.about.tsx:120
 msgid "Report issue / Ask for a feature"
 msgstr "Report issue / Ask for a feature"
 
-#: src/routes/settings.about.tsx:89
+#: src/routes/settings.about.tsx:124
 msgid "Bugs happen. Please, do not hesitate to report them or to ask for features you would like to see, using the <0>issue tracker</0>."
 msgstr "Bugs happen. Please, do not hesitate to report them or to ask for features you would like to see, using the <0>issue tracker</0>."
 
-#: src/routes/settings.about.tsx:104
+#: src/routes/settings.about.tsx:141
 msgid "Internals"
 msgstr "Internals"
 
-#: src/routes/settings.about.tsx:109
+#: src/routes/settings.about.tsx:147
 msgid "Open storage directory"
 msgstr "Open storage directory"
 
 #: src/routes/settings.audio.tsx:27
+#: src/routes/settings.audio.tsx:34
+msgid "Playback"
+msgstr "Playback"
+
+#: src/routes/settings.audio.tsx:28
+#: src/routes/settings.audio.tsx:38
+msgid "Adjust how YifuMusic plays your local music."
+msgstr "Adjust how YifuMusic plays your local music."
+
+#: src/routes/settings.audio.tsx:41
 msgid "Playback rate"
 msgstr "Playback rate"
 
-#: src/routes/settings.audio.tsx:28
+#: src/routes/settings.audio.tsx:42
 msgid "Increase the playback rate: a value of 2 will play your music at a 2x speed"
 msgstr "Increase the playback rate: a value of 2 will play your music at a 2x speed"
 
-#: src/routes/settings.audio.tsx:44
+#: src/routes/settings.audio.tsx:64
 msgid "Follow playing track"
 msgstr "Follow playing track"
 
-#: src/routes/settings.audio.tsx:45
+#: src/routes/settings.audio.tsx:65
 msgid "Automatically follow the currently playing track (only when the app is not focused)"
 msgstr "Automatically follow the currently playing track (only when the app is not focused)"
 
-#: src/routes/settings.library.tsx:48
-msgid "Files"
-msgstr "Files"
-
-#: src/routes/settings.library.tsx:52
-msgid "There are no folders in your library."
-msgstr "There are no folders in your library."
-
-#: src/routes/settings.library.tsx:84
-msgid "Add folder"
-msgstr "Add folder"
-
-#: src/routes/settings.library.tsx:90
-msgid "Scan"
-msgstr "Scan"
-
-#: src/routes/settings.library.tsx:96
-msgid "All track data will be updated from the base files, but your original files won't be modified. Any YifuMusic-specific edits you may have done will be reset."
-msgstr "All track data will be updated from the base files, but your original files won't be modified. Any YifuMusic-specific edits you may have done will be reset."
-
-#: src/routes/settings.library.tsx:98
-msgid "Refresh all tracks?"
-msgstr "Refresh all tracks?"
-
-#: src/routes/settings.library.tsx:101
-#: src/routes/settings.library.tsx:111
-msgid "Refresh"
-msgstr "Refresh"
-
-#: src/routes/settings.library.tsx:109
-msgid "Force the refresh of all tracks tags"
-msgstr "Force the refresh of all tracks tags"
-
-#: src/routes/settings.library.tsx:115
-msgid "<0>.m3u</0> files will also be imported as playlists."
-msgstr "<0>.m3u</0> files will also be imported as playlists."
-
-#: src/routes/settings.library.tsx:122
-msgid "Automatically refresh library on startup"
-msgstr "Automatically refresh library on startup"
-
-#: src/routes/settings.library.tsx:129
-msgid "Danger zone"
-msgstr "Danger zone"
-
-#: src/routes/settings.library.tsx:132
-msgid "Delete all tracks and playlists from YifuMusic."
-msgstr "Delete all tracks and playlists from YifuMusic."
-
-#: src/routes/settings.library.tsx:137
-msgid "Fully reset the library"
-msgstr "Fully reset the library"
-
-#: src/routes/settings.library.tsx:141
-msgid "All your tracks and playlists will be deleted from YifuMusic."
-msgstr "All your tracks and playlists will be deleted from YifuMusic."
-
-#: src/routes/settings.library.tsx:143
-msgid "Reset library?"
-msgstr "Reset library?"
-
-#: src/routes/settings.library.tsx:146
-#: src/routes/settings.ui.tsx:79
-msgid "Reset"
-msgstr "Reset"
-
-#: src/routes/settings.library.tsx:155
-msgid "Reset library"
-msgstr "Reset library"
-
-#: src/routes/settings.tsx:36
-msgid "Audio"
-msgstr "Audio"
-
-#: src/routes/settings.tsx:39
-msgid "Interface"
-msgstr "Interface"
-
-#: src/routes/settings.tsx:42
-msgid "About"
-msgstr "About"
-
-#: src/routes/settings.ui.tsx:46
-msgid "Theme"
-msgstr "Theme"
-
-#: src/routes/settings.ui.tsx:47
-msgid "Change the appearance of the interface"
-msgstr "Change the appearance of the interface"
-
-#: src/routes/settings.ui.tsx:55
-msgid "System (default)"
-msgstr "System (default)"
-
-#: src/routes/settings.ui.tsx:67
-msgid "Accent color"
-msgstr "Accent color"
-
-#: src/routes/settings.ui.tsx:90
-msgid "Language"
-msgstr "Language"
-
-#: src/routes/settings.ui.tsx:114
-msgid "Tracks density"
-msgstr "Tracks density"
-
-#: src/routes/settings.ui.tsx:115
-msgid "Change the tracks spacing"
-msgstr "Change the tracks spacing"
-
-#: src/routes/settings.ui.tsx:126
-msgid "Normal (default)"
-msgstr "Normal (default)"
-
-#: src/routes/settings.ui.tsx:129
-msgid "Compact"
-msgstr "Compact"
-
-#: src/routes/settings.ui.tsx:135
-msgid "Default view"
-msgstr "Default view"
-
-#: src/routes/settings.ui.tsx:137
-msgid "Change the default view when starting the application"
-msgstr "Change the default view when starting the application"
-
-#: src/routes/settings.ui.tsx:145
-msgid "Library (default)"
-msgstr "Library (default)"
-
-#: src/routes/settings.ui.tsx:157
+#: src/routes/settings.audio.tsx:78
 msgid "Display Notifications"
 msgstr "Display Notifications"
 
-#: src/routes/settings.ui.tsx:158
+#: src/routes/settings.audio.tsx:79
 msgid "Send notifications when the playing track changes"
 msgstr "Send notifications when the playing track changes"
 
-#: src/routes/settings.ui.tsx:167
+#: src/routes/settings.library.tsx:48
+#: src/routes/settings.library.tsx:58
+msgid "Choose local music folders for YifuMusic to scan."
+msgstr "Choose local music folders for YifuMusic to scan."
+
+#: src/routes/settings.library.tsx:54
+msgid "Files"
+msgstr "Files"
+
+#: src/routes/settings.library.tsx:62
+msgid "There are no folders in your library."
+msgstr "There are no folders in your library."
+
+#: src/routes/settings.library.tsx:74
+msgid "Remove {folder}"
+msgstr "Remove {folder}"
+
+#: src/routes/settings.library.tsx:95
+msgid "Add folder"
+msgstr "Add folder"
+
+#: src/routes/settings.library.tsx:101
+msgid "Scan"
+msgstr "Scan"
+
+#: src/routes/settings.library.tsx:107
+msgid "All track data will be updated from the base files, but your original files won't be modified. Any YifuMusic-specific edits you may have done will be reset."
+msgstr "All track data will be updated from the base files, but your original files won't be modified. Any YifuMusic-specific edits you may have done will be reset."
+
+#: src/routes/settings.library.tsx:109
+msgid "Refresh all tracks?"
+msgstr "Refresh all tracks?"
+
+#: src/routes/settings.library.tsx:112
+#: src/routes/settings.library.tsx:122
+msgid "Refresh"
+msgstr "Refresh"
+
+#: src/routes/settings.library.tsx:120
+msgid "Force the refresh of all tracks tags"
+msgstr "Force the refresh of all tracks tags"
+
+#: src/routes/settings.library.tsx:126
+msgid "<0>.m3u</0> files will also be imported as playlists."
+msgstr "<0>.m3u</0> files will also be imported as playlists."
+
+#: src/routes/settings.library.tsx:139
+msgid "Automatically refresh library on startup"
+msgstr "Automatically refresh library on startup"
+
+#: src/routes/settings.library.tsx:140
+msgid "Scan the configured music folders whenever YifuMusic starts."
+msgstr "Scan the configured music folders whenever YifuMusic starts."
+
+#: src/routes/settings.library.tsx:149
+msgid "Danger zone"
+msgstr "Danger zone"
+
+#: src/routes/settings.library.tsx:153
+msgid "Delete all tracks and playlists from YifuMusic."
+msgstr "Delete all tracks and playlists from YifuMusic."
+
+#: src/routes/settings.library.tsx:158
+msgid "Fully reset the library"
+msgstr "Fully reset the library"
+
+#: src/routes/settings.library.tsx:162
+msgid "All your tracks and playlists will be deleted from YifuMusic."
+msgstr "All your tracks and playlists will be deleted from YifuMusic."
+
+#: src/routes/settings.library.tsx:164
+msgid "Reset library?"
+msgstr "Reset library?"
+
+#: src/routes/settings.library.tsx:167
+#: src/routes/settings.ui.tsx:124
+msgid "Reset"
+msgstr "Reset"
+
+#: src/routes/settings.library.tsx:176
+msgid "Reset library"
+msgstr "Reset library"
+
+#: src/routes/settings.tsx:41
+#: src/routes/settings.tsx:49
+msgid "Settings categories"
+msgstr "Settings categories"
+
+#: src/routes/settings.tsx:70
+msgid "Audio"
+msgstr "Audio"
+
+#: src/routes/settings.tsx:81
+#: src/routes/settings.ui.tsx:53
+msgid "Interface"
+msgstr "Interface"
+
+#: src/routes/settings.tsx:92
+msgid "About"
+msgstr "About"
+
+#: src/routes/settings.ui.tsx:54
+#: src/routes/settings.ui.tsx:65
+msgid "Change the appearance of the interface"
+msgstr "Change the appearance of the interface"
+
+#: src/routes/settings.ui.tsx:64
+msgid "Theme"
+msgstr "Theme"
+
+#: src/routes/settings.ui.tsx:73
+msgid "System (default)"
+msgstr "System (default)"
+
+#: src/routes/settings.ui.tsx:112
+msgid "Accent color"
+msgstr "Accent color"
+
+#: src/routes/settings.ui.tsx:141
+msgid "Language"
+msgstr "Language"
+
+#: src/routes/settings.ui.tsx:142
+msgid "Choose the language used by YifuMusic"
+msgstr "Choose the language used by YifuMusic"
+
+#: src/routes/settings.ui.tsx:171
+msgid "Tracks density"
+msgstr "Tracks density"
+
+#: src/routes/settings.ui.tsx:172
+msgid "Change the tracks spacing"
+msgstr "Change the tracks spacing"
+
+#: src/routes/settings.ui.tsx:183
+msgid "Normal (default)"
+msgstr "Normal (default)"
+
+#: src/routes/settings.ui.tsx:186
+msgid "Compact"
+msgstr "Compact"
+
+#: src/routes/settings.ui.tsx:198
+msgid "Default view"
+msgstr "Default view"
+
+#: src/routes/settings.ui.tsx:200
+msgid "Change the default view when starting the application"
+msgstr "Change the default view when starting the application"
+
+#: src/routes/settings.ui.tsx:208
+msgid "Library (default)"
+msgstr "Library (default)"
+
+#: src/routes/settings.ui.tsx:226
 msgid "Sleep mode blocker"
 msgstr "Sleep mode blocker"
 
-#: src/routes/settings.ui.tsx:168
+#: src/routes/settings.ui.tsx:227
 msgid "Prevent the computer from going into sleep mode when playing"
 msgstr "Prevent the computer from going into sleep mode when playing"
 
-#: src/routes/settings.ui.tsx:178
+#: src/routes/settings.ui.tsx:279
+msgid "状态栏歌词"
+msgstr "状态栏歌词"
+
+#: src/routes/settings.ui.tsx:280
+msgid "在 macOS 菜单栏显示当前本地歌词"
+msgstr "在 macOS 菜单栏显示当前本地歌词"
+
+#: src/routes/settings.ui.tsx:295
 msgid "[Beta] Wayland compatibility enhancements"
 msgstr "[Beta] Wayland compatibility enhancements"
 
-#: src/routes/settings.ui.tsx:179
+#: src/routes/settings.ui.tsx:296
 msgid "If you face issues using Wayland, try out this option"
 msgstr "If you face issues using Wayland, try out this option"
 
-#: src/routes/settings.ui.tsx:202
+#: src/routes/settings.ui.tsx:351
 msgid "Light"
 msgstr "Light"
 
-#: src/routes/settings.ui.tsx:204
+#: src/routes/settings.ui.tsx:353
 msgid "Dark"
 msgstr "Dark"
 
-#. placeholder {0}: track.title
-#: src/routes/tracks.$trackID.tsx:84
-msgid "Edit \"{0}\""
-msgstr "Edit \"{0}\""
+#: src/routes/tracks.$trackID.tsx:202
+msgid "Create a playlist before adding tracks"
+msgstr "Create a playlist before adding tracks"
 
-#: src/routes/tracks.$trackID.tsx:110
+#: src/routes/tracks.$trackID.tsx:356
 msgid "Album Artist"
 msgstr "Album Artist"
 
-#: src/routes/tracks.$trackID.tsx:124
+#: src/routes/tracks.$trackID.tsx:368
 msgid "Track Artists"
 msgstr "Track Artists"
 
-#: src/routes/tracks.$trackID.tsx:125
+#: src/routes/tracks.$trackID.tsx:369
 msgid "You can add multiple artists with commas"
 msgstr "You can add multiple artists with commas"
 
-#: src/routes/tracks.$trackID.tsx:140
+#: src/routes/tracks.$trackID.tsx:386
 msgid "You can add multiple genres with commas"
 msgstr "You can add multiple genres with commas"
 
-#: src/routes/tracks.$trackID.tsx:154
+#: src/routes/tracks.$trackID.tsx:398
 msgid "Year"
 msgstr "Year"
 
-#: src/routes/tracks.$trackID.tsx:168
+#: src/routes/tracks.$trackID.tsx:413
 msgid "Track Nº"
 msgstr "Track Nº"
 
-#: src/routes/tracks.$trackID.tsx:182
-#: src/routes/tracks.$trackID.tsx:214
+#: src/routes/tracks.$trackID.tsx:427
+#: src/routes/tracks.$trackID.tsx:457
 msgid "Of"
 msgstr "Of"
 
-#: src/routes/tracks.$trackID.tsx:200
+#: src/routes/tracks.$trackID.tsx:443
 msgid "Disk Nº"
 msgstr "Disk Nº"
 
-#: src/routes/tracks.$trackID.tsx:231
+#: src/routes/tracks.$trackID.tsx:472
 msgid "Compilation"
 msgstr "Compilation"
 
-#: src/routes/tracks.$trackID.tsx:232
+#: src/routes/tracks.$trackID.tsx:473
 msgid "Group this track with other tracks from the same compilation, regardless of the artist names."
 msgstr "Group this track with other tracks from the same compilation, regardless of the artist names."
 
-#: src/routes/tracks.$trackID.tsx:249
+#: src/routes/tracks.$trackID.tsx:490
 msgid "Path"
 msgstr "Path"
-
-#: src/routes/tracks.$trackID.tsx:260
-msgid "Save"
-msgstr "Save"
-
-#: src/routes/tracks.$trackID.tsx:265
-msgid "Clicking \"save\" will only update the library data, but will not save it to the original file."
-msgstr "Clicking \"save\" will only update the library data, but will not save it to the original file."

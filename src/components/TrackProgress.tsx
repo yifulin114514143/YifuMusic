@@ -1,4 +1,5 @@
 import { Slider } from '@base-ui/react/slider';
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -14,6 +15,7 @@ type Props = {
 
 export default function TrackProgress(props: Props) {
   const { trackPlaying } = props;
+  const { t } = useLingui();
 
   const elapsed = usePlayingTrackCurrentTime();
   const duration = usePlayerState((state) => state.duration);
@@ -21,6 +23,7 @@ export default function TrackProgress(props: Props) {
   const disabled = duration === null || duration <= 0;
   const [previewTime, setPreviewTime] = useState(elapsed);
   const [isDragging, setIsDragging] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     setPreviewTime(0);
@@ -70,6 +73,7 @@ export default function TrackProgress(props: Props) {
   );
 
   const hideTooltip = useCallback(() => {
+    setIsHovering(false);
     setTooltipTargetTime(null);
     setTooltipX(null);
   }, []);
@@ -85,9 +89,14 @@ export default function TrackProgress(props: Props) {
       value={Math.min(previewTime, max)}
       onValueChange={previewAudioTo}
       onValueCommitted={jumpAudioTo}
+      {...stylex.props(styles.slider)}
     >
       <Slider.Control
-        {...stylex.props(styles.trackRoot)}
+        {...stylex.props(
+          styles.trackRoot,
+          (isHovering || isDragging) && styles.trackRootExpanded,
+        )}
+        onMouseEnter={() => setIsHovering(true)}
         onMouseMoveCapture={showTooltip}
         onMouseLeave={hideTooltip}
       >
@@ -103,7 +112,13 @@ export default function TrackProgress(props: Props) {
             {tooltipContent}
           </div>
         </Slider.Track>
-        <Slider.Thumb aria-label="播放进度" />
+        <Slider.Thumb
+          aria-label={t`Playback progress`}
+          {...stylex.props(
+            styles.thumb,
+            (isHovering || isDragging) && styles.thumbVisible,
+          )}
+        />
       </Slider.Control>
     </Slider.Root>
   );
@@ -116,42 +131,46 @@ const styles = stylex.create({
     alignItems: 'center',
     userSelect: 'none',
     touchAction: 'none',
-    height: '7px',
-    transform: 'translateY(4px)',
+    width: '100%',
+    height: '2px',
+    cursor: 'pointer',
+    transition: 'height 200ms ease-out',
     outline: {
       ':has(:focus-visible)': '2px solid var(--focus-color)',
     },
+  },
+  trackRootExpanded: {
+    height: '6px',
   },
   trackProgress: {
     display: 'block',
     position: 'relative',
     width: '100%',
     height: '100%',
-    backgroundColor: 'var(--header-bg)',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--border-color)',
+    backgroundColor: 'var(--progress-bg)',
+    borderWidth: 0,
   },
   trackRange: {
     position: 'absolute',
     height: '100%',
     backgroundColor: 'var(--main-color)',
-    boxShadow: 'inset 0 0 0 1px rgba(0 0 0 / 0.2)',
+    boxShadow: 'none',
   },
   progressTooltip: {
     position: 'absolute',
-    backgroundColor: 'var(--background)',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--border-color)',
-    fontSize: '10px',
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    color: '#ffffff',
+    borderWidth: 0,
+    borderStyle: 'none',
+    borderRadius: '4px',
+    fontSize: '12px',
     paddingTop: '2px',
     paddingBottom: '2px',
     paddingLeft: '5px',
     paddingRight: '5px',
-    bottom: '10px',
-    zIndex: 1,
-    transform: 'translateX(-11px)',
+    bottom: '14px',
+    zIndex: 4,
+    transform: 'translateX(-50%)',
     pointerEvents: 'none',
     '::before': {
       content: '""',
@@ -161,23 +180,29 @@ const styles = stylex.create({
       borderStyle: 'solid',
       borderColor: 'transparent',
       borderBottomWidth: 0,
-      top: '16px',
-      left: '5px',
-      borderTopColor: 'var(--border-color)',
-      borderWidth: '6px',
+      top: '100%',
+      left: '50%',
+      borderTopColor: 'rgba(0, 0, 0, 0.72)',
+      borderWidth: '4px',
+      transform: 'translateX(-50%)',
     },
-    '::after': {
-      content: '""',
-      position: 'absolute',
-      width: 0,
-      height: 0,
-      borderStyle: 'solid',
-      borderColor: 'transparent',
-      borderBottomWidth: 0,
-      top: '15px',
-      left: '6px',
-      borderTopColor: 'var(--background)',
-      borderWidth: '5px',
-    },
+  },
+  slider: {
+    width: '100%',
+    display: 'block',
+  },
+  thumb: {
+    width: '12px',
+    height: '12px',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: 'var(--main-color)',
+    borderRadius: '999px',
+    backgroundColor: 'var(--accent-contrast)',
+    opacity: 0,
+    transition: 'opacity 200ms ease-out',
+  },
+  thumbVisible: {
+    opacity: 1,
   },
 });

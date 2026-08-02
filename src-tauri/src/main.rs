@@ -73,6 +73,9 @@ fn main() {
         .plugin(plugins::app_menu::init())
         .plugin(plugins::cover::init())
         .plugin(plugins::db::init())
+        .plugin(plugins::desktop_lyrics::init())
+        .plugin(plugins::lyrics::init())
+        .plugin(plugins::tray::init())
         .plugin(plugins::debug::init())
         .plugin(plugins::default_view::init())
         .plugin(plugins::file_associations::init())
@@ -120,7 +123,7 @@ fn main() {
                     .visible(false)
                     .theme(get_theme_from_name(&conf.theme))
                     .inner_size(900.0, 550.0)
-                    .min_inner_size(900.0, 550.0)
+                    .min_inner_size(640.0, 550.0)
                     .fullscreen(false)
                     .resizable(true)
                     .zoom_hotkeys_enabled(true);

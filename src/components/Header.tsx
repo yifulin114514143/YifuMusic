@@ -1,79 +1,275 @@
-import { Popover } from '@base-ui/react/popover';
+import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
-import { useRef } from 'react';
+import { Gauge, Heart, ListPlus, Share2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
+import PlaylistsAPI from '../api/PlaylistsAPI';
 import ButtonIcon from '../elements/ButtonIcon';
+import type { Playlist } from '../generated/typings';
 import { usePlayerState } from '../hooks/usePlayer';
 import usePlayingTrack from '../hooks/usePlayingTrack';
+import DatabaseBridge from '../lib/bridge-database';
+import player from '../lib/player';
+import toastManager from '../lib/toast-manager';
+import { logAndNotifyError } from '../lib/utils';
+import { useAppShell } from './AppShellContext';
+import ButtonPlaybackMode from './ButtonPlaybackMode';
+import DesktopLyricsButton from './DesktopLyricsButton';
 import PlayerControls from './PlayerControls';
 import PlayingBar from './PlayingBar';
-import Queue from './Queue';
-import Search from './Search';
+import TrackProgress from './TrackProgress';
+import VolumeControl from './VolumeControl';
+
+const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+type OpenPlayerMenu = 'playlist' | 'speed' | null;
 
 export default function Header() {
-  const queue = usePlayerState((state) => state.queue);
-  const queueCursor = usePlayerState((state) => state.queueCursor);
-  const trackPlaying = usePlayingTrack();
   const { t } = useLingui();
-  const platform = window.__MUSEEKS_PLATFORM;
-  const queueAnchorRef = useRef<HTMLDivElement>(null);
+  const queue = usePlayerState((state) => state.queue);
+  const trackPlaying = usePlayingTrack();
+  const { queueOpen, registerQueueTrigger, toggleQueue } = useAppShell();
+  const queueButtonRef = useRef<HTMLButtonElement>(null);
+  const utilitiesRef = useRef<HTMLDivElement>(null);
+  const [openMenu, setOpenMenu] = useState<OpenPlayerMenu>(null);
+  const [playbackRate, setPlaybackRate] = useState(() =>
+    player.getPlaybackRate(),
+  );
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+
+  useEffect(() => {
+    registerQueueTrigger(queueButtonRef.current);
+  }, [registerQueueTrigger]);
+
+  useEffect(() => {
+    const syncPlaybackRate = () => setPlaybackRate(player.getPlaybackRate());
+
+    player.on('stateChange', syncPlaybackRate);
+    return () => {
+      player.off('stateChange', syncPlaybackRate);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (openMenu === null) return;
+
+    const closeMenu = (event: PointerEvent) => {
+      if (utilitiesRef.current?.contains(event.target as Node)) return;
+      setOpenMenu(null);
+    };
+
+    const closeMenuWithEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpenMenu(null);
+    };
+
+    document.addEventListener('pointerdown', closeMenu);
+    document.addEventListener('keydown', closeMenuWithEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeMenu);
+      document.removeEventListener('keydown', closeMenuWithEscape);
+    };
+  }, [openMenu]);
+
+  const togglePlaylistMenu = () => {
+    if (trackPlaying === null) return;
+
+    if (openMenu === 'playlist') {
+      setOpenMenu(null);
+      return;
+    }
+
+    setOpenMenu('playlist');
+    void DatabaseBridge.getAllPlaylists()
+      .then(setPlaylists)
+      .catch((error) => {
+        setOpenMenu(null);
+        logAndNotifyError(error);
+      });
+  };
+
+  const addTrackToPlaylist = (playlist: Playlist) => {
+    if (trackPlaying === null) return;
+
+    void PlaylistsAPI.addTracks(playlist.id, [trackPlaying.id]).then(() => {
+      toastManager.add({
+        title: t`已将“${trackPlaying.title}”加入“${playlist.name}”`,
+        type: 'success',
+      });
+    });
+    setOpenMenu(null);
+  };
+
+  const changePlaybackSpeed = (nextRate: number) => {
+    setPlaybackRate(nextRate);
+    setOpenMenu(null);
+    void player.setPlaybackRate(nextRate);
+  };
 
   return (
     <header
-      aria-label={t`Header`}
-      {...stylex.props(
-        styles.header,
-        (platform === 'windows' || platform === 'linux') &&
-          styles.headerBorderTop,
-      )}
-      data-tauri-drag-region
+      aria-label={t`Player`}
+      data-reference-layout="moekoe-player-dock"
+      {...stylex.props(styles.header)}
     >
-      <div
-        {...stylex.props(
-          styles.headerMainControls,
-          platform === 'macos' && styles.headerMainControlsMacos,
-        )}
-        data-tauri-drag-region
-      >
-        <PlayerControls />
-      </div>
-      <div {...stylex.props(styles.headerPlayingBar)} data-tauri-drag-region>
-        {trackPlaying != null && (
-          <>
+      {trackPlaying !== null && (
+        <div {...stylex.props(styles.progressRail)}>
+          <TrackProgress trackPlaying={trackPlaying} />
+        </div>
+      )}
+
+      <div {...stylex.props(styles.playerBar)}>
+        <div {...stylex.props(styles.trackArea)}>
+          {trackPlaying !== null ? (
             <PlayingBar trackPlaying={trackPlaying} />
-            <Popover.Root>
-              <div ref={queueAnchorRef} {...stylex.props(styles.queue)}>
-                <Popover.Trigger
-                  render={(triggerProps) => (
-                    <ButtonIcon
-                      {...triggerProps}
-                      icon="list"
-                      iconSize={20}
-                      label={t`Queue`}
-                      data-tauri-drag-region
-                    />
-                  )}
-                />
-              </div>
-              <Popover.Portal>
-                <Popover.Positioner
-                  side="bottom"
-                  alignOffset={-16}
-                  align="end"
-                  anchor={queueAnchorRef}
+          ) : (
+            <div
+              {...stylex.props(styles.emptyTrack)}
+            >{t`No track selected`}</div>
+          )}
+        </div>
+
+        <div {...stylex.props(styles.controls)}>
+          <PlayerControls />
+        </div>
+
+        <div ref={utilitiesRef} {...stylex.props(styles.utilities)}>
+          {trackPlaying !== null && <DesktopLyricsButton />}
+          {trackPlaying !== null && (
+            <div {...stylex.props(styles.menuControl)}>
+              <button
+                aria-controls="player-speed-menu"
+                aria-expanded={openMenu === 'speed'}
+                aria-label={t`播放速度：${playbackRate} 倍`}
+                data-museeks-action
+                title={t`播放速度`}
+                type="button"
+                onClick={() =>
+                  setOpenMenu((menu) => (menu === 'speed' ? null : 'speed'))
+                }
+                {...stylex.props(styles.utilityButton)}
+              >
+                <Gauge aria-hidden="true" size={20} strokeWidth={2} />
+              </button>
+              {openMenu === 'speed' && (
+                <div
+                  aria-label={t`播放速度选项`}
+                  id="player-speed-menu"
+                  role="menu"
+                  {...stylex.props(styles.playerMenu, styles.speedMenu)}
                 >
-                  <Popover.Popup {...stylex.props(styles.queueContainer)}>
-                    <Queue queue={queue} queueCursor={queueCursor} />
-                  </Popover.Popup>
-                </Popover.Positioner>
-              </Popover.Portal>
-            </Popover.Root>
-          </>
-        )}
-      </div>
-      <div {...stylex.props(styles.headerSearch)} data-tauri-drag-region>
-        <Search />
+                  {PLAYBACK_SPEEDS.map((speed) => (
+                    <button
+                      key={speed}
+                      aria-checked={playbackRate === speed}
+                      role="menuitemradio"
+                      type="button"
+                      onClick={() => changePlaybackSpeed(speed)}
+                      {...stylex.props(
+                        styles.playerMenuItem,
+                        playbackRate === speed && styles.playerMenuItemActive,
+                      )}
+                    >
+                      {speed}x
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {trackPlaying !== null && (
+            <button
+              aria-label={t`收藏歌曲（暂未实现）`}
+              data-museeks-action
+              title={t`收藏歌曲`}
+              type="button"
+              onClick={() =>
+                toastManager.add({
+                  title: t`收藏功能暂未实现`,
+                  type: 'warning',
+                })
+              }
+              {...stylex.props(styles.utilityButton)}
+            >
+              <Heart aria-hidden="true" size={20} strokeWidth={2} />
+            </button>
+          )}
+          {trackPlaying !== null && (
+            <div {...stylex.props(styles.menuControl)}>
+              <button
+                aria-controls="player-playlist-menu"
+                aria-expanded={openMenu === 'playlist'}
+                aria-label={t`加入歌单`}
+                data-museeks-action
+                title={t`加入歌单`}
+                type="button"
+                onClick={togglePlaylistMenu}
+                {...stylex.props(styles.utilityButton)}
+              >
+                <ListPlus aria-hidden="true" size={20} strokeWidth={2} />
+              </button>
+              {openMenu === 'playlist' && (
+                <div
+                  aria-label={t`选择歌单`}
+                  id="player-playlist-menu"
+                  role="menu"
+                  {...stylex.props(styles.playerMenu, styles.playlistMenu)}
+                >
+                  {playlists.length === 0 ? (
+                    <span {...stylex.props(styles.playerMenuEmpty)}>
+                      {t`还没有可加入的歌单`}
+                    </span>
+                  ) : (
+                    playlists.map((playlist) => (
+                      <button
+                        key={playlist.id}
+                        role="menuitem"
+                        title={playlist.name}
+                        type="button"
+                        onClick={() => addTrackToPlaylist(playlist)}
+                        {...stylex.props(styles.playerMenuItem)}
+                      >
+                        {playlist.name}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          {trackPlaying !== null && (
+            <button
+              aria-label={t`分享歌曲（暂未实现）`}
+              data-museeks-action
+              title={t`分享歌曲`}
+              type="button"
+              onClick={() =>
+                toastManager.add({
+                  title: t`分享功能暂未实现`,
+                  type: 'warning',
+                })
+              }
+              {...stylex.props(styles.utilityButton)}
+            >
+              <Share2 aria-hidden="true" size={20} strokeWidth={2} />
+            </button>
+          )}
+          <ButtonPlaybackMode />
+          <ButtonIcon
+            ref={queueButtonRef}
+            icon="list"
+            iconSize={20}
+            label={plural(queue.length, {
+              one: 'Queue, # track',
+              other: 'Queue, # tracks',
+            })}
+            aria-pressed={queueOpen}
+            isActive={queueOpen}
+            onClick={() => toggleQueue(queueButtonRef.current)}
+            xstyle={styles.utilityButton}
+          />
+          <VolumeControl />
+        </div>
       </div>
     </header>
   );
@@ -81,69 +277,146 @@ export default function Header() {
 
 const styles = stylex.create({
   header: {
-    boxSizing: 'border-box',
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: 'var(--border-color)',
-    backgroundColor: 'var(--header-bg)',
-    color: 'var(--header-color)',
-    paddingTop: 0,
-    paddingBottom: 0,
-    paddingLeft: '10px',
-    paddingRight: '10px',
-    display: 'flex',
-    alignItems: 'stretch',
-    justifyContent: 'space-between',
-    height: '50px',
-    flexGrow: 0,
-    flexShrink: 0,
-    flexBasis: 'auto',
-  },
-  headerBorderTop: {
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    backgroundColor: 'var(--footer-bg)',
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
-    borderTopColor: 'var(--border-color)',
+    borderTopColor: 'var(--border-subtle)',
+    boxShadow: 'var(--shadow-panel)',
+    backdropFilter: 'blur(10px)',
+    zIndex: 98,
   },
-  headerMainControls: {
-    flexGrow: 0,
-    flexShrink: 0,
-    flexBasis: 'auto',
+  playerBar: {
+    width: '100%',
+    maxWidth: '880px',
+    minHeight: '80px',
+    boxSizing: 'border-box',
+    marginInline: 'auto',
+    padding: '10px',
     display: 'flex',
     alignItems: 'center',
-    paddingRight: '10px',
-    minWidth: '200px',
-    paddingLeft: '12px',
+    columnGap: '12px',
   },
-  headerMainControlsMacos: {
-    paddingLeft: '72px',
+  progressRail: {
+    position: 'absolute',
+    insetInline: 0,
+    top: 0,
+    height: '6px',
+    zIndex: 1,
   },
-  headerSearch: {
-    flexGrow: 0,
-    flexShrink: 0,
-    flexBasis: 'auto',
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  headerPlayingBar: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 'auto',
+  trackArea: {
     minWidth: 0,
-    maxWidth: '600px',
-    display: 'flex',
-  },
-  queue: {
-    marginTop: 0,
-    marginBottom: 0,
-    marginLeft: '16px',
-    marginRight: '16px',
+    minHeight: 0,
+    height: '100%',
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: '300px',
     display: 'flex',
     alignItems: 'center',
   },
-  queueContainer: {
-    zIndex: 1000,
-    display: {
-      ':is([data-open])': 'block',
+  emptyTrack: {
+    color: 'var(--text-secondary)',
+    fontSize: '13px',
+  },
+  controls: {
+    minWidth: 0,
+    flexGrow: 1,
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    columnGap: '4px',
+  },
+  utilities: {
+    minWidth: 0,
+    marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    columnGap: '4px',
+  },
+  menuControl: {
+    position: 'relative',
+    display: 'inline-flex',
+    flexShrink: 0,
+  },
+  utilityButton: {
+    flexShrink: 0,
+    width: '32px',
+    height: '32px',
+    borderRadius: '999px',
+    color: 'var(--text-secondary)',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'transparent',
+      ':active': 'transparent',
     },
+    transform: {
+      ':hover': 'scale(1.12)',
+      ':active': 'scale(0.96)',
+    },
+    transition: 'transform 180ms ease-out',
+  },
+  playerMenu: {
+    position: 'absolute',
+    bottom: 'calc(100% + 8px)',
+    left: '50%',
+    zIndex: 100,
+    boxSizing: 'border-box',
+    padding: '6px',
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: '2px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'var(--border-subtle)',
+    borderRadius: '10px',
+    backgroundColor: 'var(--surface-raised)',
+    boxShadow: 'var(--shadow-panel)',
+    transform: 'translateX(-50%)',
+  },
+  speedMenu: {
+    minWidth: '70px',
+  },
+  playlistMenu: {
+    minWidth: '160px',
+    maxWidth: '260px',
+  },
+  playerMenuItem: {
+    width: '100%',
+    minHeight: '32px',
+    paddingBlock: '5px',
+    paddingInline: '10px',
+    overflow: 'hidden',
+    borderWidth: 0,
+    borderStyle: 'none',
+    borderRadius: '6px',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'var(--surface-hover)',
+    },
+    color: 'var(--text-primary)',
+    cursor: 'pointer',
+    fontSize: '13px',
+    lineHeight: 1.2,
+    textAlign: 'left',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  playerMenuItemActive: {
+    backgroundColor: 'var(--surface-selected)',
+    color: 'var(--main-color)',
+    fontWeight: 700,
+  },
+  playerMenuEmpty: {
+    paddingBlock: '7px',
+    paddingInline: '10px',
+    color: 'var(--text-secondary)',
+    fontSize: '12px',
+    whiteSpace: 'nowrap',
   },
 });

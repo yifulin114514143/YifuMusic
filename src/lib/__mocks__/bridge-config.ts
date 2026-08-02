@@ -1,7 +1,7 @@
 import type { Config } from '../../generated/typings';
 
 export const MOCK_CONFIG: Config = {
-  language: 'en',
+  language: 'zh-CN',
   theme: 'light',
   ui_accent_color: null,
   audio_volume: 1.0,
@@ -20,6 +20,7 @@ export const MOCK_CONFIG: Config = {
   sleepblocker: false,
   auto_update_checker: true,
   notifications: false,
+  status_bar_lyrics: false,
   track_view_density: 'normal',
   wayland_compat: false,
   menu_bar_visible: false,

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import { lingui } from '@lingui/vite-plugin';
 import babel from '@rolldown/plugin-babel';
 import stylex from '@stylexjs/unplugin';
@@ -100,6 +102,14 @@ export default defineConfig({
   build: {
     target: ['edge115', 'chrome115', 'safari13'],
     cssMinify: 'lightningcss',
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        desktopLyrics: fileURLToPath(
+          new URL('./desktop-lyrics.html', import.meta.url),
+        ),
+      },
+    },
   },
   css: {
     transformer: 'lightningcss',

@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 
 import Link from '../elements/Link';
@@ -5,7 +6,7 @@ import type { Track } from '../generated/typings';
 import useFormattedDuration from '../hooks/useFormattedDuration';
 import { usePlayerState } from '../hooks/usePlayer';
 import usePlayingTrackCurrentTime from '../hooks/usePlayingTrackCurrentTime';
-import TrackProgress from './TrackProgress';
+import { useAppShell } from './AppShellContext';
 
 type Props = {
   trackPlaying: Track;
@@ -13,25 +14,39 @@ type Props = {
 
 export default function PlayingBarInfo(props: Props) {
   const { trackPlaying } = props;
+  const { t } = useLingui();
+  const { openNowPlaying } = useAppShell();
   const elapsed = usePlayingTrackCurrentTime();
-  const displayDuration = usePlayerState((state) => state.duration);
-  const formattedDurationValue = useFormattedDuration(displayDuration);
-  const formattedDuration =
-    displayDuration === null ? '--:--' : formattedDurationValue;
-  const formattedProgress = useFormattedDuration(
-    Math.min(displayDuration ?? elapsed, elapsed),
+  const duration = usePlayerState((state) => state.duration);
+  const formattedElapsed = useFormattedDuration(
+    Math.min(duration ?? elapsed, elapsed),
   );
+  const formattedDurationValue = useFormattedDuration(duration);
+  const formattedDuration =
+    duration === null ? '--:--' : formattedDurationValue;
 
   return (
-    <div {...stylex.props(styles.playingBarInfo)} data-tauri-drag-region>
+    <div {...stylex.props(styles.playingBarInfo)}>
       <div {...stylex.props(styles.playingBarInfoMetas)}>
-        <div {...stylex.props(styles.duration)}>{formattedProgress}</div>
-
         <div {...stylex.props(styles.metas)}>
-          <strong {...stylex.props(styles.metadata, styles.metadataTitle)}>
-            {trackPlaying.title}
-          </strong>
-          <div {...stylex.props(styles.metadata)}>
+          <button
+            aria-label={t`Open now playing`}
+            title={t`Open now playing`}
+            type="button"
+            onClick={(event) => openNowPlaying(event.currentTarget)}
+            {...stylex.props(styles.openNowPlaying)}
+          >
+            <strong
+              title={trackPlaying.title}
+              {...stylex.props(styles.metadata, styles.metadataTitle)}
+            >
+              {trackPlaying.title}
+            </strong>
+          </button>
+          <div
+            title={`${trackPlaying.artists.join(', ')} — ${trackPlaying.album}`}
+            {...stylex.props(styles.metadata)}
+          >
             <Link
               inheritColor
               type="normal"
@@ -69,36 +84,36 @@ export default function PlayingBarInfo(props: Props) {
               {trackPlaying.album}
             </Link>
           </div>
+          <div {...stylex.props(styles.duration)}>
+            <span>{formattedElapsed}</span>
+            <span aria-hidden="true">/</span>
+            <span>{formattedDuration}</span>
+          </div>
         </div>
-
-        <div {...stylex.props(styles.duration)}>{formattedDuration}</div>
       </div>
-      <TrackProgress trackPlaying={trackPlaying} />
     </div>
   );
 }
 
 const styles = stylex.create({
   playingBarInfo: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 'auto',
+    flexGrow: '0',
+    flexShrink: '1',
+    flexBasis: '300px',
     minWidth: 0,
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     paddingTop: 0,
     paddingBottom: 0,
-    paddingLeft: '8px',
-    paddingRight: '8px',
+    paddingInline: 0,
   },
   playingBarInfoMetas: {
-    rowGap: '4px',
-    columnGap: '4px',
+    rowGap: '2px',
     display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    pointerEvents: 'none',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
   },
   metas: {
     flexGrow: 1,
@@ -108,28 +123,45 @@ const styles = stylex.create({
     textOverflow: 'ellipsis',
     overflow: 'hidden',
     verticalAlign: 'middle',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   metadataTitle: {
     fontWeight: 'var(--bold)',
     marginBottom: '2px',
+    color: 'var(--text-primary)',
+    fontSize: '13px',
+  },
+  openNowPlaying: {
+    minWidth: 0,
+    padding: 0,
+    borderStyle: 'none',
+    backgroundColor: 'transparent',
+    color: 'inherit',
+    cursor: 'pointer',
+    textAlign: 'left',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    outline: {
+      ':focus-visible': '2px solid var(--focus-color)',
+    },
   },
   metadata: {
+    color: 'var(--text-secondary)',
+    fontSize: '12px',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   duration: {
-    flexGrow: 0,
-    flexShrink: 0,
-    flexBasis: 'auto',
-    fontSize: '0.875rem',
-    paddingTop: 0,
-    paddingBottom: 0,
-    paddingLeft: '2px',
-    paddingRight: '2px',
+    display: 'flex',
+    alignItems: 'center',
+    rowGap: '4px',
+    columnGap: '4px',
+    marginTop: '3px',
+    color: 'var(--text-secondary)',
+    fontSize: '12px',
     fontVariantNumeric: 'tabular-nums',
-    whiteSpace: 'nowrap',
-    opacity: 0.7,
+    lineHeight: 1.2,
   },
 });

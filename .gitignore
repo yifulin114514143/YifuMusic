@@ -41,3 +41,7 @@ target
 release
 !src-tauri/release
 .tanstack
+
+# Browser test failure artifacts
+.vitest-attachments/
+src/**/__screenshots__/

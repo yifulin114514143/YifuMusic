@@ -9,6 +9,14 @@ export const allTracksQuery = {
   refetchOnReconnect: false,
 };
 
+export const allPlaylistsQuery = {
+  queryKey: ['all_playlists'],
+  queryFn: () => DatabaseBridge.getAllPlaylists(),
+  retry: false,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+};
+
 export const configQuery = {
   queryKey: ['config'],
   queryFn: () => ConfigBridge.getAll(),

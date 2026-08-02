@@ -88,6 +88,7 @@ function TrackListGroup(props: TrackListGroupProps) {
     showArtistInTitle,
     onTrackSelect,
     onContextMenu,
+    onMoreActions,
     onPlaybackStart,
   } = props;
   const { tracks, label, year, genres, duration } = props.tracksGroup;
@@ -128,6 +129,7 @@ function TrackListGroup(props: TrackListGroupProps) {
               index={index}
               onTrackSelect={onTrackSelect}
               onContextMenu={onContextMenu}
+              onMoreActions={onMoreActions}
               onPlaybackStart={onPlaybackStart}
               draggable={false}
               hasSelectedAbove={
@@ -147,34 +149,79 @@ function TrackListGroup(props: TrackListGroupProps) {
 const styles = stylex.create({
   group: {
     display: 'flex',
-    rowGap: '24px',
-    columnGap: '24px',
-    padding: '24px',
+    flexDirection: {
+      default: 'column',
+      '@media (min-width: 1400px)': 'row',
+    },
+    rowGap: {
+      default: '16px',
+      '@media (min-width: 1400px)': '24px',
+    },
+    columnGap: {
+      default: '16px',
+      '@media (min-width: 1400px)': '24px',
+    },
+    padding: {
+      default: '16px',
+      '@media (min-width: 1400px)': '24px',
+    },
     alignItems: 'flex-start',
     position: 'relative',
   },
   aside: {
     width: {
-      default: '160px',
-      '@media (min-width: 1024px)': '240px',
+      default: '100%',
+      '@media (min-width: 1400px)': '240px',
     },
-    position: 'sticky',
-    top: '24px',
+    position: {
+      default: 'static',
+      '@media (min-width: 1400px)': 'sticky',
+    },
+    top: {
+      default: 'auto',
+      '@media (min-width: 1400px)': '24px',
+    },
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: {
+      default: 'row',
+      '@media (min-width: 1400px)': 'column',
+    },
+    flexWrap: {
+      default: 'wrap',
+      '@media (min-width: 1400px)': 'nowrap',
+    },
+    alignItems: {
+      default: 'center',
+      '@media (min-width: 1400px)': 'stretch',
+    },
     rowGap: '8px',
     columnGap: '8px',
     flexShrink: 0,
   },
   label: {
-    fontSize: '1.4rem',
+    fontSize: {
+      default: '1.125rem',
+      '@media (min-width: 1400px)': '1.4rem',
+    },
     fontWeight: 'bold',
     margin: 0,
+    flexGrow: 1,
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   metadata: {
     color: 'var(--text-muted)',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: {
+      default: 'row',
+      '@media (min-width: 1400px)': 'column',
+    },
+    width: {
+      default: '100%',
+      '@media (min-width: 1400px)': 'auto',
+    },
     rowGap: '4px',
     columnGap: '4px',
   },

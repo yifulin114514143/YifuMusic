@@ -96,8 +96,36 @@ class DatabaseBridge implements DatabaseBridgeInterface {
     return [];
   }
 
-  async getArtistTracks(_artist: string): Promise<Array<TrackGroup>> {
-    return [];
+  async getArtistTracks(artist: string): Promise<Array<TrackGroup>> {
+    const groups = new Map<string, Array<Track>>();
+
+    for (const track of tracks) {
+      if (track.album_artist !== artist || track.is_compilation) continue;
+
+      const albumTracks = groups.get(track.album) ?? [];
+      albumTracks.push(track);
+      groups.set(track.album, albumTracks);
+    }
+
+    return Array.from(groups.entries())
+      .map(([label, albumTracks]) => ({
+        label,
+        genres: Array.from(
+          new Set(albumTracks.flatMap((track) => track.genres)),
+        ),
+        duration: albumTracks.reduce(
+          (total, track) => total + track.duration,
+          0,
+        ),
+        year: albumTracks[0]?.year ?? null,
+        tracks: albumTracks,
+      }))
+      .sort((first, second) => {
+        const firstYear = first.year ?? Number.MAX_SAFE_INTEGER;
+        const secondYear = second.year ?? Number.MAX_SAFE_INTEGER;
+
+        return firstYear - secondYear;
+      });
   }
 
   async hasCompilations(): Promise<boolean> {

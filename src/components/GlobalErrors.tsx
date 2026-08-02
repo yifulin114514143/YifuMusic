@@ -19,7 +19,7 @@ export function ErrorView(props: ErrorComponentProps) {
   } else if (typeof error === 'string') {
     errorMessage = error;
   } else {
-    errorMessage = 'Unknown error';
+    errorMessage = '未知错误';
   }
 
   logger.error(errorMessage);
@@ -27,7 +27,7 @@ export function ErrorView(props: ErrorComponentProps) {
   return (
     <ViewMessage.Notice>
       <p>
-        <span role="img" aria-label="boom">
+        <span role="img" aria-label="错误">
           💥
         </span>{' '}
         <Trans>Something wrong happened: {errorMessage}</Trans>

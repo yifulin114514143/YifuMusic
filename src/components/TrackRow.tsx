@@ -1,7 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import type React from 'react';
+import { useCallback } from 'react';
 
+import ButtonIcon from '../elements/ButtonIcon';
 import type { Track } from '../generated/typings';
 import useFormattedDuration from '../hooks/useFormattedDuration';
 import PlayingIndicator from './PlayingIndicator';
@@ -13,6 +16,11 @@ export type TrackRowEvents = {
     trackIndex: number,
   ) => void;
   onContextMenu: (
+    event: React.MouseEvent,
+    trackID: string,
+    trackIndex: number,
+  ) => void;
+  onMoreActions: (
     event: React.MouseEvent,
     trackID: string,
     trackIndex: number,
@@ -40,8 +48,10 @@ export default function TrackRow(props: Props) {
     draggable,
     onTrackSelect,
     onContextMenu,
+    onMoreActions,
     onPlaybackStart,
   } = props;
+  const { t } = useLingui();
 
   const duration = useFormattedDuration(track.duration);
 
@@ -70,6 +80,14 @@ export default function TrackRow(props: Props) {
   const isDropAbove = isOver && overIndex < activeIndex;
   const isDropBelow = isOver && overIndex > activeIndex;
 
+  const onDragKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLLIElement>) => {
+      listeners?.onKeyDown?.(event);
+      event.preventDefault();
+    },
+    [listeners],
+  );
+
   return (
     // oxlint-disable-next-line jsx_a11y/click-events-have-key-events - given by ...listeners
     <li
@@ -83,6 +101,7 @@ export default function TrackRow(props: Props) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onKeyDown={onDragKeyDown}
       // accessibility
       aria-disabled="false" // required
       aria-selected={selected}
@@ -104,7 +123,9 @@ export default function TrackRow(props: Props) {
         {props.isPlaying ? <PlayingIndicator /> : null}
       </div>
       <div {...stylex.props(cellStyles.cell, cellStyles.title)}>
-        <span {...stylex.props(cellStyles.titleText)}>{track.title}</span>
+        <span title={track.title} {...stylex.props(cellStyles.titleText)}>
+          {track.title}
+        </span>
         {props.showArtistInTitle === true && track.artists.length > 0 && (
           <span {...stylex.props(cellStyles.artistInTitle)}>
             {'— '}
@@ -112,6 +133,22 @@ export default function TrackRow(props: Props) {
           </span>
         )}
       </div>
+      {props.simplified !== true && (
+        <>
+          <div
+            title={track.artists.join(', ')}
+            {...stylex.props(cellStyles.cell, cellStyles.artist)}
+          >
+            {track.artists.join(', ')}
+          </div>
+          <div
+            title={track.album}
+            {...stylex.props(cellStyles.cell, cellStyles.album)}
+          >
+            {track.album}
+          </div>
+        </>
+      )}
       <div
         {...stylex.props(
           cellStyles.cell,
@@ -122,18 +159,27 @@ export default function TrackRow(props: Props) {
         {duration}
       </div>
       {props.simplified !== true && (
-        <>
-          <div {...stylex.props(cellStyles.cell, cellStyles.artist)}>
-            {track.artists.join(', ')}
-          </div>
-          <div {...stylex.props(cellStyles.cell, cellStyles.album)}>
-            {track.album}
-          </div>
-          <div {...stylex.props(cellStyles.cell, cellStyles.genre)}>
-            {track.genres.join(', ')}
-          </div>
-        </>
+        <div
+          title={track.genres.join(', ')}
+          {...stylex.props(cellStyles.cell, cellStyles.genre)}
+        >
+          {track.genres.join(', ')}
+        </div>
       )}
+      <div {...stylex.props(cellStyles.cell, cellStyles.actions)}>
+        <ButtonIcon
+          icon="ellipsis"
+          iconSize={16}
+          label={t`More actions`}
+          aria-label={t`More actions for ${track.title}`}
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            onMoreActions(event, track.id, index);
+          }}
+          {...stylex.props(cellStyles.moreActions)}
+        />
+      </div>
     </li>
   );
 }
@@ -144,10 +190,8 @@ const trackStyles = stylex.create({
     display: 'flex',
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
-    borderTopColor: 'transparent',
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: 'transparent',
+    borderTopColor: 'var(--border-subtle)',
+    borderBottomWidth: 0,
     backgroundColor: 'var(--tracks-bg-even)',
     alignItems: 'center',
     maxWidth: '100%',
@@ -158,6 +202,7 @@ const trackStyles = stylex.create({
   trackSelected: {
     backgroundColor: 'var(--active-item-bg)',
     color: 'var(--active-item-color)',
+    boxShadow: 'inset 3px 0 0 var(--accent)',
   },
   selectedWithSelectedAbove: {
     borderTopColor: 'rgba(255 255 255 / 0.2)',
@@ -194,8 +239,8 @@ const cellStyles = stylex.create({
     borderLeftWidth: '1px',
     borderLeftStyle: 'solid',
     borderLeftColor: 'transparent',
-    paddingRight: '4px',
-    paddingLeft: '4px',
+    paddingRight: '8px',
+    paddingLeft: '8px',
     cursor: 'default',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -203,7 +248,7 @@ const cellStyles = stylex.create({
     lineHeight: '24px',
   },
   trackPlaying: {
-    width: '30px',
+    width: '40px',
     flexShrink: 0,
   },
   title: {
@@ -232,8 +277,8 @@ const cellStyles = stylex.create({
     whiteSpace: 'nowrap',
   },
   duration: {
-    width: '7%',
-    minWidth: '70px',
+    width: '95px',
+    minWidth: '95px',
     flexShrink: 0,
   },
   artist: {
@@ -247,6 +292,33 @@ const cellStyles = stylex.create({
   genre: {
     width: '20%',
     flexShrink: 0,
+    display: {
+      default: 'none',
+      '@media (min-width: 1400px)': 'block',
+    },
+  },
+  actions: {
+    width: '40px',
+    flexShrink: 0,
+    padding: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moreActions: {
+    minWidth: '32px',
+    minHeight: '32px',
+    padding: 0,
+    borderStyle: 'none',
+    borderRadius: 'var(--radius-sm)',
+    backgroundColor: {
+      default: 'transparent',
+      ':hover': 'var(--surface-hover)',
+      ':active': 'var(--surface-selected)',
+    },
+    color: 'var(--text-primary)',
+    lineHeight: 1,
+    cursor: 'pointer',
   },
   rightAligned: {
     textAlign: 'right',

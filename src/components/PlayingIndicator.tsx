@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react/macro';
 import * as stylex from '@stylexjs/stylex';
 import { useMemo, useState } from 'react';
 
@@ -8,6 +9,8 @@ import Icon from './Icon';
 export default function TrackPlayingIndicator() {
   const [hovered, setHovered] = useState(false);
   const isPaused = usePlayerState((state) => state.isPaused);
+  const { t } = useLingui();
+  const label = isPaused ? t`Play` : t`Pause`;
 
   const icon = useMemo(() => {
     if (!isPaused) {
@@ -34,6 +37,8 @@ export default function TrackPlayingIndicator() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       tabIndex={0}
+      aria-label={label}
+      title={label}
       data-museeks-action
       {...stylex.props(styles.playingIndicator)}
     >
@@ -50,8 +55,8 @@ const barAnimation = stylex.keyframes({
 
 const styles = stylex.create({
   playingIndicator: {
-    height: '100%',
-    width: '100%',
+    minWidth: '32px',
+    minHeight: '32px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

@@ -10,9 +10,13 @@
 
 import { Route as rootRouteImport } from './../routes/__root'
 import { Route as SettingsRouteImport } from './../routes/settings'
+import { Route as SearchRouteImport } from './../routes/search'
 import { Route as PlaylistsRouteImport } from './../routes/playlists'
+import { Route as LocalMusicRouteImport } from './../routes/local-music'
 import { Route as LibraryRouteImport } from './../routes/library'
+import { Route as DiscoverRouteImport } from './../routes/discover'
 import { Route as ArtistsRouteImport } from './../routes/artists'
+import { Route as IndexRouteImport } from './../routes/index'
 import { Route as TracksTrackIDRouteImport } from './../routes/tracks.$trackID'
 import { Route as SettingsUiRouteImport } from './../routes/settings.ui'
 import { Route as SettingsLibraryRouteImport } from './../routes/settings.library'
@@ -27,9 +31,19 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlaylistsRoute = PlaylistsRouteImport.update({
   id: '/playlists',
   path: '/playlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocalMusicRoute = LocalMusicRouteImport.update({
+  id: '/local-music',
+  path: '/local-music',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -37,9 +51,19 @@ const LibraryRoute = LibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArtistsRoute = ArtistsRouteImport.update({
   id: '/artists',
   path: '/artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TracksTrackIDRoute = TracksTrackIDRouteImport.update({
@@ -85,9 +109,13 @@ const ArtistsPresetsCompilationsRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/artists': typeof ArtistsRouteWithChildren
+  '/discover': typeof DiscoverRoute
   '/library': typeof LibraryRoute
+  '/local-music': typeof LocalMusicRoute
   '/playlists': typeof PlaylistsRouteWithChildren
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/artists/$artistID': typeof ArtistsArtistIDRoute
   '/playlists/$playlistID': typeof PlaylistsPlaylistIDRoute
@@ -99,9 +127,13 @@ export interface FileRoutesByFullPath {
   '/artists/presets/compilations': typeof ArtistsPresetsCompilationsRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/artists': typeof ArtistsRouteWithChildren
+  '/discover': typeof DiscoverRoute
   '/library': typeof LibraryRoute
+  '/local-music': typeof LocalMusicRoute
   '/playlists': typeof PlaylistsRouteWithChildren
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/artists/$artistID': typeof ArtistsArtistIDRoute
   '/playlists/$playlistID': typeof PlaylistsPlaylistIDRoute
@@ -114,9 +146,13 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/artists': typeof ArtistsRouteWithChildren
+  '/discover': typeof DiscoverRoute
   '/library': typeof LibraryRoute
+  '/local-music': typeof LocalMusicRoute
   '/playlists': typeof PlaylistsRouteWithChildren
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/artists/$artistID': typeof ArtistsArtistIDRoute
   '/playlists/$playlistID': typeof PlaylistsPlaylistIDRoute
@@ -130,9 +166,13 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/artists'
+    | '/discover'
     | '/library'
+    | '/local-music'
     | '/playlists'
+    | '/search'
     | '/settings'
     | '/artists/$artistID'
     | '/playlists/$playlistID'
@@ -144,9 +184,13 @@ export interface FileRouteTypes {
     | '/artists/presets/compilations'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/artists'
+    | '/discover'
     | '/library'
+    | '/local-music'
     | '/playlists'
+    | '/search'
     | '/settings'
     | '/artists/$artistID'
     | '/playlists/$playlistID'
@@ -158,9 +202,13 @@ export interface FileRouteTypes {
     | '/artists/presets/compilations'
   id:
     | '__root__'
+    | '/'
     | '/artists'
+    | '/discover'
     | '/library'
+    | '/local-music'
     | '/playlists'
+    | '/search'
     | '/settings'
     | '/artists/$artistID'
     | '/playlists/$playlistID'
@@ -173,9 +221,13 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   ArtistsRoute: typeof ArtistsRouteWithChildren
+  DiscoverRoute: typeof DiscoverRoute
   LibraryRoute: typeof LibraryRoute
+  LocalMusicRoute: typeof LocalMusicRoute
   PlaylistsRoute: typeof PlaylistsRouteWithChildren
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   TracksTrackIDRoute: typeof TracksTrackIDRoute
 }
@@ -189,11 +241,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/playlists': {
       id: '/playlists'
       path: '/playlists'
       fullPath: '/playlists'
       preLoaderRoute: typeof PlaylistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/local-music': {
+      id: '/local-music'
+      path: '/local-music'
+      fullPath: '/local-music'
+      preLoaderRoute: typeof LocalMusicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -203,11 +269,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/artists': {
       id: '/artists'
       path: '/artists'
       fullPath: '/artists'
       preLoaderRoute: typeof ArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tracks/$trackID': {
@@ -313,9 +393,13 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   ArtistsRoute: ArtistsRouteWithChildren,
+  DiscoverRoute: DiscoverRoute,
   LibraryRoute: LibraryRoute,
+  LocalMusicRoute: LocalMusicRoute,
   PlaylistsRoute: PlaylistsRouteWithChildren,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   TracksTrackIDRoute: TracksTrackIDRoute,
 }

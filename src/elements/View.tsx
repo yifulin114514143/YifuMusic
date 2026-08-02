@@ -61,30 +61,47 @@ export default function View(props: Props) {
 
 const styles = stylex.create({
   view: {
-    height: '100%',
-    maxHeight: '100%',
-    backgroundColor: 'var(--background)',
+    minHeight: '100%',
+    padding: {
+      default: '20px',
+      '@media (max-width: 699px)': '14px',
+    },
+    backgroundColor: 'var(--surface-canvas)',
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 'auto',
-    overflow: 'auto',
+    overflow: 'visible',
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
   },
   centeredContent: {
     position: 'relative',
   },
   hasPadding: {
-    padding: '40px',
+    padding: {
+      default: '20px',
+      '@media (max-width: 699px)': '14px',
+    },
   },
   viewWithSideNav: {
     display: 'flex',
-    overflow: 'hidden',
+    padding: 0,
+    overflow: 'visible',
   },
   viewContent: {
+    minHeight: 0,
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 'auto',
     minWidth: 0,
+    padding: {
+      default: '20px',
+      '@media (max-width: 699px)': '14px',
+    },
+    overflow: 'visible',
+    display: 'flex',
+    flexDirection: 'column',
   },
 });
 
@@ -92,8 +109,12 @@ const layoutVariants = stylex.create({
   'full-width': {},
   centered: {
     display: 'grid',
-    gridTemplateColumns: '350px',
+    gridTemplateColumns: {
+      default: '350px',
+      '@media (max-width: 599px)': 'minmax(0, 1fr)',
+    },
     justifyContent: 'center',
     scrollbarGutter: 'stable',
+    overflowY: 'visible',
   },
 });

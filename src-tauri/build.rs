@@ -20,6 +20,31 @@ fn main() {
                 tauri_build::InlinedPlugin::new().commands(&["get_cover"]),
             )
             .plugin(
+                "desktop-lyrics",
+                tauri_build::InlinedPlugin::new().commands(&[
+                    "open",
+                    "sync_state",
+                    "get_state",
+                    "close",
+                    "start_dragging",
+                    "control",
+                    "set_mouse_passthrough",
+                    "get_window_geometry",
+                    "update_window_geometry",
+                    "set_always_on_top",
+                    "set_resizable",
+                ]),
+            )
+            .plugin(
+                "lyrics",
+                tauri_build::InlinedPlugin::new()
+                    .commands(&["get_sibling_lyrics", "select_and_read"]),
+            )
+            .plugin(
+                "tray",
+                tauri_build::InlinedPlugin::new().commands(&["sync_state"]),
+            )
+            .plugin(
                 "database",
                 tauri_build::InlinedPlugin::new().commands(&[
                     "scan_library",

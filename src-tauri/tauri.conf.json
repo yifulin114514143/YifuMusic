@@ -12,6 +12,7 @@
   },
   "app": {
     "windows": [],
+    "macOSPrivateApi": true,
     "security": {
       "assetProtocol": {
         "enable": true,

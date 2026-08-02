@@ -1,5 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 
+import LibraryAPI from '../api/LibraryAPI';
 import Link from '../elements/Link';
 import * as ViewMessage from '../elements/ViewMessage';
 import type { Track, TrackGroup } from '../generated/typings';
@@ -47,14 +48,15 @@ export default function TrackListStates(props: Props) {
     return (
       <ViewMessage.Notice>
         <p>
-          <Trans>There is no music in your library</Trans>
+          <Trans>Your library is empty</Trans>
         </p>
         <ViewMessage.Sub>
           <Trans>
-            you can{' '}
+            Choose a local music folder in{' '}
             <Link linkOptions={{ to: '/settings/library' }}>
-              add your music here
-            </Link>
+              library settings
+            </Link>{' '}
+            to scan it.
           </Trans>
         </ViewMessage.Sub>
       </ViewMessage.Notice>
@@ -66,8 +68,13 @@ export default function TrackListStates(props: Props) {
     return (
       <ViewMessage.Notice>
         <p>
-          <Trans>Your search returned no results</Trans>
+          <Trans>No results for "{search}"</Trans>
         </p>
+        <ViewMessage.Sub>
+          <Link onClick={() => LibraryAPI.search('')}>
+            <Trans>Clear search</Trans>
+          </Link>
+        </ViewMessage.Sub>
       </ViewMessage.Notice>
     );
   }

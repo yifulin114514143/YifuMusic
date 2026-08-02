@@ -1,5 +1,30 @@
 import * as stylex from '@stylexjs/stylex';
 import { error } from '@tauri-apps/plugin-log';
+import {
+  ArrowLeft,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  Cloud,
+  Compass,
+  Ellipsis,
+  Expand,
+  FileText,
+  GripVertical,
+  HardDrive,
+  House,
+  Lock,
+  MousePointer2,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Pin,
+  RotateCcw,
+  RotateCw,
+  Search,
+  Trash2,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 
 import chevronDown from '../assets/icons/chevron-down.svg?react';
 import chevronUp from '../assets/icons/chevron-up.svg?react';
@@ -27,28 +52,62 @@ const icons: Record<
   string,
   React.FunctionComponent<React.SVGProps<SVGSVGElement>>
 > = {
+  arrowLeft: createLucideIcon(ArrowLeft),
+  arrowUp: createLucideIcon(ArrowUp),
+  chevronLeft: createLucideIcon(ChevronLeft),
+  chevronRight: createLucideIcon(ChevronRight),
+  cloud: createLucideIcon(Cloud),
+  compass: createLucideIcon(Compass),
   chevronDown,
   chevronUp,
+  ellipsis: createLucideIcon(Ellipsis),
+  expand: createLucideIcon(Expand),
+  fileText: createLucideIcon(FileText),
   globe,
+  gripVertical: createLucideIcon(GripVertical),
+  hardDrive: createLucideIcon(HardDrive),
+  house: createLucideIcon(House),
   list,
+  lock: createLucideIcon(Lock),
   microphone,
   musicalNotes,
+  mousePointer: createLucideIcon(MousePointer2),
+  panelLeftClose: createLucideIcon(PanelLeftClose),
+  panelLeftOpen: createLucideIcon(PanelLeftOpen),
   pause,
   play,
+  pin: createLucideIcon(Pin),
   playlist,
   plus,
   repeat,
   repeatOne,
+  refresh: createLucideIcon(RotateCw),
+  rotateCcw: createLucideIcon(RotateCcw),
+  search: createLucideIcon(Search),
   settings,
   shuffle,
   skipBack,
   skipForward,
+  trash: createLucideIcon(Trash2),
   volumeHigh,
   volumeLow,
   volumeMedium,
   volumeMute,
   volumeOff,
+  close: createLucideIcon(X),
 };
+
+function createLucideIcon(IconImpl: LucideIcon) {
+  return function LucideIcon(props: React.SVGProps<SVGSVGElement>) {
+    return (
+      <IconImpl
+        {...props}
+        strokeWidth={2}
+        style={{ ...props.style, fill: 'none' }}
+      />
+    );
+  };
+}
 
 export type IconName = keyof typeof icons;
 export type IconSize = keyof typeof stylesBySize;

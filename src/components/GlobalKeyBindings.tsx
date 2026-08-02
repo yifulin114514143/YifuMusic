@@ -12,6 +12,8 @@ function GlobalKeyBindings() {
   // App shortcuts (not using global shortcuts API to avoid conflicts
   // with other applications)
   const onKey = useCallback(async (e: KeyboardEvent) => {
+    if (e.defaultPrevented) return;
+
     switch (e.key) {
       case ' ':
         e.preventDefault();

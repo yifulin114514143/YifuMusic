@@ -1,8 +1,8 @@
 export const DEFAULT_LANGUAGE = {
-  label: 'English',
-  englishLabel: null,
-  code: 'en',
-  contributors: ['Pierre de la Martinière'],
+  label: '简体中文',
+  englishLabel: 'Simplified Chinese',
+  code: 'zh-CN',
+  contributors: ['Tang Shijian'],
 };
 
 // Are you looking to add support for a language?
@@ -11,6 +11,12 @@ export const DEFAULT_LANGUAGE = {
 // 3. Edit the generated file in src/translations/<language>.po
 // 4. Profit
 export const NON_DEFAULT_LANGUAGES = [
+  {
+    label: 'English',
+    englishLabel: null,
+    code: 'en',
+    contributors: ['Pierre de la Martinière'],
+  },
   {
     label: 'Français',
     englishLabel: 'French',
@@ -28,12 +34,6 @@ export const NON_DEFAULT_LANGUAGES = [
     englishLabel: 'Russian',
     code: 'ru',
     contributors: ['Ildar Nizamov'],
-  },
-  {
-    label: '简体中文',
-    englishLabel: 'Simplified Chinese',
-    code: 'zh-CN',
-    contributors: ['Tang Shijian'],
   },
   {
     label: '繁體中文',

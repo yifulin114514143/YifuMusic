@@ -12,7 +12,9 @@ pub mod debug;
 pub mod app_close;
 pub mod app_menu;
 pub mod cover;
+pub mod desktop_lyrics;
 pub mod file_associations;
+pub mod lyrics;
 pub mod media_controls;
 
 /**
@@ -28,3 +30,4 @@ pub mod default_view;
 pub mod native_audio;
 pub mod sleepblocker;
 pub mod stream_server;
+pub mod tray;

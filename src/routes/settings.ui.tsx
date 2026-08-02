@@ -1,5 +1,6 @@
 import { t as tMacro } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
+import * as stylex from '@stylexjs/stylex';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { relaunch } from '@tauri-apps/plugin-process';
@@ -7,11 +8,14 @@ import { debounce } from 'lodash-es';
 import { useMemo } from 'react';
 
 import SettingsAPI, { DEFAULT_MAIN_COLOR } from '../api/SettingsAPI';
+import { useAppShell } from '../components/AppShellContext';
+import DesktopLyricsButton from '../components/DesktopLyricsButton';
+import Icon from '../components/Icon';
 import * as Setting from '../components/Setting';
-import CheckboxSetting from '../components/SettingCheckbox';
 import Button from '../elements/Button';
 import type { Config, DefaultView } from '../generated/typings';
 import useInvalidate, { useInvalidateCallback } from '../hooks/useInvalidate';
+import ConfigBridge from '../lib/bridge-config';
 import SettingsBridge from '../lib/bridge-settings';
 import { configQuery } from '../lib/queries';
 import { themes } from '../lib/themes';
@@ -28,6 +32,7 @@ export const Route = createFileRoute('/settings/ui')({
 function ViewSettingsUI() {
   const config = useSuspenseQuery(configQuery).data;
   const { t } = useLingui();
+  const { navigationMode, toggleNavigationMode } = useAppShell();
 
   const invalidate = useInvalidate();
 
@@ -38,10 +43,23 @@ function ViewSettingsUI() {
         .catch(logAndNotifyError);
     }, 250);
   }, [invalidate]);
+  const setStatusBarLyrics = useInvalidateCallback((value: boolean) =>
+    ConfigBridge.set('status_bar_lyrics', value),
+  );
 
   return (
     <>
+      <Setting.PageHeader
+        title={t`Interface`}
+        description={t`Change the appearance of the interface`}
+      />
       <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="settings" size={16} />
+            主题与外观
+          </span>
+        </Setting.Title>
         <Setting.Select
           label={t`Theme`}
           description={t`Change the appearance of the interface`}
@@ -63,6 +81,33 @@ function ViewSettingsUI() {
         </Setting.Select>
       </Setting.Section>
       <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="list" size={16} />
+            导航布局
+          </span>
+        </Setting.Title>
+        <Setting.Select
+          label="导航方式"
+          description="在顶部导航与侧栏导航之间切换"
+          value={navigationMode}
+          onChange={(event) => {
+            if (event.currentTarget.value !== navigationMode) {
+              toggleNavigationMode();
+            }
+          }}
+        >
+          <option value="top">顶部</option>
+          <option value="side">侧栏</option>
+        </Setting.Select>
+      </Setting.Section>
+      <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="settings" size={16} />
+            主色调
+          </span>
+        </Setting.Title>
         <Setting.ColorSelector
           label={t`Accent color`}
           value={config.ui_accent_color ?? DEFAULT_MAIN_COLOR}
@@ -86,8 +131,15 @@ function ViewSettingsUI() {
         />
       </Setting.Section>
       <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="globe" size={16} />
+            语言
+          </span>
+        </Setting.Title>
         <Setting.Select
           label={t`Language`}
+          description={t`Choose the language used by YifuMusic`}
           value={config.language}
           onChange={(e) => {
             SettingsAPI.setLanguage(e.target.value)
@@ -103,13 +155,18 @@ function ViewSettingsUI() {
             return (
               <option key={language.code} value={language.code}>
                 {language.label}
-                {language.englishLabel && ` (${language.englishLabel})`}
               </option>
             );
           })}
         </Setting.Select>
       </Setting.Section>
       <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="list" size={16} />
+            曲目列表
+          </span>
+        </Setting.Title>
         <Setting.Select
           label={t`Tracks density`}
           description={t`Change the tracks spacing`}
@@ -131,6 +188,12 @@ function ViewSettingsUI() {
         </Setting.Select>
       </Setting.Section>
       <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="house" size={16} />
+            启动页
+          </span>
+        </Setting.Title>
         <Setting.Select
           label={t`Default view`}
           value={config.default_view}
@@ -153,17 +216,13 @@ function ViewSettingsUI() {
         </Setting.Select>
       </Setting.Section>
       <Setting.Section>
-        <CheckboxSetting
-          title={t`Display Notifications`}
-          description={t`Send notifications when the playing track changes`}
-          value={config.notifications}
-          onChange={useInvalidateCallback(
-            SettingsAPI.toggleDisplayNotifications,
-          )}
-        />
-      </Setting.Section>
-      <Setting.Section>
-        <CheckboxSetting
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="musicalNotes" size={16} />
+            播放行为
+          </span>
+        </Setting.Title>
+        <Setting.Toggle
           title={t`Sleep mode blocker`}
           description={t`Prevent the computer from going into sleep mode when playing`}
           value={config.sleepblocker}
@@ -172,9 +231,67 @@ function ViewSettingsUI() {
           )}
         />
       </Setting.Section>
+      <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="musicalNotes" size={16} />
+            桌面歌词
+          </span>
+        </Setting.Title>
+        <Setting.Description>
+          在独立窗口显示当前本地歌词，并继续复用现有桌面歌词 bridge。
+        </Setting.Description>
+        <div {...stylex.props(styles.desktopLyricsAction)}>
+          <DesktopLyricsButton />
+          <span>打开后可在桌面歌词窗口调整颜色、字号与锁定状态。</span>
+        </div>
+      </Setting.Section>
+      <Setting.Section>
+        <Setting.Title>
+          <span {...stylex.props(styles.cardTitle)}>
+            <Icon name="globe" size={16} />
+            在线服务与扩展
+          </span>
+        </Setting.Title>
+        <Setting.Description>
+          账号、在线服务、代理、插件和 PWA
+          没有已验证的服务契约，因此保持不可用。
+        </Setting.Description>
+        <button
+          aria-label="在线服务、账号、代理、插件和 PWA 服务接入后可用"
+          disabled
+          title="服务接入后可用"
+          type="button"
+          {...stylex.props(styles.unavailableService)}
+        >
+          服务接入后可用
+        </button>
+      </Setting.Section>
+      {window.__MUSEEKS_PLATFORM === 'macos' && (
+        <Setting.Section>
+          <Setting.Title>
+            <span {...stylex.props(styles.cardTitle)}>
+              <Icon name="musicalNotes" size={16} />
+              状态栏歌词
+            </span>
+          </Setting.Title>
+          <Setting.Toggle
+            title={t`状态栏歌词`}
+            description={t`在 macOS 菜单栏显示当前本地歌词`}
+            value={config.status_bar_lyrics}
+            onChange={setStatusBarLyrics}
+          />
+        </Setting.Section>
+      )}
       {window.__MUSEEKS_PLATFORM === 'linux' && (
         <Setting.Section>
-          <CheckboxSetting
+          <Setting.Title>
+            <span {...stylex.props(styles.cardTitle)}>
+              <Icon name="settings" size={16} />
+              Wayland 兼容性
+            </span>
+          </Setting.Title>
+          <Setting.Toggle
             title={t`[Beta] Wayland compatibility enhancements`}
             description={t`If you face issues using Wayland, try out this option`}
             value={config.wayland_compat}
@@ -192,6 +309,38 @@ function ViewSettingsUI() {
     </>
   );
 }
+
+const styles = stylex.create({
+  cardTitle: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    columnGap: '8px',
+    color: 'var(--text-primary)',
+  },
+  desktopLyricsAction: {
+    minHeight: '38px',
+    display: 'flex',
+    alignItems: 'center',
+    columnGap: '10px',
+    color: 'var(--text-secondary)',
+    fontSize: '13px',
+    lineHeight: 1.5,
+  },
+  unavailableService: {
+    minHeight: '38px',
+    paddingBlock: '8px',
+    paddingInline: '12px',
+    alignSelf: 'flex-start',
+    color: 'var(--text-secondary)',
+    backgroundColor: 'var(--surface-sunken)',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'var(--border-subtle)',
+    borderRadius: '6px',
+    cursor: 'not-allowed',
+    opacity: 0.72,
+  },
+});
 
 /**
  * Get the theme name in the current language
