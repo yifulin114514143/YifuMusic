@@ -8,6 +8,7 @@ import type { Config } from '../generated/typings';
 import ConfigBridge from '../lib/bridge-config';
 import SettingsBridge from '../lib/bridge-settings';
 import { loadTranslation } from '../lib/i18n';
+import { normalizeLanguage } from '../lib/language';
 import player from '../lib/player';
 import { getTheme } from '../lib/themes';
 import toastManager from '../lib/toast-manager';
@@ -98,8 +99,9 @@ async function init(then: () => void): Promise<void> {
 }
 
 const setLanguage = async (language: Config['language']): Promise<void> => {
-  await loadTranslation(language);
-  await ConfigBridge.set('language', language);
+  const normalizedLanguage = normalizeLanguage(language);
+  await loadTranslation(normalizedLanguage);
+  await ConfigBridge.set('language', normalizedLanguage);
 };
 
 const setTheme = async (themeID: string): Promise<void> => {

@@ -10,7 +10,7 @@ vi.mock('@tauri-apps/api/app', () => ({
 
 beforeEachSetup({ width: 1440, height: 900, navigationMode: 'side' });
 
-function openSettings(path: 'library' | 'audio' | 'ui') {
+function openSettings(path: 'library' | 'audio' | 'ui' | 'about') {
   window.location.hash = `#/settings/${path}`;
 }
 
@@ -105,6 +105,11 @@ test('Interface and about keep their existing local settings and version data in
   await expect
     .element(page.getByLabelText('版本信息'))
     .toHaveTextContent('V0.23.4 · Tauri 2.11.2');
+  await expect
+    .element(page.getByRole('region', { name: '构建身份' }))
+    .toHaveTextContent(
+      '版本0.23.4构建提交未知构建时间1970/1/1 08:00:00当前语言代码zh-CN构建渠道/目标调试运行 / aarch64-apple-darwin',
+    );
 });
 
 test('界面设置保留桌面歌词真实入口，并清楚标记未接入服务', async () => {

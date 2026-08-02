@@ -64,6 +64,14 @@ export function beforeEachSetup(options?: SetupOptions) {
 
     // Stub Museeks Globals
     vi.stubGlobal('__MUSEEKS_INITIAL_CONFIG', MOCK_CONFIG);
+    vi.stubGlobal('__MUSEEKS_BUILD_IDENTITY', {
+      appVersion: '0.23.4',
+      commitSha: 'unknown',
+      builtAt: '0',
+      buildChannel: 'debug',
+      targetTriple: 'aarch64-apple-darwin',
+      runtimeChannel: 'debug',
+    });
     vi.stubGlobal('__MUSEEKS_INITIAL_QUEUE', []);
     vi.stubGlobal('__MUSEEKS_PLATFORM', import.meta.env.PLATFORM);
 

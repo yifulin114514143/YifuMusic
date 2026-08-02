@@ -32,6 +32,9 @@ interface TauriConfig {
       csp: Record<string, string>;
     };
   };
+  bundle: {
+    resources: Record<string, string>;
+  };
 }
 
 const expectedPermissionIdentifiers = [
@@ -205,6 +208,15 @@ describe('stage 2 capability boundary', () => {
       'http://asset.localhost',
       'http://127.0.0.1:*',
     ]);
+  });
+
+  test('bundles the generated build manifest without granting path access', () => {
+    const config = JSON.parse(tauriConfigSource) as TauriConfig;
+
+    expect(config.bundle.resources['resources/build-manifest.json']).toBe(
+      'build-manifest.json',
+    );
+    expect(config.app.security.assetProtocol.scope.allow).toStrictEqual([]);
   });
 
   test('scopes the desktop lyrics window to state, playback, and restricted geometry controls', () => {

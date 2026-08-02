@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::sqlite::{SqliteAutoVacuum, SqliteConnectOptions, SqliteJournalMode};
 use sqlx::{Connection, SqliteConnection};
 use std::collections::HashSet;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use tauri::Emitter;
@@ -21,8 +21,6 @@ use crate::libs::playlist::Playlist;
 use crate::libs::track::{Track, TrackGroup, get_track_from_file, get_track_id_for_path};
 use crate::libs::utils::{TimeLogger, scan_dirs};
 
-use super::config::get_storage_dir;
-
 // Connection is mutable, so we must wrap the state in a mutex to make sure there
 // are no concurrency issues
 pub struct DBState(Mutex<DB>);
@@ -36,8 +34,8 @@ impl DBState {
 /**
  * Database setup
  */
-async fn setup() -> AnyResult<DB> {
-    let database_path = get_storage_dir().join("yifumusic.db");
+async fn setup(storage_dir: PathBuf) -> AnyResult<DB> {
+    let database_path = storage_dir.join("yifumusic.db");
 
     info!("Opening connection to database: {:?}", database_path);
 
@@ -81,6 +79,27 @@ pub struct ScanResult {
     track_failures: usize,
     playlist_count: usize,
     playlist_failures: usize,
+}
+
+fn playlist_track_paths(playlist_path: &Path) -> AnyResult<Vec<PathBuf>> {
+    let mut reader = m3u::Reader::open(playlist_path)?;
+    let playlist_dir_path = playlist_path.parent().ok_or_else(|| {
+        MuseeksError::Unknown(anyhow::anyhow!("playlist path has no parent directory"))
+    })?;
+
+    Ok(reader
+        .entries()
+        .filter_map(|entry| {
+            let Ok(entry) = entry else {
+                return None;
+            };
+
+            match entry {
+                m3u::Entry::Path(path) => Some(playlist_dir_path.join(path)),
+                _ => None,
+            }
+        })
+        .collect())
 }
 
 /** ----------------------------------------------------------------------------
@@ -232,22 +251,7 @@ async fn scan_library<R: Runtime>(
     // Start scanning the content of the playlists and adding them to the DB
     for playlist_path in playlist_paths {
         let res = {
-            let mut reader = m3u::Reader::open(&playlist_path).unwrap();
-            let playlist_dir_path = playlist_path.parent().unwrap();
-
-            let track_paths: Vec<PathBuf> = reader
-                .entries()
-                .filter_map(|entry| {
-                    let Ok(entry) = entry else {
-                        return None;
-                    };
-
-                    match entry {
-                        m3u::Entry::Path(path) => Some(playlist_dir_path.join(path)),
-                        _ => None, // We don't support (yet?) URLs in playlists
-                    }
-                })
-                .collect();
+            let track_paths = playlist_track_paths(&playlist_path)?;
 
             // Ok, this is sketchy. To avoid having to create a TrackByPath DB View,
             // let's guess the ID of the track with UUID::v3
@@ -297,6 +301,21 @@ async fn scan_library<R: Runtime>(
 
     // All good :]
     Ok(scan_result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::playlist_track_paths;
+
+    #[test]
+    fn unreadable_m3u_is_reported_without_panicking() {
+        let missing_path = std::env::temp_dir().join(format!(
+            "yifumusic-missing-playlist-{}.m3u",
+            uuid::Uuid::new_v4()
+        ));
+
+        assert!(playlist_track_paths(&missing_path).is_err());
+    }
 }
 
 #[tauri::command]
@@ -468,7 +487,7 @@ async fn reset(db_state: State<'_, DBState>) -> AnyResult<()> {
 /**
  * Database plugin, exposing commands and state
  */
-pub fn init<R: Runtime>() -> TauriPlugin<R> {
+pub fn init<R: Runtime>(storage_dir: PathBuf) -> TauriPlugin<R> {
     Builder::<R>::new("database")
         .invoke_handler(tauri::generate_handler![
             get_all_tracks,
@@ -491,11 +510,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             reset,
             scan_library,
         ])
-        .setup(|app_handle, _api| {
+        .setup(move |app_handle, _api| {
             let app_handle = app_handle.clone();
+            let storage_dir = storage_dir.clone();
 
             tauri::async_runtime::spawn(async move {
-                let db = match setup().await {
+                let db = match setup(storage_dir).await {
                     Ok(db) => db,
                     Err(err) => {
                         handle_fatal_error(&app_handle, err);

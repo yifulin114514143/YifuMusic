@@ -120,6 +120,7 @@ export default function TrackListDefault(props: Props) {
 
         {/* The large inner element to hold all of the items */}
         <ul
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- 音轨列表支持多选与键盘操作，不能替换为原生 select。
           role="listbox"
           aria-multiselectable="true"
           aria-label={t`Track list`}

@@ -17,6 +17,7 @@ import React from 'react';
 import * as ReactDOM from 'react-dom/client';
 
 import { loadTranslation } from './lib/i18n';
+import { normalizeLanguage } from './lib/language';
 import queryClient from './lib/query-client';
 import { messages as zhCNMessages } from './translations/zh-CN.po';
 
@@ -72,7 +73,9 @@ export const app = (
     return;
   }
 
-  const initialLanguage = window.__MUSEEKS_INITIAL_CONFIG.language;
+  const initialLanguage = normalizeLanguage(
+    window.__MUSEEKS_INITIAL_CONFIG.language,
+  );
   const loadInitialTranslation =
     initialLanguage === 'zh-CN'
       ? Promise.resolve().then(() => {

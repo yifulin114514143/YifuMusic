@@ -7,7 +7,7 @@ mod plugins;
 use libs::init::init;
 use libs::utils::get_theme_from_name;
 use log::{LevelFilter, info};
-use plugins::config::{ConfigManager, get_storage_dir};
+use plugins::config::{ConfigManager, apply_mounted_dmg_isolation, resolve_storage_dir};
 use std::env;
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_log::fern::colors::ColoredLevelConfig;
@@ -19,7 +19,9 @@ use tauri_plugin_window_state::StateFlags;
  * The beast
  */
 fn main() {
-    let config = match init() {
+    apply_mounted_dmg_isolation();
+    let storage_dir = resolve_storage_dir();
+    let config = match init(&storage_dir.path) {
         Ok(config) => {
             println!("[init] Initialization successful");
             config
@@ -38,6 +40,14 @@ fn main() {
         }
     };
 
+    let log_storage_dir = storage_dir.path.clone();
+    let database_storage_dir = storage_dir.path.clone();
+    let storage_mode = if storage_dir.isolation_enabled {
+        "override"
+    } else {
+        "default"
+    };
+
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_process::init())
         // Logging must be setup first, otherwise the logs won't be captured
@@ -48,7 +58,7 @@ fn main() {
                     Target::new(TargetKind::Stdout),
                     Target::new(TargetKind::Webview),
                     Target::new(TargetKind::Folder {
-                        path: get_storage_dir(),
+                        path: log_storage_dir.clone(),
                         file_name: Some("yifumusic".into()),
                     }),
                 ])
@@ -72,7 +82,7 @@ fn main() {
         .plugin(plugins::config::init(config))
         .plugin(plugins::app_menu::init())
         .plugin(plugins::cover::init())
-        .plugin(plugins::db::init())
+        .plugin(plugins::db::init(database_storage_dir))
         .plugin(plugins::desktop_lyrics::init())
         .plugin(plugins::lyrics::init())
         .plugin(plugins::tray::init())
@@ -112,7 +122,11 @@ fn main() {
     };
 
     builder
-        .setup(|app| {
+        .setup(move |app| {
+            info!(
+                "[isolation] mode={storage_mode} config_root={}",
+                log_storage_dir.display()
+            );
             let config_manager = app.state::<ConfigManager>();
             let conf = config_manager.get()?;
 

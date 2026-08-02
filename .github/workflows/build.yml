@@ -81,7 +81,7 @@ jobs:
       HAS_APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE != '' }}
 
     permissions:
-      contents: write
+      contents: read
 
     strategy:
       fail-fast: false
@@ -131,9 +131,10 @@ jobs:
 
       - name: Build application (signed)
         if: env.HAS_APPLE_CERTIFICATE == 'true'
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YIFUMUSIC_BUILD_CHANNEL: ci-artifact
           ENABLE_CODE_SIGNING: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -151,7 +152,8 @@ jobs:
         if: env.HAS_APPLE_CERTIFICATE != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: tauri-apps/tauri-action@v0
+          YIFUMUSIC_BUILD_CHANNEL: ci-artifact
+        uses: tauri-apps/tauri-action@v0.6.1
         with:
           tauriScript: vp run tauri
           includeUpdaterJson: false

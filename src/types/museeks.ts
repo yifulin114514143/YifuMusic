@@ -14,7 +14,7 @@ export interface Theme {
  * APIs Helpers
  */
 export type API<
-  // oxlint-disable-next-line typescript/no-redundant-type-constituents - this is alright
+  // oxlint-disable-next-line typescript/no-redundant-type-constituents -- 旧 API 同时允许同步与异步返回值。
   T extends { api: Record<string, (...args: any[]) => Promise<any> | any> },
 > = T;
 
