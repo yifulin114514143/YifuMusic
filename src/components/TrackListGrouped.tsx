@@ -54,6 +54,7 @@ export default function TrackListGroupedLayout(props: Props) {
   return (
     <Scrollable
       ref={innerScrollableRef}
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- 音轨列表支持多选与键盘操作，不能替换为原生 select。
       role="listbox"
       aria-label={t`Track list`}
       aria-multiselectable="true"

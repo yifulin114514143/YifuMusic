@@ -11,6 +11,11 @@ import ExternalButton from '../elements/ExternalButton';
 import ExternalLink from '../elements/ExternalLink';
 import Flexbox from '../elements/Flexbox';
 import useInvalidate, { useInvalidateCallback } from '../hooks/useInvalidate';
+import {
+  formatBuildChannel,
+  formatBuildTimestamp,
+  formatBuildValue,
+} from '../lib/build-identity';
 import { configQuery } from '../lib/queries';
 import { logAndNotifyError } from '../lib/utils';
 
@@ -19,9 +24,11 @@ export const Route = createFileRoute('/settings/about')({
 });
 
 function ViewSettingsAbout() {
-  const { version, tauriVersion, appStorageDir } = useLoaderData({
-    from: '/settings',
-  });
+  const { buildIdentity, version, tauriVersion, appStorageDir } = useLoaderData(
+    {
+      from: '/settings',
+    },
+  );
   const config = useSuspenseQuery(configQuery).data;
 
   const invalidate = useInvalidate();
@@ -33,6 +40,28 @@ function ViewSettingsAbout() {
         title={t`About YifuMusic`}
         description={`YifuMusic ${version}`}
       />
+      <Setting.Section>
+        <section aria-label={t`构建身份`}>
+          <Setting.Title>
+            <span {...stylex.props(styles.cardTitle)}>
+              <Icon name="fileText" size={16} />
+              {t`构建身份`}
+            </span>
+          </Setting.Title>
+          <dl {...stylex.props(styles.buildIdentity)}>
+            <dt>{t`版本`}</dt>
+            <dd>{formatBuildValue(buildIdentity.appVersion)}</dd>
+            <dt>{t`构建提交`}</dt>
+            <dd>{formatBuildValue(buildIdentity.commitSha)}</dd>
+            <dt>{t`构建时间`}</dt>
+            <dd>{formatBuildTimestamp(buildIdentity.builtAt)}</dd>
+            <dt>{t`当前语言代码`}</dt>
+            <dd>{config.language}</dd>
+            <dt>{t`构建渠道/目标`}</dt>
+            <dd>{formatBuildChannel(buildIdentity)}</dd>
+          </dl>
+        </section>
+      </Setting.Section>
       <Setting.Section>
         <Setting.Title>
           <span {...stylex.props(styles.cardTitle)}>
@@ -153,6 +182,13 @@ function ViewSettingsAbout() {
 }
 
 const styles = stylex.create({
+  buildIdentity: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(120px, auto) minmax(0, 1fr)',
+    columnGap: '16px',
+    rowGap: '8px',
+    margin: 0,
+  },
   cardTitle: {
     display: 'inline-flex',
     alignItems: 'center',

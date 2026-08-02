@@ -37,11 +37,11 @@ msgid "The playlist \"{name}\" was created"
 msgstr "Создан плейлист \"{name}\""
 
 #. placeholder {0}: newRelease.tag_name
-#: src/api/SettingsAPI.ts:220
+#: src/api/SettingsAPI.ts:222
 msgid "YifuMusic {0} is available."
 msgstr ""
 
-#: src/api/SettingsAPI.ts:222
+#: src/api/SettingsAPI.ts:224
 msgid "YifuMusic {currentVersion} is the latest version available."
 msgstr ""
 
@@ -266,7 +266,7 @@ msgstr ""
 #: src/components/ProfileMenu.tsx:154
 #: src/components/ProfileMenu.tsx:157
 #: src/components/ProfileMenu.tsx:164
-#: src/routes/settings.tsx:104
+#: src/routes/settings.tsx:109
 msgid "Settings"
 msgstr "Настройки"
 
@@ -442,7 +442,7 @@ msgstr "Очередь"
 #. placeholder {0}: props.count
 #: src/components/NowPlayingOverlay.tsx:476
 #: src/components/QueuePanel.tsx:130
-#: src/components/TrackListGrouped.tsx:116
+#: src/components/TrackListGrouped.tsx:117
 #: src/components/TrackListStatus.tsx:11
 #: src/routes/artists.$artistID.tsx:76
 #: src/routes/artists.presets.compilations.tsx:67
@@ -524,7 +524,7 @@ msgstr ""
 
 #: src/components/PageHeader.tsx:73
 #: src/routes/settings.library.tsx:47
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:64
 msgid "Library"
 msgstr "Библиотека"
 
@@ -809,8 +809,8 @@ msgstr "Удалить треки"
 msgid "Remove"
 msgstr "Удалить"
 
-#: src/components/TrackListDefault.tsx:125
-#: src/components/TrackListGrouped.tsx:58
+#: src/components/TrackListDefault.tsx:126
+#: src/components/TrackListGrouped.tsx:59
 msgid "Track list"
 msgstr ""
 
@@ -1009,63 +1009,88 @@ msgstr ""
 msgid "Save"
 msgstr "Сохранить"
 
-#: src/routes/settings.about.tsx:33
+#: src/routes/settings.about.tsx:40
 msgid "About YifuMusic"
 msgstr ""
 
-#: src/routes/settings.about.tsx:50
-msgid "project repository"
+#: src/routes/settings.about.tsx:44
+#: src/routes/settings.about.tsx:48
+msgid "构建身份"
+msgstr ""
+
+#: src/routes/settings.about.tsx:52
+msgid "版本"
+msgstr ""
+
+#: src/routes/settings.about.tsx:54
+msgid "构建提交"
 msgstr ""
 
 #: src/routes/settings.about.tsx:56
+msgid "构建时间"
+msgstr ""
+
+#: src/routes/settings.about.tsx:58
+msgid "当前语言代码"
+msgstr ""
+
+#: src/routes/settings.about.tsx:60
+msgid "构建渠道/目标"
+msgstr ""
+
+#: src/routes/settings.about.tsx:79
+msgid "project repository"
+msgstr ""
+
+#: src/routes/settings.about.tsx:85
 msgid "release notes"
 msgstr "примечания к релизу"
 
-#: src/routes/settings.about.tsx:59
+#: src/routes/settings.about.tsx:88
 msgid "Automatically check for updates"
 msgstr "Автоматически проверять обновления"
 
-#: src/routes/settings.about.tsx:60
+#: src/routes/settings.about.tsx:89
 msgid "Check for an available YifuMusic release when the app starts"
 msgstr ""
 
-#: src/routes/settings.about.tsx:72
+#: src/routes/settings.about.tsx:101
 msgid "Check for update"
 msgstr "Проверить обновления"
 
-#: src/routes/settings.about.tsx:80
+#: src/routes/settings.about.tsx:109
 msgid "Licenses and notices"
 msgstr ""
 
-#: src/routes/settings.about.tsx:84
+#: src/routes/settings.about.tsx:113
 msgid "YifuMusic is a modification of Museeks and is distributed under the MIT License."
 msgstr ""
 
-#: src/routes/settings.about.tsx:90
+#: src/routes/settings.about.tsx:119
 msgid "The root LICENSE and NOTICE.md retain the upstream license and acknowledgement."
 msgstr ""
 
-#: src/routes/settings.about.tsx:100
+#: src/routes/settings.about.tsx:129
 msgid "Contributors"
 msgstr "Участники"
 
-#: src/routes/settings.about.tsx:104
+#: src/routes/settings.about.tsx:133
 msgid "YifuMusic is maintained by <0>project contributors</0>"
 msgstr ""
 
-#: src/routes/settings.about.tsx:120
+#: src/routes/settings.about.tsx:149
 msgid "Report issue / Ask for a feature"
 msgstr "Сообщить об ошибке / Предложить улучшение"
 
-#: src/routes/settings.about.tsx:124
+#: src/routes/settings.about.tsx:153
 msgid "Bugs happen. Please, do not hesitate to report them or to ask for features you would like to see, using the <0>issue tracker</0>."
 msgstr "Ошибки случаются. Пожалуйста, не стесняйтесь сообщать о них, а так же предлагать улучшения, которые вам хотелось бы видеть, посредством <0>трекера</0>."
 
-#: src/routes/settings.about.tsx:141
+#: src/routes/settings.about.tsx:170
 msgid "Internals"
 msgstr "Внутренности"
 
-#: src/routes/settings.about.tsx:147
+#: src/routes/settings.about.tsx:176
 msgid "Open storage directory"
 msgstr "Открыть папку-хранилище"
 
@@ -1186,21 +1211,21 @@ msgstr "Сбросить"
 msgid "Reset library"
 msgstr "Сбросить библиотеку"
 
-#: src/routes/settings.tsx:41
-#: src/routes/settings.tsx:49
+#: src/routes/settings.tsx:46
+#: src/routes/settings.tsx:54
 msgid "Settings categories"
 msgstr ""
 
-#: src/routes/settings.tsx:70
+#: src/routes/settings.tsx:75
 msgid "Audio"
 msgstr "Аудио"
 
-#: src/routes/settings.tsx:81
+#: src/routes/settings.tsx:86
 #: src/routes/settings.ui.tsx:53
 msgid "Interface"
 msgstr "Интерфейс"
 
-#: src/routes/settings.tsx:92
+#: src/routes/settings.tsx:97
 msgid "About"
 msgstr "О программе"
 

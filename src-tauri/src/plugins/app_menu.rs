@@ -95,17 +95,28 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             // -----------------------------------------------------------------
             let package_info = app_handle.package_info();
             let version = package_info.version.to_string().into();
-            let resource_path: PathBuf = app_handle.path().resource_dir().unwrap();
+            let resource_path: PathBuf = match app_handle.path().resource_dir() {
+                Ok(path) => path,
+                Err(_) => match std::env::current_exe()
+                    .ok()
+                    .and_then(|path| path.parent()?.parent().map(|path| path.join("Resources")))
+                {
+                    Some(path) => path,
+                    None => {
+                        log::error!("Unable to resolve the application resource directory");
+                        return;
+                    }
+                },
+            };
             let icon_path = resource_path.join("icons").join("icon.png");
-            let icon = Image::from_path(&icon_path)
-                .unwrap_or_else(|_| panic!("Failed to load icon from path: {:?}", &icon_path));
+            let icon = Image::from_path(&icon_path).ok();
 
             let about_metadata = AboutMetadataBuilder::new()
                 .version(version)
                 .license("MIT".into())
                 .website("https://github.com/yifulin114514143/YifuMusic".into())
                 .website_label("YifuMusic project".into())
-                .icon(Some(icon))
+                .icon(icon)
                 .build();
 
             // -----------------------------------------------------------------

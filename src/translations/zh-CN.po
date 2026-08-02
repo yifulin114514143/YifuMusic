@@ -37,11 +37,11 @@ msgid "The playlist \"{name}\" was created"
 msgstr "播放列表 \"{name}\" 已创建"
 
 #. placeholder {0}: newRelease.tag_name
-#: src/api/SettingsAPI.ts:220
+#: src/api/SettingsAPI.ts:222
 msgid "YifuMusic {0} is available."
 msgstr "YifuMusic {0} 现已可用。"
 
-#: src/api/SettingsAPI.ts:222
+#: src/api/SettingsAPI.ts:224
 msgid "YifuMusic {currentVersion} is the latest version available."
 msgstr "YifuMusic {currentVersion} 已是最新可用版本。"
 
@@ -266,7 +266,7 @@ msgstr "系统导航"
 #: src/components/ProfileMenu.tsx:154
 #: src/components/ProfileMenu.tsx:157
 #: src/components/ProfileMenu.tsx:164
-#: src/routes/settings.tsx:104
+#: src/routes/settings.tsx:109
 msgid "Settings"
 msgstr "设置"
 
@@ -442,7 +442,7 @@ msgstr "播放队列"
 #. placeholder {0}: props.count
 #: src/components/NowPlayingOverlay.tsx:476
 #: src/components/QueuePanel.tsx:130
-#: src/components/TrackListGrouped.tsx:116
+#: src/components/TrackListGrouped.tsx:117
 #: src/components/TrackListStatus.tsx:11
 #: src/routes/artists.$artistID.tsx:76
 #: src/routes/artists.presets.compilations.tsx:67
@@ -524,7 +524,7 @@ msgstr "等待歌词开始"
 
 #: src/components/PageHeader.tsx:73
 #: src/routes/settings.library.tsx:47
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:64
 msgid "Library"
 msgstr "音乐库"
 
@@ -809,8 +809,8 @@ msgstr "移除音轨"
 msgid "Remove"
 msgstr "移除"
 
-#: src/components/TrackListDefault.tsx:125
-#: src/components/TrackListGrouped.tsx:58
+#: src/components/TrackListDefault.tsx:126
+#: src/components/TrackListGrouped.tsx:59
 msgid "Track list"
 msgstr "音轨列表"
 
@@ -1009,63 +1009,88 @@ msgstr "播放列表名称"
 msgid "Save"
 msgstr "保存"
 
-#: src/routes/settings.about.tsx:33
+#: src/routes/settings.about.tsx:40
 msgid "About YifuMusic"
 msgstr "关于 YifuMusic"
 
-#: src/routes/settings.about.tsx:50
+#: src/routes/settings.about.tsx:44
+#: src/routes/settings.about.tsx:48
+msgid "构建身份"
+msgstr "构建身份"
+
+#: src/routes/settings.about.tsx:52
+msgid "版本"
+msgstr "版本"
+
+#: src/routes/settings.about.tsx:54
+msgid "构建提交"
+msgstr "构建提交"
+
+#: src/routes/settings.about.tsx:56
+msgid "构建时间"
+msgstr "构建时间"
+
+#: src/routes/settings.about.tsx:58
+msgid "当前语言代码"
+msgstr "当前语言代码"
+
+#: src/routes/settings.about.tsx:60
+msgid "构建渠道/目标"
+msgstr "构建渠道/目标"
+
+#: src/routes/settings.about.tsx:79
 msgid "project repository"
 msgstr "项目仓库"
 
-#: src/routes/settings.about.tsx:56
+#: src/routes/settings.about.tsx:85
 msgid "release notes"
 msgstr "发布说明"
 
-#: src/routes/settings.about.tsx:59
+#: src/routes/settings.about.tsx:88
 msgid "Automatically check for updates"
 msgstr "自动检查更新"
 
-#: src/routes/settings.about.tsx:60
+#: src/routes/settings.about.tsx:89
 msgid "Check for an available YifuMusic release when the app starts"
 msgstr "在应用启动时检查是否有可用的 YifuMusic 新版本"
 
-#: src/routes/settings.about.tsx:72
+#: src/routes/settings.about.tsx:101
 msgid "Check for update"
 msgstr "检查更新"
 
-#: src/routes/settings.about.tsx:80
+#: src/routes/settings.about.tsx:109
 msgid "Licenses and notices"
 msgstr "许可证与声明"
 
-#: src/routes/settings.about.tsx:84
+#: src/routes/settings.about.tsx:113
 msgid "YifuMusic is a modification of Museeks and is distributed under the MIT License."
 msgstr "YifuMusic 是 Museeks 的修改版本，并依据 MIT 许可证分发。"
 
-#: src/routes/settings.about.tsx:90
+#: src/routes/settings.about.tsx:119
 msgid "The root LICENSE and NOTICE.md retain the upstream license and acknowledgement."
 msgstr "根目录中的 LICENSE 和 NOTICE.md 保留上游许可证和致谢。"
 
-#: src/routes/settings.about.tsx:100
+#: src/routes/settings.about.tsx:129
 msgid "Contributors"
 msgstr "贡献者"
 
-#: src/routes/settings.about.tsx:104
+#: src/routes/settings.about.tsx:133
 msgid "YifuMusic is maintained by <0>project contributors</0>"
 msgstr "YifuMusic 由<0>项目贡献者</0>维护"
 
-#: src/routes/settings.about.tsx:120
+#: src/routes/settings.about.tsx:149
 msgid "Report issue / Ask for a feature"
 msgstr "报告问题 / 请求功能"
 
-#: src/routes/settings.about.tsx:124
+#: src/routes/settings.about.tsx:153
 msgid "Bugs happen. Please, do not hesitate to report them or to ask for features you would like to see, using the <0>issue tracker</0>."
 msgstr "错误时有发生。请不要犹豫使用<0>问题跟踪器</0>报告它们或请求您希望看到的功能。"
 
-#: src/routes/settings.about.tsx:141
+#: src/routes/settings.about.tsx:170
 msgid "Internals"
 msgstr "内部信息"
 
-#: src/routes/settings.about.tsx:147
+#: src/routes/settings.about.tsx:176
 msgid "Open storage directory"
 msgstr "打开存储目录"
 
@@ -1186,21 +1211,21 @@ msgstr "重置"
 msgid "Reset library"
 msgstr "重置音乐库"
 
-#: src/routes/settings.tsx:41
-#: src/routes/settings.tsx:49
+#: src/routes/settings.tsx:46
+#: src/routes/settings.tsx:54
 msgid "Settings categories"
 msgstr "设置分类"
 
-#: src/routes/settings.tsx:70
+#: src/routes/settings.tsx:75
 msgid "Audio"
 msgstr "音频"
 
-#: src/routes/settings.tsx:81
+#: src/routes/settings.tsx:86
 #: src/routes/settings.ui.tsx:53
 msgid "Interface"
 msgstr "界面"
 
-#: src/routes/settings.tsx:92
+#: src/routes/settings.tsx:97
 msgid "About"
 msgstr "关于"
 

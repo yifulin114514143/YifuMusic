@@ -22,7 +22,12 @@ export const Route = createFileRoute('/settings')({
       ConfigBridge.getStorageDir(),
     ]);
 
-    return { version, tauriVersion, appStorageDir };
+    return {
+      version,
+      tauriVersion,
+      appStorageDir,
+      buildIdentity: window.__MUSEEKS_BUILD_IDENTITY,
+    };
   },
 });
 

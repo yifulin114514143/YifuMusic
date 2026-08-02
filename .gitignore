@@ -36,6 +36,7 @@ dist-ssr
 
 # Generated files
 src-tauri/gen
+src-tauri/resources/build-manifest.json
 target
 .flatpak-builder
 release

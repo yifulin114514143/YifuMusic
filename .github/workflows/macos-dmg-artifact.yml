@@ -10,6 +10,8 @@ jobs:
   build:
     name: Build macOS DMG artifact
     runs-on: macos-14
+    env:
+      YIFUMUSIC_BUILD_CHANNEL: ci-artifact
     steps:
       - uses: actions/checkout@v6
 
@@ -36,7 +38,10 @@ jobs:
         run: |
           set -euo pipefail
           DMG="src-tauri/target/release/bundle/dmg/YifuMusic_0.23.4_aarch64.dmg"
+          MANIFEST="src-tauri/resources/build-manifest.json"
           test -f "$DMG"
+          test -f "$MANIFEST"
+          cat "$MANIFEST"
           shasum -a 256 "$DMG"
           hdiutil verify "$DMG"
 

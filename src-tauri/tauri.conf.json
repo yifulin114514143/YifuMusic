@@ -48,7 +48,8 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "icons/icon.png": "icons/icon.png"
+      "icons/icon.png": "icons/icon.png",
+      "resources/build-manifest.json": "build-manifest.json"
     },
     "linux": {
       "appimage": {
