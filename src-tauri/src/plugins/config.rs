@@ -84,6 +84,9 @@ pub struct Config {
     pub language: String,
     pub theme: String,
     pub ui_accent_color: Option<String>,
+    pub liquid_glass: bool,
+    pub dynamic_effects: bool,
+    pub discover_character_visible: bool,
     pub audio_volume: f32,
     pub audio_playback_rate: Option<f32>,
     pub audio_follow_playing_track: bool,
@@ -117,6 +120,9 @@ impl Default for Config {
             language: DEFAULT_LANGUAGE.to_owned(),
             theme: SYSTEM_THEME.to_owned(),
             ui_accent_color: None,
+            liquid_glass: true,
+            dynamic_effects: true,
+            discover_character_visible: true,
             audio_volume: 1.0,
             audio_playback_rate: Some(1.0),
             audio_follow_playing_track: false,
@@ -195,6 +201,15 @@ mod tests {
     #[test]
     fn default_config_uses_simplified_chinese() {
         assert_eq!(Config::default().language, DEFAULT_LANGUAGE);
+    }
+
+    #[test]
+    fn default_visual_settings_are_enabled() {
+        let config = Config::default();
+
+        assert!(config.liquid_glass);
+        assert!(config.dynamic_effects);
+        assert!(config.discover_character_visible);
     }
 
     #[test]

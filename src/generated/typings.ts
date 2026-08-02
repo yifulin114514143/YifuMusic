@@ -2,7 +2,7 @@
 
 export type BuildIdentity = { appVersion: string, commitSha: string, builtAt: string, buildChannel: string, targetTriple: string, runtimeChannel: string, };
 
-export type Config = { language: string, theme: string, ui_accent_color: string | null, audio_volume: number, audio_playback_rate: number | null, audio_follow_playing_track: boolean, audio_muted: boolean, audio_playback_mode?: PlaybackMode | null, audio_shuffle: boolean, audio_repeat: Repeat, audio_stream_server: boolean, default_view: DefaultView, library_sort_by: SortBy, library_sort_order: SortOrder, library_folders: Array<string>, library_autorefresh: boolean, sleepblocker: boolean, auto_update_checker: boolean, notifications: boolean, status_bar_lyrics: boolean, track_view_density: TrackViewDensity, wayland_compat: boolean, menu_bar_visible: boolean, };
+export type Config = { language: string, theme: string, ui_accent_color: string | null, liquid_glass: boolean, dynamic_effects: boolean, discover_character_visible: boolean, audio_volume: number, audio_playback_rate: number | null, audio_follow_playing_track: boolean, audio_muted: boolean, audio_playback_mode?: PlaybackMode | null, audio_shuffle: boolean, audio_repeat: Repeat, audio_stream_server: boolean, default_view: DefaultView, library_sort_by: SortBy, library_sort_order: SortOrder, library_folders: Array<string>, library_autorefresh: boolean, sleepblocker: boolean, auto_update_checker: boolean, notifications: boolean, status_bar_lyrics: boolean, track_view_density: TrackViewDensity, wayland_compat: boolean, menu_bar_visible: boolean, };
 
 export type DefaultView = "Library" | "Artists" | "Playlists";
 

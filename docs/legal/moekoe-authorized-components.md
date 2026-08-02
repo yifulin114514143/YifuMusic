@@ -32,15 +32,13 @@
 | `src/components/ExtensionManager.vue`、`src/config/settings.js`                                             | 插件、PWA、代理、桌面歌词、服务与播放器设置              | 独立桌面歌词窗口已开始迁移；其余由 `src/routes/settings*.tsx` 承载                                                                                                                                                                                                                                       | 进行中   |
 | `src/components/StatusBarLyrics.vue`、`src/components/AppUpdateDialog.vue`、`src/components/Disclaimer.vue` | 状态栏歌词、更新入口、免责声明                           | 目标 Tauri 等价组件尚未建立                                                                                                                                                                                                                                                                              | 未开始   |
 
-## 已迁移的授权视觉资源
+## 已登记的阶段 5.5 视觉素材
 
-下列资源只用于首页三张入口卡。用户于 2026-07-30 在当前任务中确认已获得 MoeKoeMusic 作者的完全授权，并将该授权范围授予本次 YifuMusic 复刻；迁移保留原始文件名，未搬运未使用资源。
+阶段 5.5 的发现页使用任务中明确指定的本地素材。素材只用于发现页分类区域，并由 `discover_character_visible` 开关控制显示；不得扩展为沉浸播放场景、在线内容、品牌宣传或用户场景资产。
 
-| 授权参考精确源路径                     | YifuMusic 目标路径             | 页面用途                       |
-| -------------------------------------- | ------------------------------ | ------------------------------ |
-| `public/assets/images/home/hutao.png`  | `src/assets/moekoe/hutao.png`  | 首页“我的歌单”入口卡前景角色图 |
-| `public/assets/images/home/hutao1.png` | `src/assets/moekoe/hutao1.png` | 首页“本地电台”入口卡前景角色图 |
-| `public/assets/images/home/hutao2.png` | `src/assets/moekoe/hutao2.png` | 首页“本地发现”入口卡前景角色图 |
+| 当前任务指定素材              | YifuMusic 目标路径                         | 页面用途                       |
+| ----------------------------- | ------------------------------------------ | ------------------------------ |
+| 阶段 5.5 指定的 1600×878 WebP | `src/assets/moekoe/nangong-yu-cinema.webp` | 发现页分类区域的可隐藏视觉素材 |
 
 ## 真实性要求
 

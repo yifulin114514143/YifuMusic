@@ -192,6 +192,7 @@ function FullscreenLyricsSettings({
         <section
           ref={panelRef}
           aria-label={t`歌词显示设置`}
+          data-glass-surface="lyrics-settings"
           data-testid="fullscreen-lyrics-settings"
           role="region"
           {...stylex.props(styles.lyricsSettingsPanel)}
@@ -1180,6 +1181,7 @@ export default function NowPlayingOverlay({ onClose }: Props) {
         {queueOpen && isWideLayout && (
           <aside
             aria-label={t`Queue`}
+            data-glass-surface="queue"
             role="complementary"
             {...stylex.props(styles.queuePanel)}
           >
@@ -1191,6 +1193,7 @@ export default function NowPlayingOverlay({ onClose }: Props) {
           <aside
             aria-label={t`Queue`}
             aria-modal="true"
+            data-glass-surface="queue"
             role="dialog"
             onKeyDown={trapQueueDrawerFocus}
             {...stylex.props(styles.queueDrawer)}
@@ -1575,9 +1578,9 @@ const styles = stylex.create({
     borderColor: 'rgba(255, 255, 255, 0.16)',
     borderRadius: '8px',
     color: '#ffffff',
-    backgroundColor: 'rgba(17, 23, 31, 0.94)',
+    backgroundColor: 'var(--glass-surface)',
     boxShadow: '0 16px 36px rgba(0, 0, 0, 0.34)',
-    backdropFilter: 'blur(16px)',
+    backdropFilter: 'var(--glass-backdrop-filter-soft)',
   },
   lyricsSettingsHeading: {
     margin: 0,
@@ -1729,8 +1732,8 @@ const styles = stylex.create({
     borderLeftWidth: '1px',
     borderLeftStyle: 'solid',
     borderLeftColor: 'rgba(255, 255, 255, 0.14)',
-    backgroundColor: 'rgba(17, 23, 31, 0.76)',
-    backdropFilter: 'blur(12px)',
+    backgroundColor: 'var(--glass-surface)',
+    backdropFilter: 'var(--glass-backdrop-filter-soft)',
   },
   queueDrawer: {
     position: 'absolute',
@@ -1744,7 +1747,7 @@ const styles = stylex.create({
     borderLeftWidth: '1px',
     borderLeftStyle: 'solid',
     borderLeftColor: 'rgba(255, 255, 255, 0.14)',
-    backgroundColor: 'rgba(17, 23, 31, 0.94)',
+    backgroundColor: 'var(--glass-surface)',
     boxShadow: 'var(--shadow-panel)',
   },
   queueHeader: {

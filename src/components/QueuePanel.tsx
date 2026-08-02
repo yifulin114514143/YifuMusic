@@ -118,6 +118,7 @@ export default function QueuePanel() {
         <aside
           aria-label={t`Queue`}
           aria-modal={!isWideLayout ? true : undefined}
+          data-glass-surface="queue"
           data-reference-layout="moekoe-queue-popup"
           role={isWideLayout ? 'complementary' : 'dialog'}
           onKeyDown={trapModalFocus}
@@ -211,8 +212,9 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: 'var(--border-subtle)',
     borderRadius: '10px',
-    backgroundColor: 'var(--queue-bg)',
+    backgroundColor: 'var(--glass-surface)',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+    backdropFilter: 'var(--glass-backdrop-filter-strong)',
     position: 'fixed',
     top: 'auto',
     right: {

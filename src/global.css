@@ -1,9 +1,17 @@
 /* Colors (default theme) */
 :root {
-  --main-color: #ff69b4;
-  --focus-color: #ea33e4;
+  --main-color: #7c5cff;
+  --main-color-light: #9d8cff;
+  --main-color-deep: #5b3fd4;
+  --accent-pink: #f472b6;
+  --focus-color: #7c5cff;
   --link-color: var(--main-color);
   --bold: 600;
+  --glass-surface: rgba(255, 255, 255, 0.06);
+  --glass-surface-solid: var(--surface-raised);
+  --glass-backdrop-filter-soft: blur(16px) saturate(1.15);
+  --glass-backdrop-filter-strong: blur(24px) saturate(1.4);
+  --glass-highlight: rgba(255, 255, 255, 0.14);
 }
 
 *,
@@ -81,6 +89,29 @@ p {
 
 [data-museeks-action]:active {
   opacity: 0.78;
+}
+
+/* The visual switches change the surface treatment without changing layout. */
+[data-liquid-glass="disabled"] [data-glass-surface] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: var(--surface-raised) !important;
+  box-shadow: none !important;
+}
+
+[data-dynamic-effects="disabled"] *,
+[data-dynamic-effects="disabled"] *::before,
+[data-dynamic-effects="disabled"] *::after {
+  animation-duration: 0ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+}
+
+[data-dynamic-effects="disabled"] [data-route-transition="enter"],
+[data-dynamic-effects="disabled"] [data-playing-indicator-animation] {
+  animation: none !important;
 }
 
 /* The side-toolbar search is intentionally an icon until it is hovered or

@@ -4,8 +4,12 @@ import { themes } from '../lib/themes';
 
 const REQUIRED_SEMANTIC_TOKENS = [
   '--main-color',
+  '--main-color-light',
+  '--main-color-deep',
+  '--accent-pink',
   '--link-color',
   '--surface-canvas',
+  '--surface-base',
   '--surface-raised',
   '--surface-sunken',
   '--surface-hover',
@@ -25,30 +29,35 @@ const REQUIRED_SEMANTIC_TOKENS = [
   '--radius-sm',
   '--radius-md',
   '--shadow-panel',
+  '--glass-surface',
+  '--glass-surface-solid',
+  '--glass-backdrop-filter-soft',
+  '--glass-backdrop-filter-strong',
+  '--glass-highlight',
 ] as const;
 
 const SOURCE_ALIGNED_TOKENS = {
   dark: {
-    '--main-color': '#FF69B4',
-    '--surface-canvas': '#121212',
-    '--surface-raised': '#1a1a1a',
-    '--surface-sunken': '#1d1d1d',
-    '--surface-hover': '#363636',
-    '--text-primary': '#e1e1e1',
-    '--text-secondary': '#999999',
-    '--border-subtle': '#333333',
-    '--progress-bg': '#4a4a4a',
+    '--main-color': '#7C5CFF',
+    '--surface-canvas': '#0B0E16',
+    '--surface-raised': '#161522',
+    '--surface-sunken': '#10131C',
+    '--surface-hover': '#252033',
+    '--text-primary': '#F4F3FF',
+    '--text-secondary': '#A5A8B8',
+    '--border-subtle': 'rgba(255, 255, 255, 0.12)',
+    '--progress-bg': '#373145',
   },
   light: {
-    '--main-color': '#FF69B4',
-    '--surface-canvas': '#FFF0F5',
-    '--surface-raised': '#ffffff',
-    '--surface-sunken': '#FFE6F0',
-    '--surface-hover': '#FFE9F2',
-    '--text-primary': '#333333',
-    '--text-secondary': '#777777',
-    '--border-subtle': '#FFD9E6',
-    '--progress-bg': '#FFD9E6',
+    '--main-color': '#7C5CFF',
+    '--surface-canvas': '#F5F6FF',
+    '--surface-raised': '#FFFFFF',
+    '--surface-sunken': '#ECEBFA',
+    '--surface-hover': '#E5E2FF',
+    '--text-primary': '#232034',
+    '--text-secondary': '#625E76',
+    '--border-subtle': 'rgba(80, 68, 136, 0.16)',
+    '--progress-bg': '#D9D3F1',
   },
 } as const;
 
@@ -81,13 +90,28 @@ test('installed themes provide the Stage 4 semantic tokens', () => {
   });
 });
 
-test('theme surfaces follow the authorized MoeKoeMusic palette', () => {
+test('theme surfaces follow the YifuMusic ethernal purple palette', () => {
   Object.entries(SOURCE_ALIGNED_TOKENS).forEach(([themeID, expectedTokens]) => {
     const theme = themes[themeID];
 
     Object.entries(expectedTokens).forEach(([token, expectedValue]) => {
       expect(theme.variables[token]).toBe(expectedValue);
     });
+  });
+});
+
+test('themes provide glass surfaces with solid fallbacks', () => {
+  Object.values(themes).forEach((theme) => {
+    expect(theme.variables['--glass-surface']).toContain('rgba');
+    expect(theme.variables['--glass-surface-solid']).toBe(
+      'var(--surface-raised)',
+    );
+    expect(theme.variables['--glass-backdrop-filter-soft']).toContain(
+      'blur(16px)',
+    );
+    expect(theme.variables['--glass-backdrop-filter-strong']).toContain(
+      'blur(24px)',
+    );
   });
 });
 

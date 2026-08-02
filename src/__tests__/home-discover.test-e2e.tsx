@@ -86,7 +86,7 @@ test('发现页复刻四段滑块、键盘导航和真实本地歌曲回退', as
   await expect
     .element(tabList)
     .toHaveAttribute('data-reference-layout', 'moekoe-discover-switch');
-  await expect.element(page.getByTestId('discover-arona')).toBeVisible();
+  await expect.element(page.getByTestId('discover-nangong-yu')).toBeVisible();
   await expect.element(playlist).toHaveAttribute('aria-selected', 'true');
   await expect.element(ranking).toHaveAttribute('tabindex', '-1');
   expect(
@@ -178,7 +178,7 @@ test('1440px、1024px、700px 下首页和发现页保持可达布局', async ()
     .toBeInViewport();
   expect(
     getComputedStyle(
-      page.getByTestId('discover-arona').element() as HTMLElement,
+      page.getByTestId('discover-nangong-yu').element() as HTMLElement,
     ).display,
   ).toBe('none');
   await expect
