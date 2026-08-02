@@ -89,20 +89,20 @@ function ViewSettingsUI() {
           })}
         </Setting.Select>
         <Setting.Toggle
-          title="液态玻璃效果"
-          description="使用毛玻璃表面与背景折射效果"
+          title={t`液态玻璃效果`}
+          description={t`使用毛玻璃表面与背景折射效果`}
           value={config.liquid_glass}
           onChange={setLiquidGlass}
         />
         <Setting.Toggle
-          title="动态效果"
-          description="启用播放指示、悬浮反馈与页面过渡"
+          title={t`动态效果`}
+          description={t`启用播放指示、悬浮反馈与页面过渡`}
           value={config.dynamic_effects}
           onChange={setDynamicEffects}
         />
         <Setting.Toggle
-          title="发现页角色图"
-          description="在发现页分类栏显示南宫羽视觉素材"
+          title={t`发现页角色图`}
+          description={t`在发现页分类栏显示南宫羽视觉素材`}
           value={config.discover_character_visible}
           onChange={setDiscoverCharacterVisible}
         />

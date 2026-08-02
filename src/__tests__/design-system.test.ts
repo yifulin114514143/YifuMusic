@@ -90,7 +90,7 @@ test('installed themes provide the Stage 4 semantic tokens', () => {
   });
 });
 
-test('theme surfaces follow the YifuMusic ethernal purple palette', () => {
+test('theme surfaces follow the YifuMusic ether purple palette', () => {
   Object.entries(SOURCE_ALIGNED_TOKENS).forEach(([themeID, expectedTokens]) => {
     const theme = themes[themeID];
 

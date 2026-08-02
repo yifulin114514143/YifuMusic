@@ -1242,6 +1242,30 @@ msgstr "Тема"
 msgid "System (default)"
 msgstr "Системная (по умолчанию)"
 
+#: src/routes/settings.ui.tsx:92
+msgid "液态玻璃效果"
+msgstr ""
+
+#: src/routes/settings.ui.tsx:93
+msgid "使用毛玻璃表面与背景折射效果"
+msgstr ""
+
+#: src/routes/settings.ui.tsx:98
+msgid "动态效果"
+msgstr ""
+
+#: src/routes/settings.ui.tsx:99
+msgid "启用播放指示、悬浮反馈与页面过渡"
+msgstr ""
+
+#: src/routes/settings.ui.tsx:104
+msgid "发现页角色图"
+msgstr ""
+
+#: src/routes/settings.ui.tsx:105
+msgid "在发现页分类栏显示南宫羽视觉素材"
+msgstr ""
+
 #: src/routes/settings.ui.tsx:139
 msgid "Accent color"
 msgstr "Цвет акцента"
