@@ -195,6 +195,12 @@ test('视觉开关即时控制玻璃、动效与发现页角色图，并持久�
     .getByRole('navigation', { name: '设置分类' })
     .getByRole('link', { name: '界面' })
     .click();
+  await expect
+    .element(page.getByRole('switch', { name: '液态玻璃效果' }))
+    .toHaveAttribute('aria-checked', 'false');
+  await expect
+    .element(page.getByRole('switch', { name: '动态效果' }))
+    .toHaveAttribute('aria-checked', 'false');
   const restoredCharacter = page.getByRole('switch', {
     name: '发现页角色图',
   });
@@ -202,6 +208,8 @@ test('视觉开关即时控制玻璃、动效与发现页角色图，并持久�
   await expect
     .element(restoredCharacter)
     .toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('switch', { name: '液态玻璃效果' }).click();
+  await page.getByRole('switch', { name: '动态效果' }).click();
   await getMainNavigation().getByRole('link', { name: '发现' }).click();
   await expect.element(page.getByTestId('discover-nangong-yu')).toBeVisible();
 });
