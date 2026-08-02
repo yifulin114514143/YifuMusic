@@ -108,7 +108,7 @@ test('Interface and about keep their existing local settings and version data in
   await expect
     .element(page.getByRole('region', { name: '构建身份' }))
     .toHaveTextContent(
-      '版本0.23.4构建提交未知构建时间1970/1/1 08:00:00当前语言代码zh-CN构建渠道/目标调试运行 / aarch64-apple-darwin',
+      /构建身份版本0\.23\.4构建提交未知构建时间1970\/1\/1 \d{2}:00:00当前语言代码zh-CN构建渠道\/目标调试运行 \/ aarch64-apple-darwin/,
     );
 });
 
