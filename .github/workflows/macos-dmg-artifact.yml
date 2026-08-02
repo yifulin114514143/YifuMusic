@@ -1,0 +1,48 @@
+name: macOS DMG artifact
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build macOS DMG artifact
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: .node-version
+          run-install: true
+          cache: true
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Build macOS DMG
+        run: vp run tauri build --bundles dmg
+
+      - name: Verify DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+          DMG="src-tauri/target/release/bundle/dmg/YifuMusic_0.23.4_aarch64.dmg"
+          test -f "$DMG"
+          shasum -a 256 "$DMG"
+          hdiutil verify "$DMG"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YifuMusic-0.23.4-macos-dmg
+          path: src-tauri/target/release/bundle/dmg/YifuMusic_0.23.4_aarch64.dmg
+          if-no-files-found: error
+          retention-days: 14
